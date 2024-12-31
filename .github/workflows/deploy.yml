@@ -1,13 +1,13 @@
 on:
     push:
       branches:
-        - "main" # change to the branch you wish to deploy from
-  
+        - "feature/angular" # change to the branch you wish to deploy from
+ 
   permissions:
     contents: read
     pages: write
     id-token: write
-  
+ 
   jobs:
     deploy:
       runs-on: ubuntu-latest
