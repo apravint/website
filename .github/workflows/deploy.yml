@@ -3,7 +3,7 @@ name: Deploy Angular to GitHub Pages
 on:
   push:
     branches:
-      - "feature/angular" # Change to the branch you wish to deploy from
+      - "release" # Change to the branch you wish to deploy from
 
 permissions:
   contents: read
