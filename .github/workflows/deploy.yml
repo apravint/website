@@ -3,7 +3,7 @@ name: Deploy Angular to GitHub Pages
 on:
   push:
     branches:
-      - "feature/angular" # Change to the branch you wish to deploy from
+      - "release" # Change to the branch you wish to deploy from
 
 permissions:
   contents: read
@@ -30,17 +30,15 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
-          # Set up Git user identity
+          # Initialize the gh-pages branch if it doesn't exist
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-
-          # Initialize the gh-pages branch if it doesn't exist
           mkdir -p gh-pages
           cp -R dist/* gh-pages
           cd gh-pages
           git init
-          git checkout -b gh-pages
           git add .
           git commit -m "Deploy Angular app to GitHub Pages"
+          git branch -M gh-pages
           git remote add origin https://github.com/${{ github.repository }}.git
           git push --force origin gh-pages
