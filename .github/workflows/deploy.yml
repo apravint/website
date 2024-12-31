@@ -17,11 +17,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Use the Node.js version appropriate for your project
+
       - name: Install dependencies
         run: npm install
 
-      - id: build-publish
-        uses: bitovi/github-actions-angular-to-github-pages@v1.0.0
-        with:
-          path: dist/${{ github.event.repository.name }}/browser # default path
-          build_command: npm run build --base-href=/${{ github.event.repository.name }}/ # default build command
+      - name: Build Angular app
+        run: npm run build -- --base-href="/${{ github.event.repository.name }}/"
+
+      - name: Deploy to GitHub Pages
+        run: |
+          # Initialize the gh-pages branch if it doesn't exist
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          mkdir -p gh-pages
+          cp -R dist/* gh-pages
+          cd gh-pages
+          git init
+          git add .
+          git commit -m "Deploy Angular app to GitHub Pages"
+          git branch -M gh-pages
+          git remote add origin https://github.com/${{ github.repository }}.git
+          git push --force origin gh-pages
