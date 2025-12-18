@@ -4,16 +4,23 @@
 .section-hero {
   padding: var(--space-4) 0;
   display: grid;
-  gap: var(--space-2);
+  grid-template-columns: 1fr 320px;
+  gap: var(--space-3);
   align-items: center;
 }
 
 .section-hero .hero-inner { display: flex; flex-direction: column; gap: var(--space-2); }
 .section-hero h1 { margin: 0; font-weight: 700; }
-.section-hero p { margin: 0; color: var(--muted); max-width: 68ch; }
+.section-hero .lead { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.hero-visual .card { padding: var(--space-2); text-align: center; }
+
+.actions { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
+.btn { display: inline-block; padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid rgba(2,6,23,0.06); text-decoration: none; color: var(--text); background: transparent; }
+.btn-primary { background: linear-gradient(90deg,var(--accent),var(--accent-600)); color: #fff; border: 0; box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
 
 .features { display: grid; gap: var(--space-2); grid-template-columns: repeat(3, 1fr); margin-top: var(--space-3); }
-.feature { background: var(--card); padding: var(--space-2); border-radius: calc(var(--radius) - 2px); box-shadow: 0 6px 18px rgba(2,6,23,0.04); }
+.feature { padding: var(--space-2); border-radius: calc(var(--radius) - 2px); }
 .feature h3 { margin: 0 0 0.5rem; }
 .feature p { margin: 0; color: var(--muted); }
 
@@ -21,6 +28,7 @@
 
 @media (max-width: 900px) {
   .features { grid-template-columns: repeat(2, 1fr); }
+  .section-hero { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .features { grid-template-columns: 1fr; }
