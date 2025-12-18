@@ -1,0 +1,27 @@
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <!-- <a class="navbar-brand" routerLink="/home/detail" (click)="closeMenu()">Pravin Tamilan</a> -->
+
+  <!-- <button class="burger" aria-label="Toggle menu" [attr.aria-expanded]="menuOpen" (click)="toggleMenu()">
+      <span class="burger-box">
+        <span class="burger-inner" [class.open]="menuOpen"></span>
+      </span>
+    </button> -->
+
+    <div class="nav-actions">
+      <ul class="nav-list" [class.open]="menuOpen">
+        <li><a class="nav-link" routerLink="/home" routerLinkActive="active" (click)="closeMenu()">Home</a></li>
+        <li><a class="nav-link" routerLink="/about" routerLinkActive="active" (click)="closeMenu()">About</a></li>
+        <li><a class="nav-link" routerLink="/privacy" routerLinkActive="active" (click)="closeMenu()">Privacy</a></li>
+        <li><a class="nav-link" routerLink="/terms" routerLinkActive="active" (click)="closeMenu()">Terms</a></li>
+      </ul>
+
+      <div class="controls">
+  <button class="theme-toggle" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme" (click)="toggleTheme()">
+          <ng-container *ngIf="theme === 'light'; else darkIcon">🌙</ng-container>
+          <ng-template #darkIcon>☀️</ng-template>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

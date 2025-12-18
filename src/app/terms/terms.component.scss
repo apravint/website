@@ -1,0 +1,8 @@
+.container { max-width: var(--container); margin: 0 auto; padding: 0 var(--space-2); }
+.page { padding: var(--space-3); background: var(--surface); border-radius: var(--radius); }
+
+.page .content { max-width: 72ch; line-height: 1.7; }
+.page h2 { margin-top: var(--space-3); }
+.page ul { margin-left: 1.25rem; }
+
+@media (max-width: 720px) { .page { padding: var(--space-2); } .page .content { max-width: 100%; } }
