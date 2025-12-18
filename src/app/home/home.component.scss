@@ -1,48 +1,46 @@
-/* Home page styles */
-.container { max-width: 1100px; margin: 0 auto; padding: 1rem; }
-.hero {
-  padding: 2.25rem 1.25rem;
+/* Modern home styles */
+.container { max-width: var(--container); margin: 0 auto; padding: 0 var(--space-2); }
+
+.section-hero {
+  padding: var(--space-4) 0;
   display: grid;
-  gap: 1rem;
+  gap: var(--space-2);
   align-items: center;
 }
-.hero-inner { display: flex; flex-direction: column; gap: 0.5rem; }
-.hero h1 { font-size: clamp(1.6rem, 2.5vw, 2.6rem); margin: 0; color: var(--text); }
-.hero p { margin: 0; color: var(--muted); max-width: 68ch; }
 
-.features { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); margin-top: 1.25rem; }
-.feature { background: var(--card); padding: 1rem; border-radius: 10px; box-shadow: 0 6px 18px rgba(2,6,23,0.04); }
-.feature h3 { margin-top: 0; margin-bottom: 0.5rem; }
+.section-hero .hero-inner { display: flex; flex-direction: column; gap: var(--space-2); }
+.section-hero h1 { margin: 0; font-weight: 700; }
+.section-hero p { margin: 0; color: var(--muted); max-width: 68ch; }
+
+.features { display: grid; gap: var(--space-2); grid-template-columns: repeat(3, 1fr); margin-top: var(--space-3); }
+.feature { background: var(--card); padding: var(--space-2); border-radius: calc(var(--radius) - 2px); box-shadow: 0 6px 18px rgba(2,6,23,0.04); }
+.feature h3 { margin: 0 0 0.5rem; }
 .feature p { margin: 0; color: var(--muted); }
 
-.footer { margin-top: 2rem; padding: 1rem 0; text-align: center; color: var(--muted); font-size: 0.95rem; }
+.footer { margin-top: var(--space-3); padding: 1rem 0; text-align: center; color: var(--muted); font-size: 0.95rem; }
 
 @media (max-width: 900px) {
   .features { grid-template-columns: repeat(2, 1fr); }
 }
-
 @media (max-width: 560px) {
   .features { grid-template-columns: 1fr; }
-  .hero { padding: 1rem; }
+  .section-hero { padding: var(--space-3) 0; }
 }
 
-.centered { text-align: center; margin-top: 50px; }
-
-@media (max-width: 720px) {
-	.page { padding: 1rem; }
-}
+.centered { text-align: center; margin-top: var(--space-3); }
 
 .greeting {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	padding: 20px;
-	background-color: rgba(0, 0, 0, 0.8);
-	color: #fff;
-	font-size: 2em;
-	text-align: center;
-	border-radius: 10px;
-	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-	z-index: 9999;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 18px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.16);
+  z-index: 9999;
 }
+
