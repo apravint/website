@@ -14,6 +14,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     // hide the greeting after 5 seconds
-    setTimeout(() => (this.showGreeting = false), 5000);
+    setTimeout(() => (this.showGreeting = false), 4000);
   }
 }
