@@ -57,3 +57,11 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Notes & Maintenance 🔧
+
+- Tests: Unit tests can be run headless in CI with `npm test -- --watch=false` (we fixed failing specs by adding `RouterTestingModule` to two component tests).
+- Build: Production build: `npm run build -- --configuration production`.
+- Security: The repository currently reports dependency vulnerabilities in Dependabot/GitHub Security alerts — consider running `npm audit` and addressing high/critical results.
+
+If you'd like, I can open a PR with these test fixes (already pushed to the `release` branch) and optionally address dependency updates.
