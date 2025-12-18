@@ -1,9 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {}
+export class HomeComponent implements OnInit {
+  today = new Date().toDateString();
+  showGreeting = true;
+
+  ngOnInit(): void {
+    // hide the greeting after 5 seconds
+    setTimeout(() => (this.showGreeting = false), 5000);
+  }
+}
