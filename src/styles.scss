@@ -41,6 +41,26 @@ html, body { margin: 0; padding: 0; }
   }
 }
 
+/* Explicit dark theme when toggled */
+:root[data-theme="dark"] {
+  --bg: #071023;
+  --surface: #071428;
+  --card: #0b1220;
+  --muted: #9aa7bf;
+  --accent: #8b5cf6;
+  --text: #e6eef8;
+}
+
+/* Explicit light theme when toggled */
+:root[data-theme="light"] {
+  --bg: #f7fafc;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --muted: #64748b;
+  --accent: #6d28d9;
+  --text: #0f1724;
+}
+
 /* Base styles */
 html, body {
   height: 100%;
