@@ -9,5 +9,13 @@ export const routes: Routes = [
 	{ path: 'about', component: AboutComponent },
 	{ path: 'privacy', component: PrivacyComponent },
 	{ path: 'terms', component: TermsComponent },
+	{
+		path: 'kavithai',
+		loadComponent: () => import('./kavithai/kavithai.component').then(m => m.KavithaiComponent)
+	},
+	{
+		path: 'download',
+		loadComponent: () => import('./download/download.component').then(m => m.DownloadComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

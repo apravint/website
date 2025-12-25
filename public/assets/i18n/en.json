@@ -1,0 +1,46 @@
+{
+    "NAV": {
+        "HOME": "Home",
+        "ABOUT": "About",
+        "PRIVACY": "Privacy",
+        "TERMS": "Terms",
+        "KAVITHAI": "Poems",
+        "APP": "App"
+    },
+    "KAVITHAI": {
+        "PAGE_TITLE": "Tamil Poems",
+        "LOADING": "Loading poems..."
+    },
+    "DOWNLOAD": {
+        "TITLE": "Get the Mobile App",
+        "DESC": "Experience the best of Tamil literature on the go with our official Android app.",
+        "GET_IT_ON": "Get it on",
+        "FEATURE_1_TITLE": "Offline Access",
+        "FEATURE_1_DESC": "Read your favorite poems anywhere, anytime without internet.",
+        "FEATURE_2_TITLE": "Daily Notifications",
+        "FEATURE_2_DESC": "Start your day with an inspiring new poem delivered to your phone.",
+        "FEATURE_3_TITLE": "Personalized Collection",
+        "FEATURE_3_DESC": "Save, like, and share the poems that touch your heart."
+    },
+    "HOME": {
+        "HERO": {
+            "BADGE": "Full Stack Engineer",
+            "TITLE_PREFIX": "Building digital",
+            "TITLE_HIGHLIGHT": "experiences",
+            "TITLE_SUFFIX": "that matter.",
+            "DESC": "I'm Pravin, a software engineer who loves crafting innovative solutions. I bridge the gap between logic and creativity.",
+            "BTN_ABOUT": "About Me",
+            "BTN_CONTACT": "Get in Touch"
+        },
+        "CARDS": {
+            "NEW_YEAR_TITLE": "🌟 Happy New Year 2026!",
+            "NEW_YEAR_DESC": "As we step into this brand-new year, I wish you endless joy, boundless opportunities, and all the success your heart desires. May 2026 be a year of growth, creativity, and cherished moments.",
+            "ABOUT_TITLE": "🚀 About Me",
+            "ABOUT_DESC_1": "I’m a dedicated full-stack software engineer who loves crafting innovative and efficient solutions across the tech stack.",
+            "ABOUT_DESC_2": "Beyond coding, I find solace in poetry and blogging—merging technical know-how with a touch of artistry."
+        }
+    },
+    "COMMON": {
+        "SPONSORED": "Sponsored"
+    }
+}

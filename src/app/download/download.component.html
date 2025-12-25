@@ -1,0 +1,61 @@
+<section class="animate-fade-in">
+    <div class="page-hero">
+        <div class="bg-glow"></div>
+        <div class="container hero-content">
+            <div class="app-showcase">
+                <div class="app-icon-wrapper">
+                    <span class="app-icon">📱</span>
+                </div>
+            </div>
+
+            <div class="hero-text">
+                <h1><span class="text-gradient">{{ 'DOWNLOAD.TITLE' | translate }}</span></h1>
+                <p class="lead">{{ 'DOWNLOAD.DESC' | translate }}</p>
+
+                <div class="action-area">
+                    <a [href]="playStoreUrl" target="_blank" rel="noopener noreferrer" class="play-store-btn">
+                        <span class="play-icon">▶️</span>
+                        <div class="btn-text">
+                            <span class="small-text">{{ 'DOWNLOAD.GET_IT_ON' | translate }}</span>
+                            <span class="large-text">Google Play</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="social-connect">
+                    <p class="small-text muted">Follow us for updates</p>
+                    <div class="social-links-hero">
+                        <a href="https://www.facebook.com/thamizhkavithaii" target="_blank" rel="noopener noreferrer"
+                            aria-label="Facebook">
+                            Facebook
+                        </a>
+                        <span class="divider">•</span>
+                        <a href="https://x.com/home" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                            X (Twitter)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container section-features">
+        <div class="features-grid">
+            <div class="feature-card animate-up delay-100">
+                <div class="feature-icon">🚀</div>
+                <h3>{{ 'DOWNLOAD.FEATURE_1_TITLE' | translate }}</h3>
+                <p>{{ 'DOWNLOAD.FEATURE_1_DESC' | translate }}</p>
+            </div>
+            <div class="feature-card animate-up delay-200">
+                <div class="feature-icon">🎨</div>
+                <h3>{{ 'DOWNLOAD.FEATURE_2_TITLE' | translate }}</h3>
+                <p>{{ 'DOWNLOAD.FEATURE_2_DESC' | translate }}</p>
+            </div>
+            <div class="feature-card animate-up delay-300">
+                <div class="feature-icon">📜</div>
+                <h3>{{ 'DOWNLOAD.FEATURE_3_TITLE' | translate }}</h3>
+                <p>{{ 'DOWNLOAD.FEATURE_3_DESC' | translate }}</p>
+            </div>
+        </div>
+    </div>
+</section>

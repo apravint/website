@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { TranslationService } from '../shared/translation.service';
+import { TranslatePipe } from '../shared/translate.pipe';
 
 function getPreferredTheme(): 'light' | 'dark' {
   const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
@@ -35,7 +36,7 @@ applyColor(getPreferredColor());
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, TranslatePipe],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
@@ -44,6 +45,7 @@ export class NavbarComponent implements OnInit {
   colorTheme: string = 'indigo';
   menuOpen = false;
   showColorPicker = false;
+  currentLang = 'en';
 
   colors = [
     { name: 'indigo', value: '#4f46e5' },
@@ -53,11 +55,22 @@ export class NavbarComponent implements OnInit {
     { name: 'sky', value: '#0284c7' }
   ];
 
+  constructor(private translationService: TranslationService) { }
+
   ngOnInit(): void {
     this.theme = getPreferredTheme();
     this.colorTheme = getPreferredColor();
     applyTheme(this.theme);
     applyColor(this.colorTheme);
+
+    this.translationService.currentLang$.subscribe(lang => {
+      this.currentLang = lang;
+    });
+  }
+
+  toggleLanguage() {
+    const next = this.currentLang === 'en' ? 'ta' : 'en';
+    this.translationService.setLanguage(next);
   }
 
   toggleTheme() {
