@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { AboutComponent } from './about/about.component';
-import { PrivacyComponent } from './privacy/privacy.component';
-import { TermsComponent } from './terms/terms.component';
+import { LegalComponent } from './legal/legal.component';
 
 export const routes: Routes = [
 	{ path: 'home', component: HomeComponent },
 	{ path: 'about', component: AboutComponent },
-	{ path: 'privacy', component: PrivacyComponent },
-	{ path: 'terms', component: TermsComponent },
+	{ path: 'legal', component: LegalComponent },
+	// Deep-link support for old URLs
+	{ path: 'privacy', redirectTo: '/legal?tab=privacy', pathMatch: 'full' },
+	{ path: 'terms', redirectTo: '/legal?tab=terms', pathMatch: 'full' },
 	{
 		path: 'kavithai',
 		loadComponent: () => import('./kavithai/kavithai.component').then(m => m.KavithaiComponent)
@@ -19,7 +20,8 @@ export const routes: Routes = [
 	},
 	{
 		path: 'market',
-		loadComponent: () => import('./market-prices/market-prices.component').then(m => m.MarketPricesComponent)
+		redirectTo: '/news',
+		pathMatch: 'full'
 	},
 	{
 		path: 'news',
