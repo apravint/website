@@ -14,13 +14,21 @@ describe('AdUnitComponent', () => {
     const comp = fixture.componentInstance;
     comp.adSlot = '123';
 
+    // store original
+    const originalAdsbygoogle = (window as any).adsbygoogle;
+
     // make adsbygoogle.push throw
     (window as any).adsbygoogle = { push: () => { throw new Error('boom'); } };
+
+    // spy on error and suppress it in test output
     spyOn(console, 'error');
 
     // call lifecycle
     comp.ngAfterViewInit();
 
-    expect((console.error as jasmine.Spy).calls.count()).toBeGreaterThan(0);
+    expect(console.error).toHaveBeenCalled();
+
+    // restore original
+    (window as any).adsbygoogle = originalAdsbygoogle;
   });
 });
