@@ -13,5 +13,6 @@ export const environment = {
     adClient: "YOUR_ADSENSE_CLIENT_ID",
     geminiApiKey: "YOUR_GEMINI_API_KEY",
     metalPriceApiKey: "YOUR_METAL_PRICE_API_KEY",
-    newsApiKey: "YOUR_NEWS_API_KEY"
+    newsApiKey: "YOUR_NEWS_API_KEY",
+    twelveDataApiKey: "YOUR_TWELVE_DATA_API_KEY"
 };

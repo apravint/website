@@ -19,11 +19,17 @@
     },
     "MARKET": {
         "TITLE": "Live Market Prices",
-        "SUBTITLE": "Stay updated with real-time Bitcoin and precious metal rates.",
+        "SUBTITLE": "Stay updated with real-time stock indices, Bitcoin and precious metal rates.",
         "LOADING": "Fetching latest market data...",
-        "SEO_TITLE": "Live Gold, Silver & Bitcoin Prices | Pravin Tamilan",
-        "SEO_DESC": "Real-time tracking of market rates for Bitcoin, Gold, and Silver. Stay updated with live price trends.",
-        "LAST_UPDATED": "Last updated"
+        "SEO_TITLE": "Live Gold, Silver, Bitcoin & Stock Prices | Pravin Tamilan",
+        "SEO_DESC": "Real-time tracking of market rates for Nifty 50, Sensex, Bitcoin, Gold, and Silver. Search any stock worldwide.",
+        "LAST_UPDATED": "Last updated",
+        "INDICES_TITLE": "Indian Indices",
+        "SEARCH_TITLE": "Stock Search",
+        "SEARCH_PLACEHOLDER": "Search stocks worldwide (e.g., AAPL, Reliance)...",
+        "NO_RESULTS": "No stocks found",
+        "API_KEY_REQUIRED": "API Key Required",
+        "CRYPTO_METALS": "Crypto & Precious Metals"
     },
     "KAVITHAI": {
         "PAGE_TITLE": "Tamil Poems",
