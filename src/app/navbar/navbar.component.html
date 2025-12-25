@@ -13,27 +13,41 @@
 
     <div class="nav-actions">
       <ul class="nav-list" [class.open]="menuOpen">
-        <li><a class="nav-link" routerLink="/home" routerLinkActive="active" (click)="closeMenu()">Home</a></li>
-        <li><a class="nav-link" routerLink="/about" routerLinkActive="active" (click)="closeMenu()">About</a></li>
-        <li><a class="nav-link" routerLink="/privacy" routerLinkActive="active" (click)="closeMenu()">Privacy</a></li>
-        <li><a class="nav-link" routerLink="/terms" routerLinkActive="active" (click)="closeMenu()">Terms</a></li>
+        <li><a class="nav-link" routerLink="/home" routerLinkActive="active" (click)="closeMenu()">{{ 'NAV.HOME' |
+            translate }}</a></li>
+        <li><a class="nav-link" routerLink="/kavithai" routerLinkActive="active" (click)="closeMenu()">{{ 'NAV.KAVITHAI'
+            |
+            translate }}</a></li>
+        <li><a class="nav-link" routerLink="/about" routerLinkActive="active" (click)="closeMenu()">{{ 'NAV.ABOUT' |
+            translate }}</a></li>
+        <li><a class="nav-link" routerLink="/privacy" routerLinkActive="active" (click)="closeMenu()">{{ 'NAV.PRIVACY' |
+            translate }}</a></li>
+        <li><a class="nav-link" routerLink="/terms" routerLinkActive="active" (click)="closeMenu()">{{ 'NAV.TERMS' |
+            translate }}</a></li>
+        <li><a class="nav-link" routerLink="/download" routerLinkActive="active" (click)="closeMenu()">{{
+            'NAV.APP' |
+            translate }}</a></li>
       </ul>
 
       <div class="theme-controls">
+        <!-- Language Toggle -->
+        <button class="icon-btn lang-btn" (click)="toggleLanguage()" aria-label="Toggle language">
+          {{ currentLang === 'en' ? 'TA' : 'EN' }}
+        </button>
+
         <!-- Color Picker -->
         <div class="color-picker-wrapper">
           <button class="icon-btn" aria-label="Change color theme" (click)="toggleColorPicker()">
             🎨
           </button>
           @if (showColorPicker) {
-            <div class="color-dropdown">
-              @for (c of colors; track c) {
-                <button class="color-option" [style.background-color]="c.value"
-                  [class.active]="colorTheme === c.name" [attr.aria-label]="'Select ' + c.name + ' theme'"
-                  (click)="setColorTheme(c.name)">
-                </button>
-              }
-            </div>
+          <div class="color-dropdown">
+            @for (c of colors; track c) {
+            <button class="color-option" [style.background-color]="c.value" [class.active]="colorTheme === c.name"
+              [attr.aria-label]="'Select ' + c.name + ' theme'" (click)="setColorTheme(c.name)">
+            </button>
+            }
+          </div>
           }
         </div>
 
@@ -41,9 +55,9 @@
         <button class="icon-btn" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme"
           (click)="toggleTheme()">
           @if (theme === 'light') {
-            🌙
+          🌙
           } @else {
-            ☀️
+          ☀️
           }
         </button>
       </div>

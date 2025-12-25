@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SeoService } from '../shared/seo.service';
+import { TranslatePipe } from '../shared/translate.pipe';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule, AdUnitComponent],
+  imports: [RouterModule, AdUnitComponent, TranslatePipe],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

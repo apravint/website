@@ -1,0 +1,61 @@
+<section class="animate-fade-in">
+    <div class="page-hero">
+        <div class="bg-glow"></div>
+        <div class="container">
+            <h1><span class="text-gradient">{{ 'KAVITHAI.PAGE_TITLE' | translate }}</span></h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grid-layout">
+            <!-- Top Ad -->
+            <div class="card centered">
+                <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+                <app-ad-unit adSlot="1234567890"></app-ad-unit>
+            </div>
+
+            @if (errorMessage) {
+            <div class="error-state">
+                <p>⚠️ {{ errorMessage }}</p>
+                <p><small>Check console for details.</small></p>
+            </div>
+            }
+
+            @for (k of kavithaigal$ | async; track k; let i = $index) {
+            <div class="card hover-effect">
+                @if (k.title) {
+                <h3 class="kavithai-title">{{ k.title }}</h3>
+                }
+                <p class="kavithai-content">{{ k.description }}</p>
+                <div class="author-info">
+                    <small class="muted">— {{ k.user }}</small>
+                </div>
+            </div>
+
+            <!-- Ad after every 3 poems, ensuring it's not the very last item effectively (though logic here allows it) -->
+            @if ((i + 1) % 3 === 0) {
+            <div class="card centered">
+                <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+                <app-ad-unit adSlot="1234567890"></app-ad-unit>
+            </div>
+            }
+            } @empty {
+            @if (!loading && !errorMessage) {
+            <div class="empty-state">
+                <p>No poems found.</p>
+            </div>
+            } @else if (loading) {
+            <div class="loading-state">
+                <p>{{ 'KAVITHAI.LOADING' | translate }}</p>
+            </div>
+            }
+            }
+
+            <!-- Bottom Ad -->
+            <div class="card centered">
+                <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+                <app-ad-unit adSlot="1234567890"></app-ad-unit>
+            </div>
+        </div>
+    </div>
+</section>

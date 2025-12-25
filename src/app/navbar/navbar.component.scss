@@ -27,7 +27,7 @@
 .nav-list {
   list-style: none;
   display: flex;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
 }
@@ -75,6 +75,23 @@
 
 .icon-btn:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+.lang-btn {
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 50%;
+  /* Match icons */
+  width: 2.5rem;
+  /* Match icon btn visual size approx */
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--text-rgb), 0.1);
+  /* Subtle border for visibility */
+  color: var(--text);
+  /* Ensure text is visible */
 }
 
 /* Color Picker */

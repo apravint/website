@@ -2,13 +2,13 @@
   <div class="container">
     <div class="hero-content">
       <div class="hero-text">
-        <span class="badge">Full Stack Engineer</span>
-        <h1>Building digital <br> <span class="text-gradient">experiences</span> that matter.</h1>
-        <p class="lead">I'm Pravin, a software engineer who loves crafting innovative solutions. I bridge the gap
-          between logic and creativity.</p>
+        <span class="badge">{{ 'HOME.HERO.BADGE' | translate }}</span>
+        <h1>{{ 'HOME.HERO.TITLE_PREFIX' | translate }} <br> <span class="text-gradient">{{ 'HOME.HERO.TITLE_HIGHLIGHT' |
+            translate }}</span> {{ 'HOME.HERO.TITLE_SUFFIX' | translate }}</h1>
+        <p class="lead">{{ 'HOME.HERO.DESC' | translate }}</p>
         <div class="hero-actions">
-          <a routerLink="/about" class="btn btn-primary">About Me</a>
-          <a routerLink="/contact" class="btn btn-outline">Get in Touch</a>
+          <a routerLink="/about" class="btn btn-primary">{{ 'HOME.HERO.BTN_ABOUT' | translate }}</a>
+          <a routerLink="/contact" class="btn btn-outline">{{ 'HOME.HERO.BTN_CONTACT' | translate }}</a>
         </div>
       </div>
       <div class="hero-visual">
@@ -21,27 +21,25 @@
 <section class="container content-section animate-fade-in delay-200">
   <div class="grid-layout">
     <div class="card">
-      <h3>🌟 Happy New Year 2026!</h3>
-      <p>As we step into this brand-new year, I wish you endless joy, boundless opportunities, and all the success your
-        heart desires. May 2026 be a year of growth, creativity, and cherished moments.</p>
+      <h3>{{ 'HOME.CARDS.NEW_YEAR_TITLE' | translate }}</h3>
+      <p>{{ 'HOME.CARDS.NEW_YEAR_DESC' | translate }}</p>
     </div>
 
     <!-- Ad Unit -->
     <div class="card centered">
-      <small class="muted">Sponsored</small>
+      <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
       <app-ad-unit adSlot="1234567890"></app-ad-unit>
     </div>
 
     <div class="card">
-      <h3>🚀 About Me</h3>
-      <p>I’m a dedicated full-stack software engineer who loves crafting innovative and efficient solutions across the
-        tech stack.</p>
-      <p>Beyond coding, I find solace in poetry and blogging—merging technical know-how with a touch of artistry.</p>
+      <h3>{{ 'HOME.CARDS.ABOUT_TITLE' | translate }}</h3>
+      <p>{{ 'HOME.CARDS.ABOUT_DESC_1' | translate }}</p>
+      <p>{{ 'HOME.CARDS.ABOUT_DESC_2' | translate }}</p>
     </div>
 
     <!-- Ad Unit -->
     <div class="card centered">
-      <small class="muted">Sponsored</small>
+      <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
       <app-ad-unit adSlot="1234567890"></app-ad-unit>
     </div>
   </div>
