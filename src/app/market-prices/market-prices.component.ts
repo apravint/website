@@ -7,13 +7,14 @@ import { TranslatePipe } from '../shared/translate.pipe';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
+import { SparklineComponent } from '../shared/components/sparkline/sparkline.component';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-market-prices',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, AdUnitComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, AdUnitComponent, SparklineComponent],
   template: `
     <section class="animate-fade-in">
       <div class="page-hero">
@@ -138,6 +139,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
                 {{ prices.bitcoin | currency:'USD':'symbol':'1.0-2' }}
               </div>
               <ng-template #btcError><div class="error-text">Unavailable</div></ng-template>
+              <app-sparkline *ngIf="btcHistory.length > 0" [data]="btcHistory" [width]="100" [height]="32"></app-sparkline>
             </div>
           </div>
 
@@ -150,6 +152,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
                 {{ prices.gold | currency:'USD':'symbol':'1.0-2' }}
               </div>
               <ng-template #goldError><div class="error-text">Key Required</div></ng-template>
+              <app-sparkline *ngIf="goldHistory.length > 0" [data]="goldHistory" [width]="100" [height]="32"></app-sparkline>
               <span class="unit" *ngIf="prices.gold">per oz</span>
             </div>
           </div>
@@ -163,6 +166,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
                 {{ prices.silver | currency:'USD':'symbol':'1.0-2' }}
               </div>
               <ng-template #silverError><div class="error-text">Key Required</div></ng-template>
+              <app-sparkline *ngIf="silverHistory.length > 0" [data]="silverHistory" [width]="100" [height]="32"></app-sparkline>
               <span class="unit" *ngIf="prices.silver">per oz</span>
             </div>
           </div>
@@ -471,6 +475,11 @@ export class MarketPricesComponent implements OnInit {
   isSearching = false;
   private searchSubject = new Subject<string>();
 
+  // Sparkline data
+  btcHistory: number[] = [];
+  goldHistory: number[] = [];
+  silverHistory: number[] = [];
+
   constructor(
     private marketService: MarketPricesService,
     private stockService: StockService,
@@ -483,6 +492,7 @@ export class MarketPricesComponent implements OnInit {
     this.fetchPrices();
     this.fetchIndices();
     this.setupSearch();
+    this.fetchSparklineData();
   }
 
   private updateSeo() {
@@ -548,6 +558,17 @@ export class MarketPricesComponent implements OnInit {
         console.error('Error fetching indices:', err);
       }
     });
+  }
+
+  fetchSparklineData() {
+    // Fetch Bitcoin history from CoinGecko
+    this.marketService.getBitcoinHistory().subscribe(data => {
+      this.btcHistory = data;
+    });
+
+    // Generate mock data for Gold and Silver (no free historical API)
+    this.goldHistory = this.marketService.generateMockData(2650, 7);
+    this.silverHistory = this.marketService.generateMockData(30, 7);
   }
 
   refreshAll() {

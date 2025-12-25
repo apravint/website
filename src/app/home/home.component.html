@@ -20,6 +20,53 @@
 
 <section class="container content-section animate-fade-in delay-200">
   <div class="grid-layout">
+    <!-- GitHub Stats Card (Full Width) -->
+    <div class="card github-card full-width" *ngIf="githubStats">
+      <div class="github-header">
+        <div class="github-profile">
+          <img [src]="githubStats.avatar" [alt]="githubStats.name" class="github-avatar">
+          <div class="github-info">
+            <h3 class="github-name">{{ githubStats.name }}</h3>
+            <a [href]="githubStats.profileUrl" target="_blank" rel="noopener" class="github-username">
+              <span class="github-icon-small">🐙</span> @{{ githubStats.username }}
+            </a>
+            <p class="github-bio" *ngIf="githubStats.bio">{{ githubStats.bio }}</p>
+          </div>
+        </div>
+        <a [href]="githubStats.profileUrl" target="_blank" rel="noopener" class="btn btn-github">
+          {{ 'HOME.GITHUB.VIEW_PROFILE' | translate }} →
+        </a>
+      </div>
+      <div class="github-stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">📦</span>
+          <span class="stat-value">{{ githubStats.publicRepos }}</span>
+          <span class="stat-label">{{ 'HOME.GITHUB.REPOS' | translate }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⭐</span>
+          <span class="stat-value">{{ totalStars }}</span>
+          <span class="stat-label">{{ 'HOME.GITHUB.STARS' | translate }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">👥</span>
+          <span class="stat-value">{{ githubStats.followers }}</span>
+          <span class="stat-label">{{ 'HOME.GITHUB.FOLLOWERS' | translate }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">➡️</span>
+          <span class="stat-value">{{ githubStats.following }}</span>
+          <span class="stat-label">{{ 'HOME.GITHUB.FOLLOWING' | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State for GitHub -->
+    <div class="card github-card loading-card full-width" *ngIf="loadingGitHub && !githubStats">
+      <div class="loading-spinner"></div>
+      <p class="muted">Loading GitHub stats...</p>
+    </div>
+
     <div class="card">
       <h3>{{ 'HOME.CARDS.NEW_YEAR_TITLE' | translate }}</h3>
       <p>{{ 'HOME.CARDS.NEW_YEAR_DESC' | translate }}</p>
