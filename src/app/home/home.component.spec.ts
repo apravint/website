@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { HomeComponent } from './home.component';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -35,4 +35,12 @@ describe('HomeComponent', () => {
     expect(el.querySelector('h1')?.textContent).toContain('Tamil Kavithai');
     expect(el.querySelectorAll('.btn').length).toBeGreaterThan(0);
   });
+
+  it('should hide greeting after 4 seconds', fakeAsync(() => {
+    // showGreeting starts true
+    expect(component.showGreeting).toBeTrue();
+    component.ngOnInit();
+    tick(4000);
+    expect(component.showGreeting).toBeFalse();
+  }));
 });

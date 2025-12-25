@@ -3,17 +3,18 @@ import { RouterModule } from '@angular/router';
 import { TranslationService } from '../shared/translation.service';
 import { TranslatePipe } from '../shared/translate.pipe';
 
-function getPreferredTheme(): 'light' | 'dark' {
+export function getPreferredTheme(): 'light' | 'dark' {
   const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
   if (stored === 'light' || stored === 'dark') return stored as 'light' | 'dark';
   // fall back to system preference
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    return (mq && mq.matches) ? 'dark' : 'light';
   }
   return 'light';
 }
 
-function getPreferredColor(): string {
+export function getPreferredColor(): string {
   return (typeof localStorage !== 'undefined' ? localStorage.getItem('color-theme') : null) || 'indigo';
 }
 

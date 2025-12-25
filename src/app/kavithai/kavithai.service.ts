@@ -20,9 +20,13 @@ export class KavithaiService {
         this.itemsCollection = collection(this.firestore, 'items') as CollectionReference<Kavithai>;
     }
 
+    protected _collectionData(q: any, opts: any): Observable<Kavithai[]> {
+        return collectionData(q, opts) as Observable<Kavithai[]>;
+    }
+
     getKavithaigal(): Observable<Kavithai[]> {
         const q = query(this.itemsCollection);
-        const data$ = collectionData(q, { idField: 'id' }) as Observable<Kavithai[]>;
+        const data$ = this._collectionData(q, { idField: 'id' }) as Observable<Kavithai[]>;
 
         // Add logging for debugging
         return new Observable<Kavithai[]>(subscriber => {
