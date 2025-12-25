@@ -41,14 +41,28 @@ body {
   /* Layout */
   --container: 1280px;
   --radius: 16px;
+  --radius-lg: 24px;
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.5rem;
   --space-4: 2.5rem;
+  --space-5: 3rem;
+  --space-6: 4rem;
+  --space-7: 5rem;
+  --space-8: 6rem;
   --header-height: 70px;
 
   /* Typography */
   --font-sans: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Additional colors for components */
+  --primary: #4f46e5;
+  --primary-rgb: 79, 70, 229;
+  --secondary: #9333ea;
+  --secondary-rgb: 147, 51, 234;
+  --surface-rgb: 255, 255, 255;
+  --border-rgb: 226, 232, 240;
+  --rose: #e11d48;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -69,6 +83,13 @@ body {
     /* Slate 100 */
     --border: #334155;
     /* Slate 700 */
+    --primary: #818cf8;
+    --primary-rgb: 129, 140, 248;
+    --secondary: #a855f7;
+    --secondary-rgb: 168, 85, 247;
+    --surface-rgb: 30, 41, 59;
+    --border-rgb: 51, 65, 85;
+    --rose: #fb7185;
   }
 }
 
@@ -83,6 +104,13 @@ body {
   --accent-hover: #6366f1;
   --text: #f1f5f9;
   --border: #334155;
+  --primary: #818cf8;
+  --primary-rgb: 129, 140, 248;
+  --secondary: #a855f7;
+  --secondary-rgb: 168, 85, 247;
+  --surface-rgb: 30, 41, 59;
+  --border-rgb: 51, 65, 85;
+  --rose: #fb7185;
 }
 
 /* Explicit light theme when toggled */
@@ -96,6 +124,13 @@ body {
   --accent-hover: #4338ca;
   --text: #0f172a;
   --border: #e2e8f0;
+  --primary: #4f46e5;
+  --primary-rgb: 79, 70, 229;
+  --secondary: #9333ea;
+  --secondary-rgb: 147, 51, 234;
+  --surface-rgb: 255, 255, 255;
+  --border-rgb: 226, 232, 240;
+  --rose: #e11d48;
 }
 
 /* Color Themes - Light Mode Overrides */
@@ -224,6 +259,24 @@ body {
   margin: 0 auto;
   padding: 0 var(--space-3);
   width: 100%;
+}
+
+/* Text Utilities */
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-accent {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.text-accent:hover {
+  color: var(--accent-hover);
 }
 
 /* Typography scale */

@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SeoService } from '../shared/seo.service';
+import { TranslatePipe } from '../shared/translate.pipe';
 
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [AdUnitComponent],
+  imports: [AdUnitComponent, TranslatePipe],
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss']
 })
