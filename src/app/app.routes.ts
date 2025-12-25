@@ -16,7 +16,8 @@ export const routes: Routes = [
 	},
 	{
 		path: 'ai-assistant',
-		loadComponent: () => import('./ai-assistant/ai-assistant.component').then(m => m.AiAssistantComponent)
+		redirectTo: '/kavithai',
+		pathMatch: 'full'
 	},
 	{
 		path: 'market',
