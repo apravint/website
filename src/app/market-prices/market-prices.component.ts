@@ -4,24 +4,33 @@ import { MarketPricesService, MarketData } from '../shared/services/market-price
 import { TranslatePipe } from '../shared/translate.pipe';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
+import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 
 @Component({
   selector: 'app-market-prices',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, AdUnitComponent],
   template: `
-    <div class="market-container">
-      <div class="content-wrapper">
-        <header class="page-header">
-          <h1>{{ 'MARKET.TITLE' | translate }} 📈</h1>
-          <p>{{ 'MARKET.SUBTITLE' | translate }}</p>
-        </header>
+    <section class="animate-fade-in">
+      <div class="page-hero">
+        <div class="bg-glow"></div>
+        <div class="container">
+          <h1><span class="text-gradient">{{ 'MARKET.TITLE' | translate }} 📈</span></h1>
+          <p class="lead">{{ 'MARKET.SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="container">
+        <!-- Top Ad -->
+        <div class="card centered ad-card">
+          <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+          <app-ad-unit adSlot="1234567890"></app-ad-unit>
+        </div>
 
         <div class="price-grid" *ngIf="prices; else loading">
           <!-- Bitcoin Card -->
-          <div class="price-card btc animate-in" style="--delay: 1">
-            <div class="card-glow"></div>
-            <div class="card-icon">₿</div>
+          <div class="card price-card">
+            <div class="card-icon btc-icon">₿</div>
             <div class="card-info">
               <h3>Bitcoin (BTC)</h3>
               <div class="price-value" *ngIf="prices.bitcoin; else btcError">
@@ -32,9 +41,8 @@ import { TranslationService } from '../shared/translation.service';
           </div>
 
           <!-- Gold Card -->
-          <div class="price-card gold animate-in" style="--delay: 2">
-            <div class="card-glow"></div>
-            <div class="card-icon">📀</div>
+          <div class="card price-card">
+            <div class="card-icon gold-icon">📀</div>
             <div class="card-info">
               <h3>Gold (XAU)</h3>
               <div class="price-value" *ngIf="prices.gold; else goldError">
@@ -46,9 +54,8 @@ import { TranslationService } from '../shared/translation.service';
           </div>
 
           <!-- Silver Card -->
-          <div class="price-card silver animate-in" style="--delay: 3">
-            <div class="card-glow"></div>
-            <div class="card-icon">⚪</div>
+          <div class="card price-card">
+            <div class="card-icon silver-icon">⚪</div>
             <div class="card-info">
               <h3>Silver (XAG)</h3>
               <div class="price-value" *ngIf="prices.silver; else silverError">
@@ -61,254 +68,155 @@ import { TranslationService } from '../shared/translation.service';
         </div>
 
         <ng-template #loading>
-          <div class="loading-state">
+          <div class="loading-state centered">
             <div class="spinner"></div>
-            <p>{{ 'MARKET.LOADING' | translate }}</p>
+            <p class="muted">{{ 'MARKET.LOADING' | translate }}</p>
           </div>
         </ng-template>
 
-        <footer class="market-footer">
-          <p class="data-source">Data provided by CoinGecko & GoldAPI.io</p>
-          <div class="footer-actions">
-            <span class="update-time" *ngIf="lastUpdated">
-               {{ 'MARKET.LAST_UPDATED' | translate }}: {{ lastUpdated | date:'shortTime' }}
-            </span>
-            <button class="refresh-btn" (click)="fetchPrices()" [disabled]="isRefreshing">
-               <span class="refresh-icon" [class.spinning]="isRefreshing">🔄</span>
-               {{ isRefreshing ? 'Refreshing...' : 'Refresh Prices' }}
-            </button>
-          </div>
-        </footer>
+        <!-- Bottom Ad -->
+        <div class="card centered ad-card">
+          <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+          <app-ad-unit adSlot="1234567890"></app-ad-unit>
+        </div>
+
+        <div class="footer-actions centered">
+          <span class="update-time muted" *ngIf="lastUpdated">
+             {{ 'MARKET.LAST_UPDATED' | translate }}: {{ lastUpdated | date:'shortTime' }}
+          </span>
+          <button class="refresh-btn" (click)="fetchPrices()" [disabled]="isRefreshing">
+             🔄 {{ isRefreshing ? 'Refreshing...' : 'Refresh Prices' }}
+          </button>
+          <p class="muted data-source">Data provided by CoinGecko & GoldAPI.io</p>
+        </div>
       </div>
-    </div>
+    </section>
   `,
   styles: [`
-    .market-container {
-      min-height: 85vh;
-      padding: 40px 20px;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-    }
-
-    .content-wrapper {
-      width: 100%;
-      max-width: 1000px;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 50px;
-      h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 10px;
-        background: linear-gradient(to right, #60a5fa, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      p {
-        color: #94a3b8;
-        font-size: 1.1rem;
-      }
-    }
-
     .price-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-      margin-bottom: 50px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
     }
 
     .price-card {
-      position: relative;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 28px;
-      padding: 35px;
       display: flex;
       align-items: center;
-      gap: 24px;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-      
-      &:hover {
-        transform: translateY(-12px) scale(1.02);
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        
-        .card-glow { opacity: 1; }
-      }
-    }
-
-    .card-glow {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-
-    .animate-in {
-      opacity: 0;
-      transform: translateY(30px);
-      animation: slideUp 0.6s ease forwards;
-      animation-delay: calc(var(--delay) * 0.1s);
-    }
-
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      gap: var(--space-3);
+      padding: var(--space-4);
     }
 
     .card-icon {
-      font-size: 3.2rem;
-      width: 85px;
-      height: 85px;
+      font-size: 2.5rem;
+      width: 70px;
+      height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 22px;
-      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
+      background: rgba(79, 70, 229, 0.1);
+      border-radius: var(--radius);
     }
 
-    .card-info {
-      h3 {
-        color: #94a3b8;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
-      .price-value {
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        background: linear-gradient(to bottom, #fff, #cbd5e1);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      .unit {
-        font-size: 0.75rem;
-        color: #64748b;
-        margin-left: 4px;
-      }
+    .btc-icon { color: #f7931a; background: rgba(247, 147, 26, 0.1); }
+    .gold-icon { color: #facc15; background: rgba(250, 204, 21, 0.1); }
+    .silver-icon { color: #64748b; background: rgba(100, 116, 139, 0.1); }
+
+    .card-info h3 {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      font-weight: 600;
     }
 
-    /* Gradient accents with glows */
-    .btc .card-icon { 
-      color: #f7931a; 
-      box-shadow: 0 0 30px rgba(247, 147, 26, 0.1);
+    .price-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
     }
-    .gold .card-icon { 
-      color: #facc15; 
-      box-shadow: 0 0 30px rgba(250, 204, 21, 0.1);
-    }
-    .silver .card-icon { 
-      color: #cbd5e1; 
-      box-shadow: 0 0 30px rgba(203, 213, 225, 0.1);
+
+    .unit {
+      font-size: 0.75rem;
+      color: var(--muted);
     }
 
     .loading-state {
-      text-align: center;
-      padding: 120px 0;
-      .spinner {
-        width: 60px;
-        height: 60px;
-        border: 4px solid rgba(255, 255, 255, 0.05);
-        border-left-color: #60a5fa;
-        border-radius: 50%;
-        animation: spin 1s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
-        margin: 0 auto 25px;
-      }
+      padding: var(--space-4) 0;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--border);
+      border-left-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto var(--space-2);
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    .market-footer {
-      text-align: center;
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .data-source {
-      color: #64748b;
-      font-size: 0.85rem;
-      margin-bottom: 25px;
+    .ad-card {
+      margin-bottom: var(--space-3);
     }
 
     .footer-actions {
+      margin-top: var(--space-4);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: var(--space-2);
     }
 
     .update-time {
       font-size: 0.8rem;
-      color: #475569;
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--surface);
       padding: 6px 14px;
       border-radius: 20px;
+      border: 1px solid var(--border);
     }
 
     .refresh-btn {
-      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      background: var(--accent);
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 30px;
-      border-radius: 14px;
+      border: none;
+      padding: 12px 28px;
+      border-radius: var(--radius);
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.3s;
+      transition: background-color 0.2s, transform 0.2s;
       
       &:hover:not(:disabled) {
-        transform: scale(1.05);
-        background: linear-gradient(135deg, #475569 0%, #334155 100%);
-        border-color: rgba(255, 255, 255, 0.2);
+        background: var(--accent-hover);
+        transform: scale(1.03);
       }
       &:disabled {
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: not-allowed;
       }
     }
 
-    .refresh-icon {
-      font-size: 1.1rem;
-      &.spinning {
-        animation: spin 1s linear infinite;
-      }
+    .data-source {
+      font-size: 0.8rem;
+      margin-top: var(--space-2);
     }
 
     .error-text {
-      color: #f87171;
-      font-size: 1.1rem;
+      color: #ef4444;
+      font-size: 1rem;
       font-weight: 500;
     }
 
-    @media (max-width: 600px) {
-      .page-header h1 { font-size: 2rem; }
-      .price-card { padding: 25px; }
-      .card-icon { width: 70px; height: 70px; font-size: 2.5rem; }
-      .price-value { font-size: 1.6rem; }
+    .text-gradient {
+      background: linear-gradient(to right, var(--accent), #d946ef);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   `]
 })
