@@ -39,7 +39,7 @@ body {
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Layout */
-  --container: 1000px;
+  --container: 1280px;
   --radius: 16px;
   --space-1: 0.5rem;
   --space-2: 1rem;
@@ -252,4 +252,78 @@ footer {
   color: var(--muted);
   font-size: 0.9rem;
   margin-top: var(--space-4);
+}
+
+/* Page Hero */
+.page-hero {
+  padding: 80px 0 60px;
+  text-align: center;
+  background: radial-gradient(circle at top center, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
+  margin-bottom: var(--space-4);
+}
+
+.page-hero h1 {
+  margin-bottom: var(--space-2);
+}
+
+.page-hero .lead {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Enhanced Card for Content Pages */
+.content-card {
+  background: var(--card);
+  padding: 60px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .content-card {
+    padding: 30px;
+  }
+}
+
+/* Global Animations */
+@keyframes pulse-glow {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+}
+
+.bg-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, var(--accent) 0%, #d946ef 100%);
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  z-index: -1;
+  animation: pulse-glow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  /* Contain the glow */
 }
