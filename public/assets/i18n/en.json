@@ -6,7 +6,13 @@
         "TERMS": "Terms",
         "KAVITHAI": "Poems",
         "AI_ASSISTANT": "AI Poet",
+        "MARKET": "Market",
         "APP": "App"
+    },
+    "MARKET": {
+        "TITLE": "Live Market Prices",
+        "SUBTITLE": "Stay updated with real-time Bitcoin and precious metal rates.",
+        "LOADING": "Fetching latest market data..."
     },
     "KAVITHAI": {
         "PAGE_TITLE": "Tamil Poems",

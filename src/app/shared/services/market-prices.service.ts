@@ -1,0 +1,43 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+
+export interface MarketData {
+    bitcoin: number;
+    gold: number;
+    silver: number;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class MarketPricesService {
+    private coinGeckoUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd';
+    private goldApiUrl = 'https://www.goldapi.io/api';
+
+    constructor(private http: HttpClient) { }
+
+    getMarketPrices(): Observable<MarketData> {
+        const headers = new HttpHeaders().set('x-access-token', environment.metalPriceApiKey);
+
+        const btc$ = this.http.get<any>(this.coinGeckoUrl).pipe(
+            map(data => data.bitcoin.usd)
+        );
+
+        const gold$ = this.http.get<any>(`${this.goldApiUrl}/XAU/USD`, { headers }).pipe(
+            map(data => data.price)
+        );
+
+        const silver$ = this.http.get<any>(`${this.goldApiUrl}/XAG/USD`, { headers }).pipe(
+            map(data => data.price)
+        );
+
+        return forkJoin({
+            bitcoin: btc$,
+            gold: gold$,
+            silver: silver$
+        });
+    }
+}

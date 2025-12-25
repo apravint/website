@@ -11,5 +11,6 @@ export const environment = {
         measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
     },
     adClient: "YOUR_ADSENSE_CLIENT_ID",
-    geminiApiKey: "YOUR_GEMINI_API_KEY"
+    geminiApiKey: "YOUR_GEMINI_API_KEY",
+    metalPriceApiKey: "YOUR_METAL_PRICE_API_KEY"
 };
