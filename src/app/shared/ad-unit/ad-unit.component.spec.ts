@@ -12,7 +12,6 @@ describe('AdUnitComponent', () => {
 
   it('should log error when adsbygoogle push throws', () => {
     const comp = fixture.componentInstance;
-    comp.adSlot = '123';
 
     // store original
     const originalAdsbygoogle = (window as any).adsbygoogle;
