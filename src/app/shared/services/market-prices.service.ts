@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface MarketData {
@@ -23,15 +23,27 @@ export class MarketPricesService {
         const headers = new HttpHeaders().set('x-access-token', environment.metalPriceApiKey);
 
         const btc$ = this.http.get<any>(this.coinGeckoUrl).pipe(
-            map(data => data.bitcoin.usd)
+            map(data => data.bitcoin.usd),
+            catchError(err => {
+                console.error('Error fetching BTC:', err);
+                return of(null);
+            })
         );
 
         const gold$ = this.http.get<any>(`${this.goldApiUrl}/XAU/USD`, { headers }).pipe(
-            map(data => data.price)
+            map(data => data.price),
+            catchError(err => {
+                console.warn('Error fetching Gold (check API key):', err);
+                return of(null);
+            })
         );
 
         const silver$ = this.http.get<any>(`${this.goldApiUrl}/XAG/USD`, { headers }).pipe(
-            map(data => data.price)
+            map(data => data.price),
+            catchError(err => {
+                console.warn('Error fetching Silver (check API key):', err);
+                return of(null);
+            })
         );
 
         return forkJoin({
