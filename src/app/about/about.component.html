@@ -14,7 +14,7 @@
         <div>
           <h3>Our Mission</h3>
           <p>Tamil Kavithai is a small, lovingly curated collection of Tamil poems and short literary pieces. Our
-            mission is to celebrate the language’s poetic traditions and make them accessible to readers who want a
+            mission is to celebrate the language's poetic traditions and make them accessible to readers who want a
             quiet place for reflection, discovery, and inspiration.</p>
         </div>
 
@@ -47,10 +47,24 @@
             submissions and suggestions.</p>
         </div>
       </div>
+    </div>
 
-      <div class="centered mt-5">
-        <p class="muted">Thank you for visiting Tamil Kavithai — may you find something that speaks to you.</p>
+    <!-- Skills Section -->
+    <div class="content-card skills-section">
+      <h2 class="section-title">
+        <span class="text-gradient">💻 Tech Skills</span>
+      </h2>
+      <p class="section-subtitle muted">Technologies I work with professionally</p>
+
+      <div class="skills-grid">
+        <div class="skills-column" *ngFor="let col of [skills.slice(0, 5), skills.slice(5, 10)]; let i = index">
+          <app-skill-bar *ngFor="let skill of col" [skill]="skill"></app-skill-bar>
+        </div>
       </div>
+    </div>
+
+    <div class="centered mt-5">
+      <p class="muted">Thank you for visiting Tamil Kavithai — may you find something that speaks to you.</p>
     </div>
 
     <!-- Ad Unit -->
