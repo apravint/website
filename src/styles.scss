@@ -98,6 +98,102 @@ body {
   --border: #e2e8f0;
 }
 
+/* Color Themes - Light Mode Overrides */
+/* Color Themes - Light Mode Overrides */
+:root[data-color="emerald"] {
+  --accent: #059669;
+  --accent-hover: #047857;
+  /* Emerald Vibe: Organic, Soft */
+  --radius: 24px;
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+:root[data-color="rose"] {
+  --accent: #e11d48;
+  --accent-hover: #be123c;
+  /* Rose Vibe: Bold, Sharp */
+  --radius: 8px;
+  --border: #cbd5e1;
+  /* Slightly higher contrast border */
+}
+
+:root[data-color="amber"] {
+  --accent: #d97706;
+  --accent-hover: #b45309;
+  /* Amber Vibe: Cozy, Solid */
+  --radius: 12px;
+  --surface-glass: rgba(255, 255, 255, 0.9);
+  /* Less transparent */
+}
+
+:root[data-color="sky"] {
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  /* Sky Vibe: Airy, Glassy */
+  --radius: 20px;
+  --surface-glass: rgba(255, 255, 255, 0.5);
+  /* More transparent */
+  --shadow-lg: 0 10px 30px -3px rgba(2, 132, 199, 0.15);
+  /* Blue-tinted shadow */
+}
+
+/* Color Themes - Dark Mode Overrides */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-color="emerald"] {
+    --accent: #34d399;
+    --accent-hover: #10b981;
+    --radius: 24px;
+  }
+
+  :root:not([data-theme="light"])[data-color="rose"] {
+    --accent: #fb7185;
+    --accent-hover: #f43f5e;
+    --radius: 8px;
+    --border: #475569;
+  }
+
+  :root:not([data-theme="light"])[data-color="amber"] {
+    --accent: #fbbf24;
+    --accent-hover: #f59e0b;
+    --radius: 12px;
+    --surface-glass: rgba(30, 41, 59, 0.9);
+  }
+
+  :root:not([data-theme="light"])[data-color="sky"] {
+    --accent: #38bdf8;
+    --accent-hover: #0ea5e9;
+    --radius: 20px;
+    --surface-glass: rgba(30, 41, 59, 0.5);
+  }
+}
+
+:root[data-theme="dark"][data-color="emerald"] {
+  --accent: #34d399;
+  --accent-hover: #10b981;
+  --radius: 24px;
+}
+
+:root[data-theme="dark"][data-color="rose"] {
+  --accent: #fb7185;
+  --accent-hover: #f43f5e;
+  --radius: 8px;
+  --border: #475569;
+}
+
+:root[data-theme="dark"][data-color="amber"] {
+  --accent: #fbbf24;
+  --accent-hover: #f59e0b;
+  --radius: 12px;
+  --surface-glass: rgba(30, 41, 59, 0.9);
+}
+
+:root[data-theme="dark"][data-color="sky"] {
+  --accent: #38bdf8;
+  --accent-hover: #0ea5e9;
+  --radius: 20px;
+  --surface-glass: rgba(30, 41, 59, 0.5);
+}
+
 /* Base styles */
 html,
 body {
@@ -108,6 +204,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll from animations */
 }
 
 /* Accessibility helpers */
@@ -324,6 +422,5 @@ footer {
 
 .page-hero {
   position: relative;
-  overflow: hidden;
-  /* Contain the glow */
+  /* overflow: hidden; Removed to let glow breathe */
 }

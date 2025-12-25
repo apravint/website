@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Pravin Tamilan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body{font-family:Inter, Arial, sans-serif;margin:0;padding:40px;background:#fafafa;color:#111}
+    .wrap{max-width:960px;margin:0 auto}
+    header{background:#007acc;color:#fff;padding:24px;border-radius:8px}
+    a{color:#007acc}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Pravin Tamilan</h1>
+    </header>
+    <main>
+      <p>This page is a fallback to boot the single-page app. If you opened a sub-route directly, the app should load now.</p>
+      <p>If it doesn't, <a href="/">go to home</a>.</p>
+    </main>
+    <footer style="margin-top:24px;font-size:13px;color:#666">&copy; 2025 Pravin Tamilan</footer>
+  </div>
+</body>
+<!doctype html>
+<html lang="en" data-beasties-container>
+<head>
+  <meta charset="utf-8">
+  <title>Pravin Tamilan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    header {
+      background-color: #007acc;
+      color: white;
+      padding: 20px 0;
+    }
+    section {
+      padding: 20px;
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+  </style>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles-5INURTSO.css"></head>
+<body>
+  <header>
+    <h1>Welcome to My Website</h1>
+    <script>
+      document.write('<p>Today is ' + new Date().toDateString() + '</p>');
+    </script>
+  </header>
+  <section>
+    <p>Hello! I’m Pravin Tamilan. This is my personal website hosted on GitHub Pages. Stay tuned for updates!</p>
+  </section>
+  <app-root></app-root>
+  <footer>
+    <p>&copy; 2024 Pravin Tamilan. All rights reserved.</p>
+  </footer>
+
+  <!-- SPA boot fallback: dynamically load current index.html so hashed assets are correct -->
+  <script>
+    (function() {
+      // If the current path is not root, fetch the site's index.html and write it into the page,
+      // preserving the original path so the SPA router can handle it.
+      if (location.pathname !== '/') {
+        fetch('/index.html').then(function(resp){ return resp.text(); }).then(function(html){
+          // replace base href to root to ensure assets resolve on custom domain
+          html = html.replace(/<base[^>]*>/i, '<base href="/">');
+          document.open();
+          document.write(html);
+          // restore original url so Angular router sees the correct path
+          history.replaceState({}, '', location.pathname + location.search);
+          document.close();
+        }).catch(function(){
+          // fallback: try to redirect to root
+          location.replace('/');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

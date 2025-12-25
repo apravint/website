@@ -19,11 +19,27 @@
         <li><a class="nav-link" routerLink="/terms" routerLinkActive="active" (click)="closeMenu()">Terms</a></li>
       </ul>
 
-      <button class="theme-toggle" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme"
-        (click)="toggleTheme()">
-        <ng-container *ngIf="theme === 'light'; else darkIcon">🌙</ng-container>
-        <ng-template #darkIcon>☀️</ng-template>
-      </button>
+      <div class="theme-controls">
+        <!-- Color Picker -->
+        <div class="color-picker-wrapper">
+          <button class="icon-btn" aria-label="Change color theme" (click)="toggleColorPicker()">
+            🎨
+          </button>
+          <div class="color-dropdown" *ngIf="showColorPicker">
+            <button *ngFor="let c of colors" class="color-option" [style.background-color]="c.value"
+              [class.active]="colorTheme === c.name" [attr.aria-label]="'Select ' + c.name + ' theme'"
+              (click)="setColorTheme(c.name)">
+            </button>
+          </div>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <button class="icon-btn" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme"
+          (click)="toggleTheme()">
+          <ng-container *ngIf="theme === 'light'; else darkIcon">🌙</ng-container>
+          <ng-template #darkIcon>☀️</ng-template>
+        </button>
+      </div>
     </div>
   </div>
 </nav>

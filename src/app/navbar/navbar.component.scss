@@ -48,11 +48,19 @@
 
 .nav-link.active {
   color: var(--accent);
-  background: rgba(79, 70, 229, 0.1);
+  background: rgba(var(--accent), 0.1);
+  /* Fallback */
+  background: color-mix(in srgb, var(--accent), transparent 90%);
 }
 
-/* Theme Toggle */
-.theme-toggle {
+/* Theme Controls */
+.theme-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.icon-btn {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -65,8 +73,47 @@
   transition: background 0.2s ease;
 }
 
-.theme-toggle:hover {
+.icon-btn:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+/* Color Picker */
+.color-picker-wrapper {
+  position: relative;
+}
+
+.color-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  min-width: 120px;
+  animation: fadeIn 0.2s ease;
+}
+
+.color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-option.active {
+  border-color: var(--text);
+  transform: scale(1.1);
 }
 
 /* Burger Menu */
@@ -144,6 +191,11 @@
 
   .nav-actions {
     margin-left: 0;
+  }
+
+  /* Move theme controls to be visible on mobile header, not inside menu */
+  .theme-controls {
+    margin-right: var(--space-2);
   }
 
   .nav-list {
