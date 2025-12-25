@@ -22,6 +22,10 @@ export const routes: Routes = [
 		loadComponent: () => import('./market-prices/market-prices.component').then(m => m.MarketPricesComponent)
 	},
 	{
+		path: 'news',
+		loadComponent: () => import('./news/news.component').then(m => m.NewsComponent)
+	},
+	{
 		path: 'download',
 		loadComponent: () => import('./download/download.component').then(m => m.DownloadComponent)
 	},

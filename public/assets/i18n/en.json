@@ -7,7 +7,15 @@
         "KAVITHAI": "Poems",
         "AI_ASSISTANT": "AI Poet",
         "MARKET": "Market",
+        "NEWS": "News",
         "APP": "App"
+    },
+    "NEWS": {
+        "TITLE": "Trending News",
+        "SUBTITLE": "Stay informed with the latest headlines from around the world.",
+        "LOADING": "Loading news...",
+        "SEO_TITLE": "Trending News | Pravin Tamilan",
+        "SEO_DESC": "Get the latest news headlines from top sources around the world."
     },
     "MARKET": {
         "TITLE": "Live Market Prices",
