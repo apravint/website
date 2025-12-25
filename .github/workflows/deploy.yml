@@ -42,7 +42,7 @@ jobs:
           echo "File exists if above line succeeded."
 
       - name: Build
-        run: npm run build -- --configuration=production --base-href=/website/
+        run: npm run build -- --configuration=production --base-href=/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
