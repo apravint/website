@@ -9,7 +9,9 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  actions: read
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -21,8 +23,27 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create environment file
+        run: |
+          mkdir -p src/environments
+          cat > src/environments/environment.prod.ts << EOF
+          export const environment = {
+            production: true,
+            firebase: {
+              apiKey: "${{ secrets.FIREBASE_API_KEY }}",
+              authDomain: "tamil-kavithai-28d8b.firebaseapp.com",
+              databaseURL: "https://tamil-kavithai-28d8b.firebaseio.com",
+              projectId: "tamil-kavithai-28d8b",
+              storageBucket: "tamil-kavithai-28d8b.firebasestorage.app",
+              messagingSenderId: "YOUR_FIREBASE_SENDER_ID",
+              appId: "${{ secrets.FIREBASE_APP_ID }}",
+              measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
+            }
+          };
+          EOF
+
       - id: build-publish
         uses: bitovi/github-actions-angular-to-github-pages@v1.0.0
         with:
-          path: dist/${{ github.event.repository.name }}/browser # default path
-          build_command: npm run build --base-href=/${{ github.event.repository.name }}/ # default build command
+          path: dist/website/browser
+          build_command: npm run build -- --configuration=production --base-href=/website/

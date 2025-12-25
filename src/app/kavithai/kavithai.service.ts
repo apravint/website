@@ -17,7 +17,11 @@ export class KavithaiService {
     private itemsCollection: CollectionReference<Kavithai>;
 
     constructor(private firestore: Firestore) {
-        this.itemsCollection = collection(this.firestore, 'items') as CollectionReference<Kavithai>;
+        this.itemsCollection = this._getCollection('items');
+    }
+
+    protected _getCollection(path: string): CollectionReference<Kavithai> {
+        return collection(this.firestore, path) as CollectionReference<Kavithai>;
     }
 
     protected _collectionData(q: any, opts: any): Observable<Kavithai[]> {
