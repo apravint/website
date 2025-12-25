@@ -38,8 +38,15 @@ jobs:
           ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
         run: |
           mkdir -p src/environments
-          printf "export const environment = {\n  production: true,\n  firebase: {\n    apiKey: '%s',\n    authDomain: 'tamil-kavithai-28d8b.firebaseapp.com',\n    databaseURL: 'https://tamil-kavithai-28d8b.firebaseio.com',\n    projectId: 'tamil-kavithai-28d8b',\n    storageBucket: 'tamil-kavithai-28d8b.firebasestorage.app',\n    messagingSenderId: '%s',\n    appId: '%s',\n    measurementId: '%s'\n  },\n  adClient: '%s'\n};\n" \
-          "$FIREBASE_API_KEY" "$FIREBASE_SENDER_ID" "$FIREBASE_APP_ID" "$FIREBASE_MEASUREMENT_ID" "$ADSENSE_CLIENT_ID" > src/environments/environment.prod.ts
+          # Robustly trim newlines and spaces from secrets
+          CLEAN_API_KEY=$(echo "${FIREBASE_API_KEY}" | xargs)
+          CLEAN_SENDER_ID=$(echo "${FIREBASE_SENDER_ID}" | xargs)
+          CLEAN_APP_ID=$(echo "${FIREBASE_APP_ID}" | xargs)
+          CLEAN_MEASUREMENT_ID=$(echo "${FIREBASE_MEASUREMENT_ID}" | xargs)
+          CLEAN_ADSENSE_ID=$(echo "${ADSENSE_CLIENT_ID}" | xargs)
+          
+          printf "export const environment = {\n  production: true,\n  firebase: {\n    apiKey: \"%s\",\n    authDomain: \"tamil-kavithai-28d8b.firebaseapp.com\",\n    databaseURL: \"https://tamil-kavithai-28d8b.firebaseio.com\",\n    projectId: \"tamil-kavithai-28d8b\",\n    storageBucket: \"tamil-kavithai-28d8b.firebasestorage.app\",\n    messagingSenderId: \"%s\",\n    appId: \"%s\",\n    measurementId: \"%s\"\n  },\n  adClient: \"%s\"\n};\n" \
+          "$CLEAN_API_KEY" "$CLEAN_SENDER_ID" "$CLEAN_APP_ID" "$CLEAN_MEASUREMENT_ID" "$CLEAN_ADSENSE_ID" > src/environments/environment.prod.ts
           
           echo "Verifying file creation..."
           ls -l src/environments/environment.prod.ts
