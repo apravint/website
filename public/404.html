@@ -71,5 +71,27 @@
   <footer>
     <p>&copy; 2024 Pravin Tamilan. All rights reserved.</p>
   </footer>
-<script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-5M6BGGIA.js" type="module"></script></body>
+
+  <!-- SPA boot fallback: dynamically load current index.html so hashed assets are correct -->
+  <script>
+    (function() {
+      // If the current path is not root, fetch the site's index.html and write it into the page,
+      // preserving the original path so the SPA router can handle it.
+      if (location.pathname !== '/') {
+        fetch('/index.html').then(function(resp){ return resp.text(); }).then(function(html){
+          // replace base href to root to ensure assets resolve on custom domain
+          html = html.replace(/<base[^>]*>/i, '<base href="/">');
+          document.open();
+          document.write(html);
+          // restore original url so Angular router sees the correct path
+          history.replaceState({}, '', location.pathname + location.search);
+          document.close();
+        }).catch(function(){
+          // fallback: try to redirect to root
+          location.replace('/');
+        });
+      }
+    })();
+  </script>
+</body>
 </html>
