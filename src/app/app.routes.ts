@@ -14,6 +14,10 @@ export const routes: Routes = [
 		loadComponent: () => import('./kavithai/kavithai.component').then(m => m.KavithaiComponent)
 	},
 	{
+		path: 'ai-assistant',
+		loadComponent: () => import('./ai-assistant/ai-assistant.component').then(m => m.AiAssistantComponent)
+	},
+	{
 		path: 'download',
 		loadComponent: () => import('./download/download.component').then(m => m.DownloadComponent)
 	},

@@ -10,5 +10,6 @@ export const environment = {
         appId: "YOUR_FIREBASE_APP_ID",
         measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
     },
-    adClient: "YOUR_ADSENSE_CLIENT_ID"
+    adClient: "YOUR_ADSENSE_CLIENT_ID",
+    geminiApiKey: "YOUR_GEMINI_API_KEY"
 };
