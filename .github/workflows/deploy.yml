@@ -33,9 +33,13 @@ jobs:
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
+          FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
         run: |
           mkdir -p src/environments
-          printf "export const environment = {\n  production: true,\n  firebase: {\n    apiKey: '%s',\n    authDomain: 'tamil-kavithai-28d8b.firebaseapp.com',\n    databaseURL: 'https://tamil-kavithai-28d8b.firebaseio.com',\n    projectId: 'tamil-kavithai-28d8b',\n    storageBucket: 'tamil-kavithai-28d8b.firebasestorage.app',\n    messagingSenderId: 'YOUR_FIREBASE_SENDER_ID',\n    appId: '%s',\n    measurementId: 'YOUR_FIREBASE_MEASUREMENT_ID'\n  }\n};\n" "$FIREBASE_API_KEY" "$FIREBASE_APP_ID" > src/environments/environment.prod.ts
+          printf "export const environment = {\n  production: true,\n  firebase: {\n    apiKey: '%s',\n    authDomain: 'tamil-kavithai-28d8b.firebaseapp.com',\n    databaseURL: 'https://tamil-kavithai-28d8b.firebaseio.com',\n    projectId: 'tamil-kavithai-28d8b',\n    storageBucket: 'tamil-kavithai-28d8b.firebasestorage.app',\n    messagingSenderId: '%s',\n    appId: '%s',\n    measurementId: '%s'\n  },\n  adClient: '%s'\n};\n" \
+          "$FIREBASE_API_KEY" "$FIREBASE_SENDER_ID" "$FIREBASE_APP_ID" "$FIREBASE_MEASUREMENT_ID" "$ADSENSE_CLIENT_ID" > src/environments/environment.prod.ts
           
           echo "Verifying file creation..."
           ls -l src/environments/environment.prod.ts

@@ -58,6 +58,21 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
+## Local Development Setup
+
+To run the project locally with Firebase features enabled:
+
+1. Open `src/environments/environment.ts`.
+2. Replace `YOUR_FIREBASE_API_KEY` and `YOUR_FIREBASE_APP_ID` with your actual Firebase credentials.
+3. Run the following command to prevent your local changes to this file from being tracked by Git:
+   ```bash
+   git update-index --assume-unchanged src/environments/environment.ts
+   ```
+   If you ever need to track changes to this file again, run:
+   ```bash
+   git update-index --no-assume-unchanged src/environments/environment.ts
+   ```
+
 ## Notes & Maintenance 🔧
 
 - Tests: Unit tests can be run headless in CI with `npm test -- --watch=false` (we fixed failing specs by adding `RouterTestingModule` to two component tests).

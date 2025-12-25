@@ -9,5 +9,6 @@ export const environment = {
         messagingSenderId: "YOUR_FIREBASE_SENDER_ID",
         appId: "YOUR_FIREBASE_APP_ID",
         measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
-    }
+    },
+    adClient: "YOUR_ADSENSE_CLIENT_ID"
 };

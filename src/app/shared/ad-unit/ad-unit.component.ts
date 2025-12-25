@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, Input, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-ad-unit',
@@ -29,8 +30,8 @@ import { isPlatformBrowser } from '@angular/common';
   `]
 })
 export class AdUnitComponent implements AfterViewInit {
-  @Input() adClient = 'YOUR_ADSENSE_CLIENT_ID';
-  @Input() adSlot: string = ''; 
+  @Input() adClient = environment.adClient;
+  @Input() adSlot: string = '';
   @Input() adFormat = 'auto';
   @Input() fullWidthResponsive = true;
 
