@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { environment } from '../../environments/environment';
+import { SeoService } from '../shared/seo.service';
 
 @Component({
-    selector: 'app-ai-assistant',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-ai-assistant',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="ai-container">
       <div class="glass-card">
         <div class="header">
@@ -44,7 +45,7 @@ import { environment } from '../../environments/environment';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .ai-container {
       min-height: 80vh;
       display: flex;
@@ -174,44 +175,50 @@ import { environment } from '../../environments/environment';
   `]
 })
 export class AiAssistantComponent {
-    userInput: string = '';
-    messages: { role: 'user' | 'ai', text: string }[] = [
-        { role: 'ai', text: 'வணக்கம்! நான் உங்கள் தமிழ் கவிதை உதவியாளர். நான் உங்களுக்கு எப்படி உதவ முடியும்?' }
-    ];
-    isLoading: boolean = false;
+  userInput: string = '';
+  messages: { role: 'user' | 'ai', text: string }[] = [
+    { role: 'ai', text: 'வணக்கம்! நான் உங்கள் தமிழ் கவிதை உதவியாளர். நான் உங்களுக்கு எப்படி உதவ முடியும்?' }
+  ];
+  isLoading: boolean = false;
 
-    private genAI = new GoogleGenerativeAI(environment.geminiApiKey);
-    private model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  private genAI = new GoogleGenerativeAI(environment.geminiApiKey);
+  private model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef, private seo: SeoService) {
+    this.seo.updateMetaTags({
+      title: 'AI Kavithai Assistant - Tamil Poetry Generator',
+      description: 'Ask our AI poet to write or explain a Tamil kavithai for you. Generate beautiful Tamil poetry with help from AI.',
+      url: 'https://pravintamilan.com/ai-assistant'
+    });
+  }
 
-    async generatePoetry() {
-        if (!this.userInput.trim() || this.isLoading) return;
+  async generatePoetry() {
+    if (!this.userInput.trim() || this.isLoading) return;
 
-        const userText = this.userInput;
-        this.messages.push({ role: 'user', text: userText });
-        this.userInput = '';
-        this.isLoading = true;
-        this.cdr.detectChanges();
+    const userText = this.userInput;
+    this.messages.push({ role: 'user', text: userText });
+    this.userInput = '';
+    this.isLoading = true;
+    this.cdr.detectChanges();
 
-        try {
-            const prompt = `You are a legendary Tamil poet. 
+    try {
+      const prompt = `You are a legendary Tamil poet. 
       The user wants: "${userText}". 
       Respond with a beautiful, high-quality Tamil kavithai or a clear explanation if asked. 
       Always maintain a sophisticated yet accessible poetic tone in Tamil. 
       If the user speaks in English, answer mainly in Tamil with occasional English context if helpful.`;
 
-            const result = await this.model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
-            this.messages.push({ role: 'ai', text: text });
-        } catch (error) {
-            console.error('Gemini error:', error);
-            this.messages.push({ role: 'ai', text: 'மன்னிக்கவும், என்னால் இப்போது பதில் அளிக்க முடியவில்லை. தயவுசெய்து சிறிது நேரம் கழித்து முயற்சிக்கவும்.' });
-        } finally {
-            this.isLoading = false;
-            this.cdr.detectChanges();
-        }
+      this.messages.push({ role: 'ai', text: text });
+    } catch (error) {
+      console.error('Gemini error:', error);
+      this.messages.push({ role: 'ai', text: 'மன்னிக்கவும், என்னால் இப்போது பதில் அளிக்க முடியவில்லை. தயவுசெய்து சிறிது நேரம் கழித்து முயற்சிக்கவும்.' });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
     }
+  }
 }
