@@ -1,12 +1,15 @@
 <nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
-    <!-- <a class="navbar-brand" routerLink="/home/detail" (click)="closeMenu()">Pravin Tamilan</a> -->
+    <a class="navbar-brand" routerLink="/home" (click)="closeMenu()"
+      style="font-weight: 700; font-size: 1.2rem; color: var(--text); text-decoration: none;">
+      Pravin Tamilan
+    </a>
 
-  <!-- <button class="burger" aria-label="Toggle menu" [attr.aria-expanded]="menuOpen" (click)="toggleMenu()">
+    <button class="burger" aria-label="Toggle menu" [attr.aria-expanded]="menuOpen" (click)="toggleMenu()">
       <span class="burger-box">
         <span class="burger-inner" [class.open]="menuOpen"></span>
       </span>
-    </button> -->
+    </button>
 
     <div class="nav-actions">
       <ul class="nav-list" [class.open]="menuOpen">
@@ -16,12 +19,11 @@
         <li><a class="nav-link" routerLink="/terms" routerLinkActive="active" (click)="closeMenu()">Terms</a></li>
       </ul>
 
-      <div class="controls">
-  <button class="theme-toggle" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme" (click)="toggleTheme()">
-          <ng-container *ngIf="theme === 'light'; else darkIcon">🌙</ng-container>
-          <ng-template #darkIcon>☀️</ng-template>
-        </button>
-      </div>
+      <button class="theme-toggle" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme"
+        (click)="toggleTheme()">
+        <ng-container *ngIf="theme === 'light'; else darkIcon">🌙</ng-container>
+        <ng-template #darkIcon>☀️</ng-template>
+      </button>
     </div>
   </div>
 </nav>
