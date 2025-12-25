@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 function getPreferredTheme(): 'light' | 'dark' {
   const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
@@ -35,7 +35,7 @@ applyColor(getPreferredColor());
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
