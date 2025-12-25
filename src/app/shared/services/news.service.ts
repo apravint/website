@@ -24,7 +24,7 @@ export interface NewsResponse {
     providedIn: 'root'
 })
 export class NewsService {
-    private apiUrl = 'https://newsdata.io/api/1/news';
+    private apiUrl = 'https://newsdata.io/api/1/latest';
 
     constructor(private http: HttpClient) { }
 
