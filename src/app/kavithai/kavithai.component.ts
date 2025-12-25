@@ -5,6 +5,7 @@ import { TranslatePipe } from '../shared/translate.pipe';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
+import { SeoService } from '../shared/seo.service';
 
 @Component({
     selector: 'app-kavithai',
@@ -15,9 +16,18 @@ import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 })
 export class KavithaiComponent {
     private kavithaiService = inject(KavithaiService);
+    private seo = inject(SeoService);
 
     errorMessage = '';
     loading = true;
+
+    constructor() {
+        this.seo.updateMetaTags({
+            title: 'Poems - Tamil Kavithai',
+            description: 'Browse poems and poetry in Tamil from the Tamil Kavithai collection.',
+            url: 'https://pravintamilan.com/kavithai'
+        });
+    }
 
     kavithaigal$ = this.kavithaiService.getKavithaigal().pipe(
         tap(() => {
