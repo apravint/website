@@ -85,6 +85,14 @@ jobs:
           ls -l src/environments/environment.prod.ts
           echo "File exists if above line succeeded."
 
+      - name: Replace index.html placeholders
+        env:
+          ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
+        run: |
+          CLEAN_ADSENSE_ID=$(echo "${ADSENSE_CLIENT_ID}" | xargs)
+          sed -i "s/__ADSENSE_CLIENT_ID__/${CLEAN_ADSENSE_ID}/g" src/index.html
+          echo "Replaced AdSense placeholder in index.html"
+
       - name: Build
         run: npm run build -- --configuration=production --base-href=/
 

@@ -12,9 +12,8 @@ import { environment } from '../../../environments/environment';
         <ins class="adsbygoogle"
           style="display:block"
           [attr.data-ad-client]="adClient"
-          [attr.data-ad-slot]="adSlot"
-          [attr.data-ad-format]="adFormat"
-          [attr.data-full-width-responsive]="fullWidthResponsive">
+          data-ad-format="auto"
+          data-full-width-responsive="true">
         </ins>
       </div>
     }
@@ -30,11 +29,7 @@ import { environment } from '../../../environments/environment';
   `]
 })
 export class AdUnitComponent implements AfterViewInit {
-  @Input() adClient = environment.adClient;
-  @Input() adSlot: string = '';
-  @Input() adFormat = 'auto';
-  @Input() fullWidthResponsive = true;
-
+  adClient = environment.adClient;
   isBrowser: boolean;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
@@ -42,7 +37,7 @@ export class AdUnitComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.isBrowser && this.adSlot) {
+    if (this.isBrowser) {
       try {
         (window as any).adsbygoogle = (window as any).adsbygoogle || [];
         (window as any).adsbygoogle.push({});
