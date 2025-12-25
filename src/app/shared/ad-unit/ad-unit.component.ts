@@ -1,21 +1,23 @@
 import { Component, AfterViewInit, Input, PLATFORM_ID, Inject } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-ad-unit',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
-    <div class="ad-container" *ngIf="isBrowser">
-      <ins class="adsbygoogle"
-           style="display:block"
-           [attr.data-ad-client]="adClient"
-           [attr.data-ad-slot]="adSlot"
-           [attr.data-ad-format]="adFormat"
-           [attr.data-full-width-responsive]="fullWidthResponsive">
-      </ins>
-    </div>
-  `,
+    @if (isBrowser) {
+      <div class="ad-container">
+        <ins class="adsbygoogle"
+          style="display:block"
+          [attr.data-ad-client]="adClient"
+          [attr.data-ad-slot]="adSlot"
+          [attr.data-ad-format]="adFormat"
+          [attr.data-full-width-responsive]="fullWidthResponsive">
+        </ins>
+      </div>
+    }
+    `,
   styles: [`
     .ad-container {
       display: block;

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, AdUnitComponent],
+  imports: [RouterModule, AdUnitComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
