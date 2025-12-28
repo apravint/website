@@ -40,14 +40,14 @@ export class LegalComponent implements OnInit {
     private updateSeo() {
         if (this.activeTab === 'privacy') {
             this.seo.updateMetaTags({
-                title: 'Privacy Policy - Tamil Kavithai',
-                description: 'Privacy policy for Tamil Kavithai app and website.',
+                title: 'Privacy Policy - Pravin Tamilan',
+                description: 'Privacy policy for Pravin Tamilan app and website.',
                 url: 'https://pravintamilan.com/legal'
             });
         } else {
             this.seo.updateMetaTags({
-                title: 'Terms & Conditions - Tamil Kavithai',
-                description: 'Terms and conditions for using Tamil Kavithai app and website.',
+                title: 'Terms & Conditions - Pravin Tamilan',
+                description: 'Terms and conditions for using Pravin Tamilan app and website.',
                 url: 'https://pravintamilan.com/legal'
             });
         }

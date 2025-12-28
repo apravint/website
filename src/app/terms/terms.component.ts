@@ -14,8 +14,8 @@ import { TranslatePipe } from '../shared/translate.pipe';
 export class TermsComponent {
   constructor(private seo: SeoService) {
     this.seo.updateMetaTags({
-      title: 'Terms & Conditions - Tamil Kavithai',
-      description: 'Terms and Conditions for using the Tamil Kavithai app and website.',
+      title: 'Terms & Conditions - Pravin Tamilan',
+      description: 'Terms and Conditions for using the Pravin Tamilan app and website.',
       url: 'https://pravintamilan.com/terms'
     });
   }
