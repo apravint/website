@@ -74,12 +74,6 @@ import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
           </button>
         </div>
 
-        <!-- Top Ad -->
-        <div class="card centered ad-card">
-          <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
-          <app-ad-unit adSlot="1234567890"></app-ad-unit>
-        </div>
-
         <!-- News Grid -->
         <div class="news-grid" *ngIf="articles.length > 0; else loading">
           <a *ngFor="let article of articles; let i = index" 
