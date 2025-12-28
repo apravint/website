@@ -13,8 +13,8 @@ import { TranslatePipe } from '../shared/translate.pipe';
 export class PrivacyComponent {
   constructor(private seo: SeoService) {
     this.seo.updateMetaTags({
-      title: 'Privacy Policy - Tamil Kavithai',
-      description: 'Privacy Policy for Tamil Kavithai app and website. Learn how we handle your data.',
+      title: 'Privacy Policy - Pravin Tamilan',
+      description: 'Privacy Policy for Pravin Tamilan app and website. Learn how we handle your data.',
       url: 'https://pravintamilan.com/privacy'
     });
   }
