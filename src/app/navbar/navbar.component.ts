@@ -45,7 +45,7 @@ export class NavbarComponent implements OnInit {
   theme: 'light' | 'dark' = 'light';
   colorTheme: string = 'indigo';
   menuOpen = false;
-  showColorPicker = false;
+  showSettings = false;
   currentLang = 'en';
 
   colors = [
@@ -85,11 +85,10 @@ export class NavbarComponent implements OnInit {
     this.colorTheme = color;
     applyColor(color);
     try { localStorage.setItem('color-theme', color); } catch { /* ignore */ }
-    this.showColorPicker = false;
   }
 
-  toggleColorPicker() {
-    this.showColorPicker = !this.showColorPicker;
+  toggleSettings() {
+    this.showSettings = !this.showSettings;
   }
 
   toggleMenu() {
@@ -98,6 +97,6 @@ export class NavbarComponent implements OnInit {
 
   closeMenu() {
     this.menuOpen = false;
-    this.showColorPicker = false;
+    this.showSettings = false;
   }
 }

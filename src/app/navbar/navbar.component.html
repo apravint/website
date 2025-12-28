@@ -26,37 +26,53 @@
             translate }}</a></li>
       </ul>
 
-      <div class="theme-controls">
-        <!-- Language Toggle -->
-        <button class="icon-btn lang-btn" (click)="toggleLanguage()" aria-label="Toggle language">
-          {{ currentLang === 'en' ? 'TA' : 'EN' }}
+      <div class="settings-wrapper">
+        <button class="icon-btn settings-btn" aria-label="Settings" (click)="toggleSettings()">
+          ⚙️
         </button>
-
-        <!-- Color Picker -->
-        <div class="color-picker-wrapper">
-          <button class="icon-btn" aria-label="Change color theme" (click)="toggleColorPicker()">
-            🎨
-          </button>
-          @if (showColorPicker) {
-          <div class="color-dropdown">
-            @for (c of colors; track c) {
-            <button class="color-option" [style.background-color]="c.value" [class.active]="colorTheme === c.name"
-              [attr.aria-label]="'Select ' + c.name + ' theme'" (click)="setColorTheme(c.name)">
-            </button>
-            }
+        @if (showSettings) {
+        <div class="settings-dropdown">
+          <!-- Theme Toggle -->
+          <div class="settings-section">
+            <span class="settings-label">Theme</span>
+            <div class="settings-options">
+              <button class="setting-option" [class.active]="theme === 'light'" (click)="toggleTheme()"
+                aria-label="Light mode">
+                ☀️ Light
+              </button>
+              <button class="setting-option" [class.active]="theme === 'dark'" (click)="toggleTheme()"
+                aria-label="Dark mode">
+                🌙 Dark
+              </button>
+            </div>
           </div>
-          }
-        </div>
 
-        <!-- Dark Mode Toggle -->
-        <button class="icon-btn" [attr.aria-pressed]="theme === 'dark'" aria-label="Toggle theme"
-          (click)="toggleTheme()">
-          @if (theme === 'light') {
-          🌙
-          } @else {
-          ☀️
-          }
-        </button>
+          <!-- Language Toggle -->
+          <div class="settings-section">
+            <span class="settings-label">Language</span>
+            <div class="settings-options">
+              <button class="setting-option" [class.active]="currentLang === 'en'" (click)="toggleLanguage()">
+                EN
+              </button>
+              <button class="setting-option" [class.active]="currentLang === 'ta'" (click)="toggleLanguage()">
+                தமிழ்
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Theme -->
+          <div class="settings-section">
+            <span class="settings-label">Accent Color</span>
+            <div class="color-options">
+              @for (c of colors; track c) {
+              <button class="color-option" [style.background-color]="c.value" [class.active]="colorTheme === c.name"
+                [attr.aria-label]="'Select ' + c.name + ' theme'" (click)="setColorTheme(c.name)">
+              </button>
+              }
+            </div>
+          </div>
+        </div>
+        }
       </div>
     </div>
   </div>
