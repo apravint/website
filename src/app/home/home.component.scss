@@ -291,3 +291,30 @@
     transform: rotate(360deg);
   }
 }
+
+/* Legal Links Section for Compliance */
+.legal-links-section {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-4) var(--space-3);
+  margin-top: var(--space-3);
+  background: rgba(79, 70, 229, 0.05);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.legal-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
