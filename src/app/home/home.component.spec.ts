@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HomeComponent } from './home.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TranslationService } from '../shared/translation.service';
@@ -11,15 +11,19 @@ describe('HomeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HomeComponent],
+      imports: [RouterTestingModule, HttpClientTestingModule, HomeComponent],
       providers: [
-        { provide: TranslationService, useValue: { translate: (k: string) => {
-          if (k.includes('HOME.HERO.TITLE')) return 'Tamil Kavithai';
-          return k;
-        }, translations$: of({}) } }
+        {
+          provide: TranslationService, useValue: {
+            translate: (k: string) => {
+              if (k.includes('HOME.HERO.TITLE')) return 'Tamil Kavithai';
+              return k;
+            }, translations$: of({})
+          }
+        }
       ]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;

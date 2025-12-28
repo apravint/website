@@ -3,58 +3,136 @@
         <div class="bg-glow"></div>
         <div class="container">
             <h1><span class="text-gradient">{{ 'KAVITHAI.PAGE_TITLE' | translate }}</span></h1>
+            <p class="lead">Browse poems or create your own with AI</p>
         </div>
     </div>
 
     <div class="container">
-        <div class="grid-layout">
-            <!-- Top Ad -->
-            <div class="card centered">
-                <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
-                <app-ad-unit adSlot="1234567890"></app-ad-unit>
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn" [class.active]="activeTab === 'browse'" (click)="activeTab = 'browse'">
+                📜 Browse Poems
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'ai'" (click)="activeTab = 'ai'">
+                🤖 AI Poet
+            </button>
+        </div>
+
+        <!-- Browse Poems Tab -->
+        <div class="tab-content" *ngIf="activeTab === 'browse'">
+            <div class="tab-header">
+                <button class="surprise-btn" (click)="surpriseMe()" [disabled]="loading">
+                    🎲 {{ 'KAVITHAI.SURPRISE_ME' | translate }}
+                </button>
             </div>
 
-            @if (errorMessage) {
-            <div class="error-state">
-                <p>⚠️ {{ errorMessage }}</p>
-                <p><small>Check console for details.</small></p>
-            </div>
-            }
+            <div class="grid-layout">
+                <!-- Top Ad -->
+                <div class="card centered">
+                    <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+                    <app-ad-unit adSlot="1234567890"></app-ad-unit>
+                </div>
 
-            @for (k of kavithaigal$ | async; track k; let i = $index) {
-            <div class="card hover-effect">
-                @if (k.title) {
-                <h3 class="kavithai-title">{{ k.title }}</h3>
+                @if (errorMessage) {
+                <div class="error-state">
+                    <p>⚠️ {{ errorMessage }}</p>
+                    <p><small>Check console for details.</small></p>
+                </div>
                 }
-                <p class="kavithai-content">{{ k.description }}</p>
-                <div class="author-info">
-                    <small class="muted">— {{ k.user }}</small>
+
+                @for (k of kavithaigal$ | async; track k; let i = $index) {
+                <div class="card hover-effect poem-card" [id]="'poem-' + getPoemId(k)"
+                    [class.highlighted]="highlightedPoemId === getPoemId(k)">
+                    @if (k.title) {
+                    <h3 class="kavithai-title">{{ k.title }}</h3>
+                    }
+                    <p class="kavithai-content">{{ k.description }}</p>
+                    <div class="author-info">
+                        <small class="muted">— {{ k.user }}</small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="poem-actions">
+                        <button class="action-btn like-btn" [class.liked]="isLiked(k)" (click)="toggleLike(k)"
+                            [attr.aria-label]="isLiked(k) ? 'Unlike poem' : 'Like poem'">
+                            <span class="icon">{{ isLiked(k) ? '❤️' : '🤍' }}</span>
+                        </button>
+
+                        <button class="action-btn share-btn" (click)="shareToTwitter(k)" aria-label="Share to Twitter"
+                            title="Share on X/Twitter">
+                            <span class="icon">𝕏</span>
+                        </button>
+
+                        <button class="action-btn share-btn whatsapp-btn" (click)="shareToWhatsApp(k)"
+                            aria-label="Share to WhatsApp" title="Share on WhatsApp">
+                            <span class="icon">📱</span>
+                        </button>
+
+                        <button class="action-btn copy-btn" [class.copied]="copiedId === getPoemId(k)"
+                            (click)="copyPoem(k)" aria-label="Copy poem" title="Copy to clipboard">
+                            <span class="icon">{{ copiedId === getPoemId(k) ? '✓' : '📋' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ad after every 3 poems -->
+                @if ((i + 1) % 3 === 0) {
+                <div class="card centered">
+                    <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+                    <app-ad-unit adSlot="1234567890"></app-ad-unit>
+                </div>
+                }
+                } @empty {
+                @if (!loading && !errorMessage) {
+                <div class="empty-state">
+                    <p>No poems found.</p>
+                </div>
+                } @else if (loading) {
+                <div class="loading-state">
+                    <p>{{ 'KAVITHAI.LOADING' | translate }}</p>
+                </div>
+                }
+                }
+
+                <!-- Bottom Ad -->
+                <div class="card centered">
+                    <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
+                    <app-ad-unit adSlot="1234567890"></app-ad-unit>
                 </div>
             </div>
+        </div>
 
-            <!-- Ad after every 3 poems, ensuring it's not the very last item effectively (though logic here allows it) -->
-            @if ((i + 1) % 3 === 0) {
-            <div class="card centered">
-                <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
-                <app-ad-unit adSlot="1234567890"></app-ad-unit>
-            </div>
-            }
-            } @empty {
-            @if (!loading && !errorMessage) {
-            <div class="empty-state">
-                <p>No poems found.</p>
-            </div>
-            } @else if (loading) {
-            <div class="loading-state">
-                <p>{{ 'KAVITHAI.LOADING' | translate }}</p>
-            </div>
-            }
-            }
+        <!-- AI Poet Tab -->
+        <div class="tab-content ai-poet-content" *ngIf="activeTab === 'ai'">
+            <div class="ai-container">
+                <div class="glass-card">
+                    <div class="ai-header">
+                        <h2>Tamil AI Kavithai Assistant 🤖</h2>
+                        <p class="muted">Ask our AI poet to write or explain a kavithai for you.</p>
+                    </div>
 
-            <!-- Bottom Ad -->
-            <div class="card centered">
-                <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
-                <app-ad-unit adSlot="1234567890"></app-ad-unit>
+                    <div class="chat-window">
+                        <div *ngFor="let msg of aiMessages"
+                            [ngClass]="{'message': true, 'user-msg': msg.role === 'user', 'ai-msg': msg.role === 'ai'}">
+                            <div class="msg-bubble">
+                                {{ msg.text }}
+                            </div>
+                        </div>
+                        <div *ngIf="aiLoading" class="message ai-msg">
+                            <div class="msg-bubble loading">
+                                <span>.</span><span>.</span><span>.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-area">
+                        <input type="text" [(ngModel)]="aiUserInput" (keyup.enter)="generatePoetry()"
+                            placeholder="e.g., Write a poem about friendship in Tamil..." [disabled]="aiLoading" />
+                        <button (click)="generatePoetry()" [disabled]="aiLoading || !aiUserInput.trim()">
+                            Send
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

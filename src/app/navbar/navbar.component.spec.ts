@@ -20,7 +20,7 @@ describe('NavbarComponent', () => {
       imports: [NavbarComponent, RouterTestingModule],
       providers: [{ provide: TranslationService, useValue: translationSpy }]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
@@ -59,19 +59,20 @@ describe('NavbarComponent', () => {
     expect(translationSpy.setLanguage).toHaveBeenCalledWith('en');
   });
 
-  it('should set color theme and toggle color picker and menu', () => {
+  it('should set color theme and toggle settings and menu', () => {
     component.setColorTheme('rose');
     expect(component.colorTheme).toBe('rose');
-    expect(component.showColorPicker).toBeFalse();
 
-    component.toggleColorPicker();
-    expect(component.showColorPicker).toBeTrue();
+    expect(component.showSettings).toBeFalse();
+    component.toggleSettings();
+    expect(component.showSettings).toBeTrue();
 
     component.toggleMenu();
     expect(component.menuOpen).toBeTrue();
 
     component.closeMenu();
     expect(component.menuOpen).toBeFalse();
+    expect(component.showSettings).toBeFalse();
   });
 
   it('should respect system theme preference when no stored theme', () => {

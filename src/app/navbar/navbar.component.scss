@@ -53,11 +53,9 @@
   background: color-mix(in srgb, var(--accent), transparent 90%);
 }
 
-/* Theme Controls */
-.theme-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
+/* Settings Dropdown */
+.settings-wrapper {
+  position: relative;
 }
 
 .icon-btn {
@@ -77,51 +75,85 @@
   background: rgba(0, 0, 0, 0.05);
 }
 
-.lang-btn {
-  font-size: 0.85rem;
-  font-weight: 700;
-  border-radius: 50%;
-  /* Match icons */
-  width: 2.5rem;
-  /* Match icon btn visual size approx */
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(var(--text-rgb), 0.1);
-  /* Subtle border for visibility */
-  color: var(--text);
-  /* Ensure text is visible */
+.settings-btn {
+  font-size: 1.3rem;
 }
 
-/* Color Picker */
-.color-picker-wrapper {
-  position: relative;
-}
-
-.color-dropdown {
+.settings-dropdown {
   position: absolute;
-  top: 120%;
+  top: calc(100% + 8px);
   right: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
+  padding: var(--space-2);
+  min-width: 200px;
   box-shadow: var(--shadow-lg);
-  min-width: 120px;
   animation: fadeIn 0.2s ease;
+  z-index: 200;
+}
+
+.settings-section {
+  padding: var(--space-1) 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
+  }
+}
+
+.settings-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: var(--space-1);
+}
+
+.settings-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.setting-option {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+
+  &.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+}
+
+.color-options {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
 }
 
 .color-option {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .color-option:hover {
@@ -130,7 +162,7 @@
 
 .color-option.active {
   border-color: var(--text);
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 /* Burger Menu */
@@ -210,9 +242,13 @@
     margin-left: 0;
   }
 
-  /* Move theme controls to be visible on mobile header, not inside menu */
-  .theme-controls {
+  /* Settings visible on mobile header */
+  .settings-wrapper {
     margin-right: var(--space-2);
+  }
+
+  .settings-dropdown {
+    right: -8px;
   }
 
   .nav-list {
