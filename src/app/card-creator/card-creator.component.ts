@@ -5,12 +5,11 @@ import { CanvasService } from './services/canvas.service';
 import { HistoryService } from './services/history.service';
 import { ExportService, ExportOptions } from './services/export.service';
 import { CANVAS_SIZES } from './models/canvas-element.model';
-import { TranslatePipe } from '../shared/translate.pipe';
 
 @Component({
     selector: 'app-card-creator',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslatePipe],
+    imports: [CommonModule, FormsModule],
     templateUrl: './card-creator.component.html',
     styleUrl: './card-creator.component.scss'
 })
