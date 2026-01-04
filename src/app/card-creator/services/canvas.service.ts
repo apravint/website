@@ -153,7 +153,10 @@ export class CanvasService {
         const activeObject = this.canvas?.getActiveObject();
         if (activeObject && activeObject instanceof fabric.IText) {
             activeObject.set(options);
-            this.canvas?.renderAll();
+            // Mark as dirty to force re-render and recalculate dimensions
+            activeObject.dirty = true;
+            activeObject.setCoords();
+            this.canvas?.requestRenderAll();
         }
     }
 
