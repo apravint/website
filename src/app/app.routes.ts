@@ -29,6 +29,10 @@ export const routes: Routes = [
 		loadComponent: () => import('./news/news.component').then(m => m.NewsComponent)
 	},
 	{
+		path: 'create',
+		loadComponent: () => import('./card-creator/card-creator.component').then(m => m.CardCreatorComponent)
+	},
+	{
 		path: 'download',
 		loadComponent: () => import('./download/download.component').then(m => m.DownloadComponent)
 	},

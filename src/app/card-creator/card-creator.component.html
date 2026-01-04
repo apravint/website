@@ -1,0 +1,301 @@
+<div class="card-creator">
+    <!-- Toolbar -->
+    <header class="toolbar">
+        <div class="toolbar-left">
+            <button class="toolbar-btn" (click)="clearCanvas()" title="New">
+                <span class="icon">📄</span>
+            </button>
+            <div class="divider"></div>
+            <button class="toolbar-btn" (click)="undo()" [disabled]="!historyService.canUndo()" title="Undo (Ctrl+Z)">
+                <span class="icon">↩️</span>
+            </button>
+            <button class="toolbar-btn" (click)="redo()" [disabled]="!historyService.canRedo()" title="Redo (Ctrl+Y)">
+                <span class="icon">↪️</span>
+            </button>
+        </div>
+
+        <div class="toolbar-center">
+            <select class="size-select" [ngModel]="selectedSizeIndex()" (ngModelChange)="onSizeChange($event)">
+                <option *ngFor="let size of canvasSizes; let i = index" [value]="i">
+                    {{ size.icon }} {{ size.name }} ({{ size.width }}×{{ size.height }})
+                </option>
+            </select>
+        </div>
+
+        <div class="toolbar-right">
+            <div class="zoom-controls">
+                <button class="toolbar-btn" (click)="zoomOut()" title="Zoom Out">
+                    <span class="icon">➖</span>
+                </button>
+                <span class="zoom-level">{{ (canvasService.zoom() * 100).toFixed(0) }}%</span>
+                <button class="toolbar-btn" (click)="zoomIn()" title="Zoom In">
+                    <span class="icon">➕</span>
+                </button>
+                <button class="toolbar-btn" (click)="fitToScreen()" title="Fit to Screen">
+                    <span class="icon">🔲</span>
+                </button>
+            </div>
+            <div class="divider"></div>
+            <button class="btn-export" (click)="openExportModal()">
+                <span class="icon">💾</span> Export
+            </button>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- Left Panel - Elements -->
+        <aside class="left-panel">
+            <nav class="panel-tabs">
+                <button class="tab-btn" [class.active]="activePanel() === 'text'" (click)="setActivePanel('text')"
+                    title="Text">
+                    <span class="tab-icon">📝</span>
+                    <span class="tab-label">Text</span>
+                </button>
+                <button class="tab-btn" [class.active]="activePanel() === 'image'" (click)="setActivePanel('image')"
+                    title="Image">
+                    <span class="tab-icon">🖼️</span>
+                    <span class="tab-label">Image</span>
+                </button>
+                <button class="tab-btn" [class.active]="activePanel() === 'background'"
+                    (click)="setActivePanel('background')" title="Background">
+                    <span class="tab-icon">🎨</span>
+                    <span class="tab-label">BG</span>
+                </button>
+                <button class="tab-btn" [class.active]="activePanel() === 'templates'"
+                    (click)="setActivePanel('templates')" title="Templates">
+                    <span class="tab-icon">📋</span>
+                    <span class="tab-label">Templates</span>
+                </button>
+            </nav>
+
+            <div class="panel-content" *ngIf="activePanel()">
+                <!-- Text Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'text'">
+                    <h4>Add Text</h4>
+                    <div class="text-add-buttons">
+                        <button class="add-btn heading-btn" (click)="addHeading()">
+                            <span class="preview">Aa</span>
+                            <span class="label">Heading</span>
+                        </button>
+                        <button class="add-btn subheading-btn" (click)="addSubheading()">
+                            <span class="preview">Aa</span>
+                            <span class="label">Subheading</span>
+                        </button>
+                        <button class="add-btn body-btn" (click)="addBodyText()">
+                            <span class="preview">Aa</span>
+                            <span class="label">Body Text</span>
+                        </button>
+                    </div>
+
+                    <!-- Text Formatting Controls (shown when text is selected) -->
+                    <div class="text-formatting" *ngIf="canvasService.isTextSelected()">
+                        <h4>Format Text</h4>
+
+                        <!-- Font Family -->
+                        <div class="form-group">
+                            <label>Font</label>
+                            <select class="font-select" [ngModel]="selectedFont()"
+                                (ngModelChange)="setTextFont($event)">
+                                <option *ngFor="let font of fonts" [value]="font">{{ font }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Font Size -->
+                        <div class="form-group">
+                            <label>Size</label>
+                            <div class="size-control">
+                                <input type="range" min="12" max="120" step="1" [ngModel]="selectedFontSize()"
+                                    (ngModelChange)="setTextSize($event)">
+                                <input type="number" min="12" max="200" [ngModel]="selectedFontSize()"
+                                    (ngModelChange)="setTextSize($event)" class="size-input">
+                            </div>
+                        </div>
+
+                        <!-- Text Style (Bold/Italic) -->
+                        <div class="form-group">
+                            <label>Style</label>
+                            <div class="style-buttons">
+                                <button class="style-btn" [class.active]="isBold()" (click)="toggleBold()" title="Bold">
+                                    <strong>B</strong>
+                                </button>
+                                <button class="style-btn" [class.active]="isItalic()" (click)="toggleItalic()"
+                                    title="Italic">
+                                    <em>I</em>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Text Alignment -->
+                        <div class="form-group">
+                            <label>Align</label>
+                            <div class="align-buttons">
+                                <button class="align-btn" [class.active]="selectedTextAlign() === 'left'"
+                                    (click)="setTextAlign('left')" title="Align Left">⬛◻◻</button>
+                                <button class="align-btn" [class.active]="selectedTextAlign() === 'center'"
+                                    (click)="setTextAlign('center')" title="Center">◻⬛◻</button>
+                                <button class="align-btn" [class.active]="selectedTextAlign() === 'right'"
+                                    (click)="setTextAlign('right')" title="Align Right">◻◻⬛</button>
+                            </div>
+                        </div>
+
+                        <!-- Text Color -->
+                        <div class="form-group">
+                            <label>Color</label>
+                            <div class="color-grid compact">
+                                <button *ngFor="let color of colors" class="color-btn small"
+                                    [style.backgroundColor]="color" [class.active]="selectedTextColor() === color"
+                                    (click)="setTextColor(color)" [title]="color">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'image'">
+                    <h4>Add Image</h4>
+                    <label class="upload-btn">
+                        <span class="icon">📤</span>
+                        <span>Upload Image</span>
+                        <input type="file" accept="image/*" (change)="onImageUpload($event)" hidden>
+                    </label>
+                    <p class="hint">Supports PNG, JPG, GIF, WebP</p>
+                </div>
+
+                <!-- Background Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'background'">
+                    <h4>Solid Colors</h4>
+                    <div class="color-grid">
+                        <button *ngFor="let color of colors" class="color-btn" [style.backgroundColor]="color"
+                            (click)="setBackgroundColor(color)" [title]="color">
+                        </button>
+                    </div>
+
+                    <h4>Gradients</h4>
+                    <div class="gradient-grid">
+                        <button *ngFor="let gradient of gradients" class="gradient-btn"
+                            [style.background]="'linear-gradient(135deg, ' + gradient[0] + ', ' + gradient[1] + ')'"
+                            (click)="setBackgroundGradient(gradient)">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Templates Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'templates'">
+                    <h4>Templates</h4>
+                    <div class="template-list">
+                        <button *ngFor="let template of templates" class="template-btn"
+                            (click)="applyTemplate(template.id)">
+                            <span class="template-icon">{{ template.icon }}</span>
+                            <span class="template-name">{{ template.name }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <main class="canvas-area" #canvasContainer>
+            <div class="canvas-wrapper">
+                <canvas #canvasElement></canvas>
+            </div>
+        </main>
+
+        <!-- Right Panel - Properties -->
+        <aside class="right-panel">
+            <div class="panel-content">
+                <h4>Quick Actions</h4>
+                <div class="action-grid">
+                    <button class="action-btn" (click)="duplicateSelected()" title="Duplicate (Ctrl+D)">
+                        <span class="icon">📋</span>
+                        <span>Duplicate</span>
+                    </button>
+                    <button class="action-btn" (click)="deleteSelected()" title="Delete">
+                        <span class="icon">🗑️</span>
+                        <span>Delete</span>
+                    </button>
+                    <button class="action-btn" (click)="bringForward()" title="Bring Forward">
+                        <span class="icon">⬆️</span>
+                        <span>Forward</span>
+                    </button>
+                    <button class="action-btn" (click)="sendBackward()" title="Send Backward">
+                        <span class="icon">⬇️</span>
+                        <span>Backward</span>
+                    </button>
+                </div>
+
+                <div class="keyboard-hints">
+                    <h4>Keyboard Shortcuts</h4>
+                    <ul>
+                        <li><kbd>Ctrl</kbd>+<kbd>Z</kbd> Undo</li>
+                        <li><kbd>Ctrl</kbd>+<kbd>Y</kbd> Redo</li>
+                        <li><kbd>Ctrl</kbd>+<kbd>D</kbd> Duplicate</li>
+                        <li><kbd>Delete</kbd> Remove</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" *ngIf="showExportModal()" (click)="closeExportModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <header class="modal-header">
+                <h3>Export Image</h3>
+                <button class="close-btn" (click)="closeExportModal()">✕</button>
+            </header>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Format</label>
+                    <div class="radio-group">
+                        <label class="radio-btn" [class.active]="exportFormat() === 'png'">
+                            <input type="radio" name="format" value="png" [ngModel]="exportFormat()"
+                                (ngModelChange)="exportFormat.set($event)">
+                            PNG
+                        </label>
+                        <label class="radio-btn" [class.active]="exportFormat() === 'jpeg'">
+                            <input type="radio" name="format" value="jpeg" [ngModel]="exportFormat()"
+                                (ngModelChange)="exportFormat.set($event)">
+                            JPEG
+                        </label>
+                        <label class="radio-btn" [class.active]="exportFormat() === 'svg'">
+                            <input type="radio" name="format" value="svg" [ngModel]="exportFormat()"
+                                (ngModelChange)="exportFormat.set($event)">
+                            SVG
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" *ngIf="exportFormat() !== 'svg'">
+                    <label>Quality</label>
+                    <div class="radio-group">
+                        <label class="radio-btn" [class.active]="exportQuality() === 'medium'">
+                            <input type="radio" name="quality" value="medium" [ngModel]="exportQuality()"
+                                (ngModelChange)="exportQuality.set($event)">
+                            Medium (1x)
+                        </label>
+                        <label class="radio-btn" [class.active]="exportQuality() === 'high'">
+                            <input type="radio" name="quality" value="high" [ngModel]="exportQuality()"
+                                (ngModelChange)="exportQuality.set($event)">
+                            High (2x)
+                        </label>
+                        <label class="radio-btn" [class.active]="exportQuality() === 'max'">
+                            <input type="radio" name="quality" value="max" [ngModel]="exportQuality()"
+                                (ngModelChange)="exportQuality.set($event)">
+                            Max (4x)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button class="btn-secondary" (click)="closeExportModal()">Cancel</button>
+                <button class="btn-primary" (click)="exportImage()" [disabled]="isLoading()">
+                    <span *ngIf="isLoading()">Exporting...</span>
+                    <span *ngIf="!isLoading()">💾 Download</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+</div>
