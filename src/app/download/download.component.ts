@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { TranslatePipe } from '../shared/translate.pipe';
 import { SeoService } from '../shared/seo.service';
-import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 
 @Component({
     selector: 'app-download',
     standalone: true,
-    imports: [TranslatePipe, AdUnitComponent],
+    imports: [TranslatePipe],
     templateUrl: './download.component.html',
     styleUrls: ['./download.component.scss']
 })

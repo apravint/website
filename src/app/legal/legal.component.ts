@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SeoService } from '../shared/seo.service';
-import { TranslatePipe } from '../shared/translate.pipe';
 
 @Component({
     selector: 'app-legal',
     standalone: true,
-    imports: [CommonModule, AdUnitComponent, TranslatePipe],
+    imports: [CommonModule],
     templateUrl: './legal.component.html',
     styleUrls: ['./legal.component.scss']
 })

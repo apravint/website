@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SeoService } from '../shared/seo.service';
-import { TranslatePipe } from '../shared/translate.pipe';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [AdUnitComponent, TranslatePipe],
+  imports: [],
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss']
 })
