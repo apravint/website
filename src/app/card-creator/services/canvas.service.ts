@@ -167,16 +167,43 @@ export class CanvasService {
         textAlign: string;
         fontWeight: string;
         fontStyle: string;
+        underline: boolean;
+        linethrough: boolean;
+        charSpacing: number;
+        lineHeight: number;
+        shadow: string;
+        stroke: string;
+        strokeWidth: number;
+        opacity: number;
+        textBackgroundColor: string;
+        isUppercase: boolean;
     } | null {
         const activeObject = this.canvas?.getActiveObject();
         if (activeObject && activeObject instanceof fabric.IText) {
+            // Parse shadow if it exists
+            let shadowString = '';
+            if (activeObject.shadow) {
+                const s = activeObject.shadow as fabric.Shadow;
+                shadowString = `${s.offsetX || 0},${s.offsetY || 0},${s.blur || 0},${s.color || '#000000'}`;
+            }
+
             return {
                 fontFamily: activeObject.fontFamily || 'Noto Sans Tamil',
                 fontSize: activeObject.fontSize || 48,
                 fill: (activeObject.fill as string) || '#000000',
                 textAlign: activeObject.textAlign || 'left',
                 fontWeight: String(activeObject.fontWeight || 'normal'),
-                fontStyle: activeObject.fontStyle || 'normal'
+                fontStyle: activeObject.fontStyle || 'normal',
+                underline: activeObject.underline || false,
+                linethrough: activeObject.linethrough || false,
+                charSpacing: activeObject.charSpacing || 0,
+                lineHeight: activeObject.lineHeight || 1.16,
+                shadow: shadowString,
+                stroke: (activeObject.stroke as string) || '',
+                strokeWidth: activeObject.strokeWidth || 0,
+                opacity: activeObject.opacity ?? 1,
+                textBackgroundColor: (activeObject.textBackgroundColor as string) || '',
+                isUppercase: false // This is handled at component level
             };
         }
         return null;

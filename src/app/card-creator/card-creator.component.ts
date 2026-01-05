@@ -5,6 +5,7 @@ import { CanvasService } from './services/canvas.service';
 import { HistoryService } from './services/history.service';
 import { ExportService, ExportOptions } from './services/export.service';
 import { CANVAS_SIZES } from './models/canvas-element.model';
+import * as fabric from 'fabric';
 
 @Component({
     selector: 'app-card-creator',
@@ -39,6 +40,22 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly selectedTextAlign = signal<'left' | 'center' | 'right'>('center');
     readonly isBold = signal(false);
     readonly isItalic = signal(false);
+
+    // Advanced text formatting state
+    readonly isUnderline = signal(false);
+    readonly isStrikethrough = signal(false);
+    readonly letterSpacing = signal(0);
+    readonly lineHeight = signal(1.16);
+    readonly textShadowEnabled = signal(false);
+    readonly textShadowX = signal(2);
+    readonly textShadowY = signal(2);
+    readonly textShadowBlur = signal(4);
+    readonly textShadowColor = signal('#000000');
+    readonly textStrokeColor = signal('#000000');
+    readonly textStrokeWidth = signal(0);
+    readonly textOpacity = signal(100);
+    readonly textBackgroundColor = signal('');
+    readonly textTransform = signal<'none' | 'uppercase' | 'lowercase' | 'capitalize'>('none');
 
     // Google Fonts for text
     readonly fonts = [
@@ -356,6 +373,138 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.saveHistory();
     }
 
+    toggleUnderline(): void {
+        const newUnderline = !this.isUnderline();
+        this.isUnderline.set(newUnderline);
+        this.canvasService.updateSelectedText({ underline: newUnderline });
+        this.saveHistory();
+    }
+
+    toggleStrikethrough(): void {
+        const newStrikethrough = !this.isStrikethrough();
+        this.isStrikethrough.set(newStrikethrough);
+        this.canvasService.updateSelectedText({ linethrough: newStrikethrough });
+        this.saveHistory();
+    }
+
+    setLetterSpacing(spacing: number): void {
+        this.letterSpacing.set(spacing);
+        // Fabric.js charSpacing is in 1/1000 of em
+        this.canvasService.updateSelectedText({ charSpacing: spacing * 10 });
+        this.saveHistory();
+    }
+
+    setLineHeight(height: number): void {
+        this.lineHeight.set(height);
+        this.canvasService.updateSelectedText({ lineHeight: height });
+        this.saveHistory();
+    }
+
+    updateTextShadow(): void {
+        if (this.textShadowEnabled()) {
+            const shadow = new fabric.Shadow({
+                offsetX: this.textShadowX(),
+                offsetY: this.textShadowY(),
+                blur: this.textShadowBlur(),
+                color: this.textShadowColor()
+            });
+            this.canvasService.updateSelectedText({ shadow });
+        } else {
+            this.canvasService.updateSelectedText({ shadow: null });
+        }
+        this.saveHistory();
+    }
+
+    toggleTextShadow(): void {
+        this.textShadowEnabled.set(!this.textShadowEnabled());
+        this.updateTextShadow();
+    }
+
+    setTextShadowX(value: number): void {
+        this.textShadowX.set(value);
+        if (this.textShadowEnabled()) this.updateTextShadow();
+    }
+
+    setTextShadowY(value: number): void {
+        this.textShadowY.set(value);
+        if (this.textShadowEnabled()) this.updateTextShadow();
+    }
+
+    setTextShadowBlur(value: number): void {
+        this.textShadowBlur.set(value);
+        if (this.textShadowEnabled()) this.updateTextShadow();
+    }
+
+    setTextShadowColor(color: string): void {
+        this.textShadowColor.set(color);
+        if (this.textShadowEnabled()) this.updateTextShadow();
+    }
+
+    setTextStroke(width: number, color?: string): void {
+        this.textStrokeWidth.set(width);
+        if (color) this.textStrokeColor.set(color);
+        this.canvasService.updateSelectedText({
+            stroke: this.textStrokeColor(),
+            strokeWidth: width
+        });
+        this.saveHistory();
+    }
+
+    setTextStrokeColor(color: string): void {
+        this.textStrokeColor.set(color);
+        if (this.textStrokeWidth() > 0) {
+            this.canvasService.updateSelectedText({ stroke: color });
+            this.saveHistory();
+        }
+    }
+
+    setTextOpacity(opacity: number): void {
+        this.textOpacity.set(opacity);
+        this.canvasService.updateSelectedText({ opacity: opacity / 100 });
+        this.saveHistory();
+    }
+
+    setTextBackgroundColor(color: string): void {
+        this.textBackgroundColor.set(color);
+        this.canvasService.updateSelectedText({ textBackgroundColor: color || '' });
+        this.saveHistory();
+    }
+
+    clearTextBackground(): void {
+        this.textBackgroundColor.set('');
+        this.canvasService.updateSelectedText({ textBackgroundColor: '' });
+        this.saveHistory();
+    }
+
+    applyTextTransform(transform: 'none' | 'uppercase' | 'lowercase' | 'capitalize'): void {
+        this.textTransform.set(transform);
+        const activeObject = this.canvasService.getCanvas()?.getActiveObject();
+        if (activeObject && 'text' in activeObject) {
+            const currentText = (activeObject as any).text as string;
+            let newText = currentText;
+
+            switch (transform) {
+                case 'uppercase':
+                    newText = currentText.toUpperCase();
+                    break;
+                case 'lowercase':
+                    newText = currentText.toLowerCase();
+                    break;
+                case 'capitalize':
+                    newText = currentText.replace(/\b\w/g, char => char.toUpperCase());
+                    break;
+                case 'none':
+                    // Keep as is
+                    break;
+            }
+
+            if (newText !== currentText) {
+                this.canvasService.updateSelectedText({ text: newText });
+                this.saveHistory();
+            }
+        }
+    }
+
     updateTextPropertiesFromSelection(): void {
         const props = this.canvasService.getSelectedTextProperties();
         if (props) {
@@ -365,6 +514,28 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
             this.selectedTextAlign.set(props.textAlign as 'left' | 'center' | 'right');
             this.isBold.set(props.fontWeight === 'bold' || props.fontWeight === '700');
             this.isItalic.set(props.fontStyle === 'italic');
+
+            // Advanced properties
+            this.isUnderline.set(props.underline);
+            this.isStrikethrough.set(props.linethrough);
+            this.letterSpacing.set(props.charSpacing / 10); // Convert from fabric's 1/1000 em
+            this.lineHeight.set(props.lineHeight);
+            this.textStrokeWidth.set(props.strokeWidth);
+            this.textStrokeColor.set(props.stroke || '#000000');
+            this.textOpacity.set(Math.round(props.opacity * 100));
+            this.textBackgroundColor.set(props.textBackgroundColor);
+
+            // Parse shadow
+            if (props.shadow) {
+                const [x, y, blur, color] = props.shadow.split(',');
+                this.textShadowEnabled.set(true);
+                this.textShadowX.set(parseFloat(x) || 2);
+                this.textShadowY.set(parseFloat(y) || 2);
+                this.textShadowBlur.set(parseFloat(blur) || 4);
+                this.textShadowColor.set(color || '#000000');
+            } else {
+                this.textShadowEnabled.set(false);
+            }
         }
     }
 
