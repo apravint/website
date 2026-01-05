@@ -1,82 +1,113 @@
-# Website
+# Pravin Tamilan - Personal Website
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+A modern Angular 19 personal website featuring a portfolio, Tamil poetry (Kavithai) collection with Firebase integration, and a powerful Card Creator tool for designing social media graphics.
 
-## Development server
+## ✨ Features
 
-To start a local development server, run:
+### 🎨 Card Creator
+A professional-grade graphic design tool for creating social media cards and posters:
+- **Canvas Sizes**: Instagram Post/Story, WhatsApp Status, Facebook, Twitter/X, YouTube Thumbnail
+- **Text Editing**:
+  - Multiple fonts (20+ Google Fonts including Tamil fonts)
+  - Font size, color, and alignment controls
+  - Bold, Italic, Underline, Strikethrough
+  - Letter spacing and line height
+  - Text shadow with customizable offset, blur, and color
+  - Text stroke/outline
+  - Text opacity and background color
+  - Text transform (uppercase, lowercase, capitalize)
+- **Templates**: 25+ pre-designed templates for quotes, poems, festivals, social media, and business
+- **Backgrounds**: 30+ gradient presets and 50+ solid color options
+- **Export**: PNG, JPEG, SVG formats with quality options (1x, 2x, 4x)
+
+### 📜 Kavithai (Tamil Poetry)
+- Browse and read Tamil poems with Firebase backend
+- AI-powered poetry assistant
+- Share poems on social media
+
+### 📰 News
+- Trending Tamil news from Google News RSS
+- Clean reading experience
+
+### 📱 Pages
+- Home / Portfolio
+- About
+- Download (App downloads)
+- Privacy Policy
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js v20.19+ or v22.12+
+- Angular CLI
+
+### Development Server
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Navigate to `http://localhost:4200/`. The app auto-reloads on file changes.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Build
 
 ```bash
-ng generate component component-name
+ng build --configuration production
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Build artifacts are stored in the `dist/` directory.
+
+### Testing
 
 ```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
+# Unit tests
 ng test
+
+# Headless (CI)
+npm test -- --watch=false
 ```
 
-## Running end-to-end tests
+## 🔧 Firebase Setup
 
-For end-to-end (e2e) testing, run:
+For local development with Firebase features:
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-
-## Local Development Setup
-
-To run the project locally with Firebase features enabled:
-
-1. Open `src/environments/environment.ts`.
-2. Replace `YOUR_FIREBASE_API_KEY` and `YOUR_FIREBASE_APP_ID` with your actual Firebase credentials.
-3. Run the following command to prevent your local changes to this file from being tracked by Git:
+1. Open `src/environments/environment.ts`
+2. Replace `YOUR_FIREBASE_API_KEY` and `YOUR_FIREBASE_APP_ID` with your credentials
+3. To prevent tracking local changes:
    ```bash
    git update-index --assume-unchanged src/environments/environment.ts
    ```
-   If you ever need to track changes to this file again, run:
-   ```bash
-   git update-index --no-assume-unchanged src/environments/environment.ts
-   ```
 
-## Notes & Maintenance 🔧
+## 🛠️ Tech Stack
 
-- Tests: Unit tests can be run headless in CI with `npm test -- --watch=false` (we fixed failing specs by adding `RouterTestingModule` to two component tests).
-- Build: Production build: `npm run build -- --configuration production`.
-- Security: The repository currently reports dependency vulnerabilities in Dependabot/GitHub Security alerts — consider running `npm audit` and addressing high/critical results.
+- **Framework**: Angular 19
+- **Styling**: SCSS with CSS custom properties
+- **Canvas**: Fabric.js 6.x
+- **Backend**: Firebase (Firestore, Auth)
+- **Deployment**: GitHub Pages
 
-If you'd like, I can open a PR with these test fixes (already pushed to the `release` branch) and optionally address dependency updates.
+## 📁 Project Structure
+
+```
+src/app/
+├── card-creator/       # Card design tool
+│   ├── services/       # Canvas, Export, History services
+│   └── models/         # Canvas element models
+├── kavithai/           # Tamil poetry page
+├── news/               # News feed
+├── about/              # About page
+├── download/           # Downloads page
+├── privacy/            # Privacy policy
+├── navbar/             # Navigation
+└── shared/             # Shared services
+```
+
+## 📝 Notes
+
+- This project was generated with Angular CLI v19.0.6
+- For more Angular CLI commands: [Angular CLI Reference](https://angular.dev/tools/cli)
+
+## 📄 License
+
+© Pravin Tamilan. All rights reserved.
