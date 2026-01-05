@@ -211,9 +211,12 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private loadGoogleFonts(): void {
-        const fonts = this.fonts.join('|').replace(/ /g, '+');
+        // CSS2 API requires separate family= parameters for each font
+        const fontParams = this.fonts
+            .map(font => `family=${font.replace(/ /g, '+')}:wght@300;400;500;600;700`)
+            .join('&');
         const link = document.createElement('link');
-        link.href = `https://fonts.googleapis.com/css2?family=${fonts}:wght@300;400;500;600;700&display=swap`;
+        link.href = `https://fonts.googleapis.com/css2?${fontParams}&display=swap`;
         link.rel = 'stylesheet';
         document.head.appendChild(link);
     }
