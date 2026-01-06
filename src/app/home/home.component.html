@@ -73,8 +73,8 @@
       <p>{{ 'HOME.CARDS.ABOUT_DESC_2' | translate }}</p>
     </div>
 
-    <!-- Ad Unit -->
-    <div class="card centered">
+    <!-- Ad Unit - only show when content is available -->
+    <div class="card centered" *ngIf="githubStats">
       <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
       <app-ad-unit adSlot="1234567890"></app-ad-unit>
     </div>
@@ -82,8 +82,8 @@
     <!-- Legal Links for Compliance -->
     <div class="legal-links-section">
       <p class="legal-text">
-        By using this site, you agree to our 
-        <a routerLink="/privacy">Privacy Policy</a> and 
+        By using this site, you agree to our
+        <a routerLink="/privacy">Privacy Policy</a> and
         <a routerLink="/terms">Terms of Service</a>.
       </p>
     </div>

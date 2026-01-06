@@ -107,8 +107,8 @@ import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
           </div>
         </ng-template>
 
-        <!-- Bottom Ad -->
-        <div class="card centered ad-card">
+        <!-- Bottom Ad - only show when content is available -->
+        <div class="card centered ad-card" *ngIf="articles.length > 0">
           <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
           <app-ad-unit adSlot="1234567890"></app-ad-unit>
         </div>
