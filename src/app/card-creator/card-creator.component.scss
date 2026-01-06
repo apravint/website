@@ -1053,7 +1053,7 @@
 // ==================
 @media (max-width: 1024px) {
   .left-panel {
-    width: 200px;
+    width: 220px;
   }
 
   .right-panel {
@@ -1062,55 +1062,349 @@
 }
 
 @media (max-width: 768px) {
-  .toolbar {
-    flex-wrap: wrap;
-    padding: 0.5rem;
+  .card-creator {
+    height: 100vh;
+    height: 100dvh; // Dynamic viewport height for mobile browsers
+  }
 
-    .toolbar-center {
-      order: 3;
-      flex-basis: 100%;
-      justify-content: flex-start;
-      margin-top: 0.5rem;
+  .toolbar {
+    padding: 0.5rem;
+    gap: 0.5rem;
+
+    .toolbar-left {
+      gap: 0.25rem;
     }
 
-    .size-select {
-      width: 100%;
+    .toolbar-center {
+      display: none; // Hide size selector on mobile - use default or add to panel
+    }
+
+    .toolbar-right {
+      gap: 0.25rem;
+
+      .zoom-controls {
+        display: none; // Hide zoom on mobile - use pinch to zoom
+      }
+
+      .divider {
+        display: none;
+      }
+    }
+  }
+
+  .toolbar-btn {
+    width: 36px;
+    height: 36px;
+
+    .icon {
+      font-size: 1.1rem;
+    }
+  }
+
+  .btn-export {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+
+    .icon {
+      display: none;
     }
   }
 
   .workspace {
     flex-direction: column;
+    min-height: 0;
   }
 
-  .left-panel,
-  .right-panel {
-    width: 100%;
-    max-height: 200px;
-    border-left: none;
-    border-right: none;
-  }
-
+  // Left panel becomes horizontal scrollable toolbar at top
   .left-panel {
+    width: 100%;
+    flex: 0 0 auto;
+    border-right: none;
     border-bottom: 1px solid var(--border);
-  }
-
-  .right-panel {
-    border-top: 1px solid var(--border);
-    display: none; // Hide on mobile
+    display: flex;
+    flex-direction: column;
+    max-height: 45vh; // Allow more space for panel on mobile
+    min-height: 120px;
   }
 
   .panel-tabs {
-    overflow-x: auto;
     flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0.5rem;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
   }
 
+  .tab-btn {
+    min-width: 60px;
+    padding: 0.5rem;
+
+    .tab-icon {
+      font-size: 1.2rem;
+    }
+
+    .tab-label {
+      font-size: 0.65rem;
+    }
+  }
+
+  .panel-content {
+    padding: 0.75rem;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Text formatting on mobile
+  .text-formatting {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .style-buttons,
+  .align-buttons {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .style-btn,
+  .align-btn {
+    min-width: 44px;
+    min-height: 44px; // Touch-friendly size
+  }
+
+  .color-grid.compact {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.25rem;
+  }
+
+  .color-btn.small {
+    width: 32px;
+    height: 32px;
+  }
+
+  // Canvas area takes remaining space
   .canvas-area {
-    padding: 10px;
+    flex: 1;
+    min-height: 200px;
+    padding: 8px;
+    order: -1; // Put canvas first visually
   }
 
+  .canvas-wrapper {
+    max-width: 100%;
+    max-height: 100%;
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+      touch-action: none; // Prevent default touch behaviors
+    }
+  }
+
+  // Hide right panel completely on mobile
+  .right-panel {
+    display: none;
+  }
+
+  // Modal adjustments for mobile
   .modal {
     min-width: auto;
     width: 95vw;
-    margin: 1rem;
+    max-height: 90vh;
+    margin: auto;
+    overflow-y: auto;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .radio-group {
+    flex-wrap: wrap;
+  }
+
+  .radio-btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  // Upload button more compact
+  .upload-btn {
+    padding: 1.5rem 1rem;
+
+    .icon {
+      font-size: 1.5rem;
+    }
+  }
+
+  // Template buttons more compact
+  .template-btn {
+    padding: 0.6rem 0.75rem;
+
+    .template-icon {
+      font-size: 1.25rem;
+    }
+
+    .template-name {
+      font-size: 0.8rem;
+    }
+  }
+
+  // Color and gradient grids
+  .color-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.35rem;
+  }
+
+  .gradient-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+  }
+
+  .gradient-btn {
+    height: 40px;
+  }
+
+  // Add text buttons more compact
+  .add-btn {
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.35rem;
+
+    .preview {
+      min-width: 30px;
+    }
+
+    .label {
+      font-size: 0.85rem;
+    }
+
+    &.heading-btn .preview {
+      font-size: 1.25rem;
+    }
+
+    &.subheading-btn .preview {
+      font-size: 1.1rem;
+    }
+  }
+
+  // Slider controls
+  .slider-control,
+  .stroke-control {
+    gap: 0.5rem;
+
+    .slider-value {
+      min-width: 35px;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.35rem;
+    }
+  }
+
+  .size-control {
+    gap: 0.5rem;
+
+    .size-input {
+      width: 50px;
+      padding: 0.35rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  // Shadow controls
+  .shadow-controls {
+    padding: 0.5rem;
+    gap: 0.35rem;
+
+    .shadow-row {
+      >span:first-child {
+        min-width: 30px;
+        font-size: 0.7rem;
+      }
+    }
+  }
+
+  // Transform buttons
+  .transform-buttons {
+    gap: 0.35rem;
+  }
+
+  .transform-btn {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    min-height: 40px;
+  }
+
+  // Background color control
+  .bg-color-control {
+    .color-grid.compact.mini {
+      grid-template-columns: repeat(8, 1fr);
+    }
+  }
+}
+
+// Extra small screens (phones in portrait)
+@media (max-width: 480px) {
+  .toolbar {
+    padding: 0.35rem;
+  }
+
+  .toolbar-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-export {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .left-panel {
+    max-height: 50vh;
+  }
+
+  .panel-tabs {
+    padding: 0.35rem;
+  }
+
+  .tab-btn {
+    min-width: 50px;
+    padding: 0.4rem;
+
+    .tab-icon {
+      font-size: 1.1rem;
+    }
+
+    .tab-label {
+      font-size: 0.6rem;
+    }
+  }
+
+  .canvas-area {
+    padding: 4px;
+    min-height: 180px;
+  }
+
+  .color-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .color-grid.compact {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .gradient-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .radio-btn {
+    flex: 1 1 100%;
+    padding: 0.5rem;
   }
 }
