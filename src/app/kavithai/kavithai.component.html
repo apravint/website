@@ -27,11 +27,13 @@
             </div>
 
             <div class="grid-layout">
-                <!-- Top Ad -->
+                <!-- Top Ad - only show when content is available -->
+                @if ((kavithaigal$ | async)?.length) {
                 <div class="card centered">
                     <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
                     <app-ad-unit adSlot="1234567890"></app-ad-unit>
                 </div>
+                }
 
                 @if (errorMessage) {
                 <div class="error-state">
@@ -94,11 +96,13 @@
                 }
                 }
 
-                <!-- Bottom Ad -->
+                <!-- Bottom Ad - only show when content is available -->
+                @if ((kavithaigal$ | async)?.length) {
                 <div class="card centered">
                     <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
                     <app-ad-unit adSlot="1234567890"></app-ad-unit>
                 </div>
+                }
             </div>
         </div>
 
