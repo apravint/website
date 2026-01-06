@@ -81,82 +81,104 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         'Ubuntu'
     ];
 
-    // Enterprise Color Palettes (50+ colors)
+    // Premium Color Palettes (60+ designer colors)
     readonly colorPalettes = {
-        basics: [
-            '#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666',
-            '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6', '#ffffff'
+        monochrome: [
+            '#000000', '#0a0a0a', '#171717', '#262626', '#404040',
+            '#525252', '#737373', '#a3a3a3', '#d4d4d4', '#f5f5f5', '#ffffff'
+        ],
+        slate: [
+            '#0f172a', '#1e293b', '#334155', '#475569', '#64748b',
+            '#94a3b8', '#cbd5e1', '#e2e8f0', '#f1f5f9', '#f8fafc'
         ],
         brand: [
-            '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc',
-            '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd',
-            '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd',
+            '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
+            '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe',
         ],
-        warm: [
-            '#dc2626', '#ef4444', '#f87171', '#fca5a5',
-            '#ea580c', '#f97316', '#fb923c', '#fdba74',
-            '#ca8a04', '#eab308', '#facc15', '#fde047',
+        sunset: [
+            '#dc2626', '#ea580c', '#f97316', '#fb923c', '#fdba74',
+            '#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#fef08a',
         ],
-        cool: [
-            '#0891b2', '#06b6d4', '#22d3ee', '#67e8f9',
-            '#059669', '#10b981', '#34d399', '#6ee7b7',
-            '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4',
+        ocean: [
+            '#0c4a6e', '#0369a1', '#0284c7', '#0ea5e9', '#38bdf8',
+            '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
         ],
-        accent: [
-            '#db2777', '#ec4899', '#f472b6', '#f9a8d4',
-            '#9333ea', '#a855f7', '#c084fc', '#d8b4fe',
-            '#be123c', '#e11d48', '#f43f5e', '#fb7185',
+        rose: [
+            '#881337', '#be123c', '#e11d48', '#f43f5e', '#fb7185',
+            '#9d174d', '#db2777', '#ec4899', '#f472b6', '#f9a8d4',
+        ],
+        forest: [
+            '#14532d', '#166534', '#15803d', '#16a34a', '#22c55e',
+            '#365314', '#3f6212', '#4d7c0f', '#65a30d', '#84cc16',
         ]
     };
 
-    // Flat colors array for template
+    // Flat colors array for quick access
     readonly colors = [
-        '#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080',
-        '#999999', '#b3b3b3', '#cccccc', '#e6e6e6', '#ffffff',
-        '#4f46e5', '#6366f1', '#818cf8', '#7c3aed', '#8b5cf6',
-        '#2563eb', '#3b82f6', '#dc2626', '#ef4444', '#ea580c',
-        '#f97316', '#ca8a04', '#eab308', '#0891b2', '#06b6d4',
-        '#059669', '#10b981', '#db2777', '#ec4899', '#9333ea'
+        // Monochrome
+        '#000000', '#171717', '#404040', '#737373', '#d4d4d4', '#ffffff',
+        // Blues & Purples
+        '#0f172a', '#1e40af', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7',
+        // Warm
+        '#dc2626', '#ea580c', '#f97316', '#eab308', '#fbbf24',
+        // Cool
+        '#0369a1', '#0ea5e9', '#14b8a6', '#10b981', '#22c55e',
+        // Rose & Pink
+        '#be123c', '#e11d48', '#ec4899', '#f472b6',
+        // Premium
+        '#1e1b4b', '#312e81', '#4338ca', '#0891b2', '#059669'
     ];
 
-    // Enterprise Gradient Presets (30 gradients)
+    // Premium Gradient Presets (40 designer gradients)
     readonly gradients = [
-        // Classic
-        ['#667eea', '#764ba2'],
+        // 🌅 Sunset & Sunrise
+        ['#ff6b6b', '#feca57'],
+        ['#ff9a9e', '#fecfef'],
         ['#f093fb', '#f5576c'],
-        ['#4facfe', '#00f2fe'],
-        ['#43e97b', '#38f9d7'],
-        ['#fa709a', '#fee140'],
-        // Sunset & Warm
-        ['#ff0844', '#ffb199'],
-        ['#fc4a1a', '#f7b733'],
+        ['#ee0979', '#ff6a00'],
         ['#f12711', '#f5af19'],
-        ['#ff416c', '#ff4b2b'],
-        ['#ed4264', '#ffedbc'],
-        // Ocean & Cool
-        ['#6a11cb', '#2575fc'],
-        ['#11998e', '#38ef7d'],
+        // 🌊 Ocean & Sky
+        ['#667eea', '#764ba2'],
+        ['#4facfe', '#00f2fe'],
+        ['#0093E9', '#80D0C7'],
         ['#00c6ff', '#0072ff'],
-        ['#4776e6', '#8e54e9'],
-        ['#00b4db', '#0083b0'],
-        // Luxury
-        ['#a18cd1', '#fbc2eb'],
-        ['#d299c2', '#fef9d7'],
-        ['#accbee', '#e7f0fd'],
-        ['#e0c3fc', '#8ec5fc'],
-        ['#f5f7fa', '#c3cfe2'],
-        // Dark & Bold
-        ['#0f0c29', '#302b63'],
-        ['#1a1a2e', '#16213e'],
-        ['#232526', '#414345'],
-        ['#0f2027', '#2c5364'],
-        ['#141e30', '#243b55'],
-        // Nature
+        ['#48c6ef', '#6f86d6'],
+        // 🌿 Nature & Earth
+        ['#11998e', '#38ef7d'],
         ['#56ab2f', '#a8e063'],
         ['#134e5e', '#71b280'],
-        ['#1d976c', '#93f9b9'],
-        ['#3a6186', '#89253e'],
-        ['#e65c00', '#f9d423'],
+        ['#43e97b', '#38f9d7'],
+        ['#96fbc4', '#f9f586'],
+        // 💜 Purple Dreams
+        ['#6a11cb', '#2575fc'],
+        ['#a18cd1', '#fbc2eb'],
+        ['#e0c3fc', '#8ec5fc'],
+        ['#8360c3', '#2ebf91'],
+        ['#cc2b5e', '#753a88'],
+        // 🌙 Dark & Moody
+        ['#0f0c29', '#302b63', '#24243e'],
+        ['#232526', '#414345'],
+        ['#1a1a2e', '#16213e', '#0f3460'],
+        ['#000428', '#004e92'],
+        ['#141e30', '#243b55'],
+        // ✨ Luxury & Premium
+        ['#c9d6ff', '#e2e2e2'],
+        ['#f5f7fa', '#c3cfe2'],
+        ['#ffecd2', '#fcb69f'],
+        ['#d299c2', '#fef9d7'],
+        ['#accbee', '#e7f0fd'],
+        // 🔥 Bold & Vibrant
+        ['#fc4a1a', '#f7b733'],
+        ['#ff416c', '#ff4b2b'],
+        ['#f857a6', '#ff5858'],
+        ['#00b09b', '#96c93d'],
+        ['#ed4264', '#ffedbc'],
+        // 🎨 Artistic & Creative
+        ['#ff758c', '#ff7eb3'],
+        ['#7f7fd5', '#86a8e7', '#91eae4'],
+        ['#a8edea', '#fed6e3'],
+        ['#d558c8', '#24d292'],
+        ['#74ebd5', '#acb6e5'],
     ];
 
     // Enterprise Templates (35+ organized by category)
