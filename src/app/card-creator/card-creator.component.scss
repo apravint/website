@@ -1,21 +1,43 @@
+// ==================
+// PREMIUM DARK MODE TOKENS
+// ==================
+$premium-bg: #08080a;
+$premium-surface: #111114;
+$premium-elevated: #1a1a1f;
+$premium-border: rgba(255, 255, 255, 0.06);
+$premium-border-hover: rgba(255, 255, 255, 0.12);
+$premium-text: #fafafa;
+$premium-muted: #71717a;
+$premium-accent: #6366f1;
+$premium-accent-glow: rgba(99, 102, 241, 0.4);
+
+// Glassmorphism
+$glass-bg: rgba(255, 255, 255, 0.02);
+$glass-bg-hover: rgba(255, 255, 255, 0.05);
+$glass-border: rgba(255, 255, 255, 0.06);
+$glass-blur: 16px;
+
 .card-creator {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--bg);
+  background: $premium-bg;
   overflow: hidden;
+  color: $premium-text;
 }
 
 // ==================
-// TOOLBAR
+// TOOLBAR - Glassmorphism
 // ==================
 .toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: rgba($premium-surface, 0.8);
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  border-bottom: 1px solid $glass-border;
   gap: 1rem;
   z-index: 100;
 
@@ -39,23 +61,24 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius);
+  background: $glass-bg;
+  border: 1px solid transparent;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--text);
+  color: $premium-text;
 
   .icon {
     font-size: 1.25rem;
   }
 
   &:hover:not(:disabled) {
-    background: var(--border);
+    background: $glass-bg-hover;
+    border-color: $premium-border-hover;
   }
 
   &:disabled {
-    opacity: 0.4;
+    opacity: 0.3;
     cursor: not-allowed;
   }
 }
@@ -63,22 +86,29 @@
 .divider {
   width: 1px;
   height: 24px;
-  background: var(--border);
+  background: $premium-border;
   margin: 0 0.5rem;
 }
 
 .size-select {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
+  background: $premium-elevated;
+  border: 1px solid $premium-border;
+  border-radius: 10px;
+  color: $premium-text;
   cursor: pointer;
   min-width: 280px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $premium-border-hover;
+  }
 
   &:focus {
-    outline: var(--focus);
+    outline: none;
+    border-color: $premium-accent;
+    box-shadow: 0 0 0 3px $premium-accent-glow;
   }
 }
 
@@ -91,7 +121,7 @@
     min-width: 50px;
     text-align: center;
     font-size: 0.85rem;
-    color: var(--muted);
+    color: $premium-muted;
   }
 }
 
@@ -100,17 +130,17 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, $premium-accent 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  border-radius: var(--radius);
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+    box-shadow: 0 4px 20px $premium-accent-glow;
   }
 }
 
@@ -121,15 +151,18 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  background: $premium-bg;
 }
 
 // ==================
-// LEFT PANEL
+// LEFT PANEL - Glass
 // ==================
 .left-panel {
   width: 280px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: rgba($premium-surface, 0.6);
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  border-right: 1px solid $glass-border;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -140,8 +173,9 @@
   flex-wrap: nowrap;
   padding: 0.75rem 0.5rem;
   gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid $glass-border;
   overflow-x: auto;
+  background: rgba(0, 0, 0, 0.2);
 
   // Hide scrollbar but keep functionality
   scrollbar-width: none;
@@ -160,10 +194,10 @@
   gap: 0.35rem;
   padding: 0.5rem 0.75rem;
   background: transparent;
-  border: none;
-  border-radius: var(--radius);
+  border: 1px solid transparent;
+  border-radius: 10px;
   cursor: pointer;
-  color: var(--muted);
+  color: $premium-muted;
   transition: all 0.2s ease;
   white-space: nowrap;
 
@@ -177,13 +211,15 @@
   }
 
   &:hover {
-    background: var(--border);
-    color: var(--text);
+    background: $glass-bg-hover;
+    border-color: $premium-border;
+    color: $premium-text;
   }
 
   &.active {
-    background: rgba(var(--primary-rgb), 0.15);
-    color: var(--accent);
+    background: rgba($premium-accent, 0.15);
+    border-color: rgba($premium-accent, 0.3);
+    color: $premium-accent;
   }
 }
 
@@ -191,20 +227,38 @@
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $premium-border;
+    border-radius: 3px;
+
+    &:hover {
+      background: $premium-border-hover;
+    }
+  }
 }
 
 .panel-section {
   h4 {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--muted);
+    color: $premium-muted;
     margin-bottom: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
   }
 }
 
-// Text buttons
+// Text buttons - Premium glass style
 .add-btn {
   display: flex;
   align-items: center;
@@ -212,12 +266,12 @@
   width: 100%;
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: $glass-bg;
+  border: 1px solid $premium-border;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--text);
+  color: $premium-text;
 
   .preview {
     font-weight: 700;
@@ -229,8 +283,9 @@
   }
 
   &:hover {
-    border-color: var(--accent);
-    background: rgba(var(--primary-rgb), 0.05);
+    border-color: $premium-accent;
+    background: rgba($premium-accent, 0.08);
+    box-shadow: 0 0 20px rgba($premium-accent, 0.1);
   }
 
   &.heading-btn .preview {
