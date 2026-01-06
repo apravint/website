@@ -27,13 +27,6 @@
             </div>
 
             <div class="grid-layout">
-                <!-- Top Ad - only show when content is available -->
-                @if ((kavithaigal$ | async)?.length) {
-                <div class="card centered">
-                    <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
-                    <app-ad-unit adSlot="1234567890"></app-ad-unit>
-                </div>
-                }
 
                 @if (errorMessage) {
                 <div class="error-state">
@@ -77,8 +70,8 @@
                     </div>
                 </div>
 
-                <!-- Ad after every 3 poems -->
-                @if ((i + 1) % 3 === 0) {
+                <!-- Ad after every 6 poems -->
+                @if ((i + 1) % 6 === 0) {
                 <div class="card centered">
                     <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
                     <app-ad-unit adSlot="1234567890"></app-ad-unit>
