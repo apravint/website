@@ -40,8 +40,8 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly selectedTextAlign = signal<'left' | 'center' | 'right'>('center');
     readonly isBold = signal(false);
     readonly isItalic = signal(false);
-
-    // Advanced text formatting state
+    readonly fontWeight = signal(400); // Variable font weight: 100-900
+    readonly selectedFontCategory = signal('all'); // Font category filter
     readonly isUnderline = signal(false);
     readonly isStrikethrough = signal(false);
     readonly letterSpacing = signal(0);
@@ -57,155 +57,329 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly textBackgroundColor = signal('');
     readonly textTransform = signal<'none' | 'uppercase' | 'lowercase' | 'capitalize'>('none');
 
-    // Google Fonts for text
-    readonly fonts = [
-        'Noto Sans Tamil',
-        'Noto Serif Tamil',
-        'Mukta Malar',
-        'Catamaran',
-        'Hind Madurai',
-        'Meera Inimai',
-        'Poppins',
-        'Inter',
-        'Outfit',
-        'Roboto',
-        'Open Sans',
-        'Lato',
-        'Montserrat',
-        'Playfair Display',
-        'Dancing Script',
-        'Pacifico',
-        'Bebas Neue',
-        'Oswald',
-        'Raleway',
-        'Ubuntu'
+    // Premium Font Library with Variable Font Support
+    readonly fontCategories = [
+        { id: 'tamil', name: 'தமிழ் Tamil', icon: '🏛️' },
+        { id: 'modern', name: 'Modern Sans', icon: '✨' },
+        { id: 'classic', name: 'Classic Serif', icon: '📚' },
+        { id: 'display', name: 'Display', icon: '🎨' },
+        { id: 'script', name: 'Script & Hand', icon: '✍️' },
     ];
 
-    // Enterprise Color Palettes (50+ colors)
+    readonly fontLibrary: { name: string; category: string; variable: boolean; weights: string }[] = [
+        // Tamil Fonts
+        { name: 'Noto Sans Tamil', category: 'tamil', variable: true, weights: '100-900' },
+        { name: 'Noto Serif Tamil', category: 'tamil', variable: true, weights: '100-900' },
+        { name: 'Mukta Malar', category: 'tamil', variable: false, weights: '200-800' },
+        { name: 'Catamaran', category: 'tamil', variable: false, weights: '100-900' },
+        { name: 'Hind Madurai', category: 'tamil', variable: false, weights: '300-700' },
+        { name: 'Meera Inimai', category: 'tamil', variable: false, weights: '400' },
+        // Modern Sans (Variable)
+        { name: 'Inter', category: 'modern', variable: true, weights: '100-900' },
+        { name: 'Outfit', category: 'modern', variable: true, weights: '100-900' },
+        { name: 'Plus Jakarta Sans', category: 'modern', variable: true, weights: '200-800' },
+        { name: 'DM Sans', category: 'modern', variable: true, weights: '100-900' },
+        { name: 'Space Grotesk', category: 'modern', variable: true, weights: '300-700' },
+        { name: 'Manrope', category: 'modern', variable: true, weights: '200-800' },
+        { name: 'Sora', category: 'modern', variable: true, weights: '100-800' },
+        { name: 'Poppins', category: 'modern', variable: false, weights: '100-900' },
+        { name: 'Roboto', category: 'modern', variable: false, weights: '100-900' },
+        // Classic Serif
+        { name: 'Playfair Display', category: 'classic', variable: true, weights: '400-900' },
+        { name: 'Cormorant', category: 'classic', variable: true, weights: '300-700' },
+        { name: 'Libre Baskerville', category: 'classic', variable: false, weights: '400-700' },
+        { name: 'Lora', category: 'classic', variable: true, weights: '400-700' },
+        { name: 'Merriweather', category: 'classic', variable: false, weights: '300-900' },
+        // Display Fonts
+        { name: 'Bebas Neue', category: 'display', variable: false, weights: '400' },
+        { name: 'Oswald', category: 'display', variable: true, weights: '200-700' },
+        { name: 'Anton', category: 'display', variable: false, weights: '400' },
+        { name: 'Abril Fatface', category: 'display', variable: false, weights: '400' },
+        { name: 'Righteous', category: 'display', variable: false, weights: '400' },
+        // Script & Handwriting
+        { name: 'Dancing Script', category: 'script', variable: true, weights: '400-700' },
+        { name: 'Pacifico', category: 'script', variable: false, weights: '400' },
+        { name: 'Caveat', category: 'script', variable: true, weights: '400-700' },
+        { name: 'Satisfy', category: 'script', variable: false, weights: '400' },
+        { name: 'Great Vibes', category: 'script', variable: false, weights: '400' },
+    ];
+
+    // Flat fonts array for backward compatibility
+    readonly fonts = this.fontLibrary.map(f => f.name);
+
+    // Premium Color Palettes (60+ designer colors)
     readonly colorPalettes = {
-        basics: [
-            '#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666',
-            '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6', '#ffffff'
+        monochrome: [
+            '#000000', '#0a0a0a', '#171717', '#262626', '#404040',
+            '#525252', '#737373', '#a3a3a3', '#d4d4d4', '#f5f5f5', '#ffffff'
+        ],
+        slate: [
+            '#0f172a', '#1e293b', '#334155', '#475569', '#64748b',
+            '#94a3b8', '#cbd5e1', '#e2e8f0', '#f1f5f9', '#f8fafc'
         ],
         brand: [
-            '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc',
-            '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd',
-            '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd',
+            '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
+            '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe',
         ],
-        warm: [
-            '#dc2626', '#ef4444', '#f87171', '#fca5a5',
-            '#ea580c', '#f97316', '#fb923c', '#fdba74',
-            '#ca8a04', '#eab308', '#facc15', '#fde047',
+        sunset: [
+            '#dc2626', '#ea580c', '#f97316', '#fb923c', '#fdba74',
+            '#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#fef08a',
         ],
-        cool: [
-            '#0891b2', '#06b6d4', '#22d3ee', '#67e8f9',
-            '#059669', '#10b981', '#34d399', '#6ee7b7',
-            '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4',
+        ocean: [
+            '#0c4a6e', '#0369a1', '#0284c7', '#0ea5e9', '#38bdf8',
+            '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
         ],
-        accent: [
-            '#db2777', '#ec4899', '#f472b6', '#f9a8d4',
-            '#9333ea', '#a855f7', '#c084fc', '#d8b4fe',
-            '#be123c', '#e11d48', '#f43f5e', '#fb7185',
+        rose: [
+            '#881337', '#be123c', '#e11d48', '#f43f5e', '#fb7185',
+            '#9d174d', '#db2777', '#ec4899', '#f472b6', '#f9a8d4',
+        ],
+        forest: [
+            '#14532d', '#166534', '#15803d', '#16a34a', '#22c55e',
+            '#365314', '#3f6212', '#4d7c0f', '#65a30d', '#84cc16',
         ]
     };
 
-    // Flat colors array for template
+    // Flat colors array for quick access
     readonly colors = [
-        '#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080',
-        '#999999', '#b3b3b3', '#cccccc', '#e6e6e6', '#ffffff',
-        '#4f46e5', '#6366f1', '#818cf8', '#7c3aed', '#8b5cf6',
-        '#2563eb', '#3b82f6', '#dc2626', '#ef4444', '#ea580c',
-        '#f97316', '#ca8a04', '#eab308', '#0891b2', '#06b6d4',
-        '#059669', '#10b981', '#db2777', '#ec4899', '#9333ea'
+        // Monochrome
+        '#000000', '#171717', '#404040', '#737373', '#d4d4d4', '#ffffff',
+        // Blues & Purples
+        '#0f172a', '#1e40af', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7',
+        // Warm
+        '#dc2626', '#ea580c', '#f97316', '#eab308', '#fbbf24',
+        // Cool
+        '#0369a1', '#0ea5e9', '#14b8a6', '#10b981', '#22c55e',
+        // Rose & Pink
+        '#be123c', '#e11d48', '#ec4899', '#f472b6',
+        // Premium
+        '#1e1b4b', '#312e81', '#4338ca', '#0891b2', '#059669'
     ];
 
-    // Enterprise Gradient Presets (30 gradients)
+    // Premium Gradient Presets (40 designer gradients)
     readonly gradients = [
-        // Classic
-        ['#667eea', '#764ba2'],
+        // 🌅 Sunset & Sunrise
+        ['#ff6b6b', '#feca57'],
+        ['#ff9a9e', '#fecfef'],
         ['#f093fb', '#f5576c'],
-        ['#4facfe', '#00f2fe'],
-        ['#43e97b', '#38f9d7'],
-        ['#fa709a', '#fee140'],
-        // Sunset & Warm
-        ['#ff0844', '#ffb199'],
-        ['#fc4a1a', '#f7b733'],
+        ['#ee0979', '#ff6a00'],
         ['#f12711', '#f5af19'],
-        ['#ff416c', '#ff4b2b'],
-        ['#ed4264', '#ffedbc'],
-        // Ocean & Cool
-        ['#6a11cb', '#2575fc'],
-        ['#11998e', '#38ef7d'],
+        // 🌊 Ocean & Sky
+        ['#667eea', '#764ba2'],
+        ['#4facfe', '#00f2fe'],
+        ['#0093E9', '#80D0C7'],
         ['#00c6ff', '#0072ff'],
-        ['#4776e6', '#8e54e9'],
-        ['#00b4db', '#0083b0'],
-        // Luxury
-        ['#a18cd1', '#fbc2eb'],
-        ['#d299c2', '#fef9d7'],
-        ['#accbee', '#e7f0fd'],
-        ['#e0c3fc', '#8ec5fc'],
-        ['#f5f7fa', '#c3cfe2'],
-        // Dark & Bold
-        ['#0f0c29', '#302b63'],
-        ['#1a1a2e', '#16213e'],
-        ['#232526', '#414345'],
-        ['#0f2027', '#2c5364'],
-        ['#141e30', '#243b55'],
-        // Nature
+        ['#48c6ef', '#6f86d6'],
+        // 🌿 Nature & Earth
+        ['#11998e', '#38ef7d'],
         ['#56ab2f', '#a8e063'],
         ['#134e5e', '#71b280'],
-        ['#1d976c', '#93f9b9'],
-        ['#3a6186', '#89253e'],
-        ['#e65c00', '#f9d423'],
+        ['#43e97b', '#38f9d7'],
+        ['#96fbc4', '#f9f586'],
+        // 💜 Purple Dreams
+        ['#6a11cb', '#2575fc'],
+        ['#a18cd1', '#fbc2eb'],
+        ['#e0c3fc', '#8ec5fc'],
+        ['#8360c3', '#2ebf91'],
+        ['#cc2b5e', '#753a88'],
+        // 🌙 Dark & Moody
+        ['#0f0c29', '#302b63', '#24243e'],
+        ['#232526', '#414345'],
+        ['#1a1a2e', '#16213e', '#0f3460'],
+        ['#000428', '#004e92'],
+        ['#141e30', '#243b55'],
+        // ✨ Luxury & Premium
+        ['#c9d6ff', '#e2e2e2'],
+        ['#f5f7fa', '#c3cfe2'],
+        ['#ffecd2', '#fcb69f'],
+        ['#d299c2', '#fef9d7'],
+        ['#accbee', '#e7f0fd'],
+        // 🔥 Bold & Vibrant
+        ['#fc4a1a', '#f7b733'],
+        ['#ff416c', '#ff4b2b'],
+        ['#f857a6', '#ff5858'],
+        ['#00b09b', '#96c93d'],
+        ['#ed4264', '#ffedbc'],
+        // 🎨 Artistic & Creative
+        ['#ff758c', '#ff7eb3'],
+        ['#7f7fd5', '#86a8e7', '#91eae4'],
+        ['#a8edea', '#fed6e3'],
+        ['#d558c8', '#24d292'],
+        ['#74ebd5', '#acb6e5'],
     ];
 
-    // Enterprise Templates (25+ organized by category)
+    // Premium Texture Library (CSS patterns and gradients for backgrounds)
+    readonly textureCategories = [
+        { id: 'paper', name: 'Paper', icon: '📄' },
+        { id: 'fabric', name: 'Fabric', icon: '🧵' },
+        { id: 'geometric', name: 'Geometric', icon: '🔷' },
+        { id: 'noise', name: 'Noise', icon: '📺' },
+        { id: 'luxury', name: 'Luxury', icon: '✨' },
+    ];
+
+    readonly textures = [
+        // Paper textures (CSS gradients simulating paper)
+        { id: 'paper-cream', name: 'Cream Paper', category: 'paper', css: 'linear-gradient(135deg, #fef9ef 0%, #f5f0e3 100%)' },
+        { id: 'paper-kraft', name: 'Kraft Paper', category: 'paper', css: 'linear-gradient(180deg, #c4a77d 0%, #b8956e 100%)' },
+        { id: 'paper-recycled', name: 'Recycled', category: 'paper', css: 'linear-gradient(135deg, #e8e0d5 0%, #d4ccc0 50%, #e0d8cd 100%)' },
+        { id: 'paper-white', name: 'Cotton White', category: 'paper', css: 'linear-gradient(145deg, #ffffff 0%, #f8f8f8 50%, #ffffff 100%)' },
+        // Fabric textures
+        { id: 'fabric-linen', name: 'Linen', category: 'fabric', css: 'linear-gradient(90deg, #f5f5dc 25%, #f0f0d0 50%, #f5f5dc 75%)' },
+        { id: 'fabric-denim', name: 'Denim Blue', category: 'fabric', css: 'linear-gradient(145deg, #4a6fa5 0%, #3a5a89 100%)' },
+        { id: 'fabric-velvet', name: 'Velvet Purple', category: 'fabric', css: 'linear-gradient(135deg, #4a1a6b 0%, #2d1042 100%)' },
+        { id: 'fabric-silk', name: 'Silk Rose', category: 'fabric', css: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #fce4ec 100%)' },
+        // Geometric patterns
+        { id: 'geo-dots', name: 'Polka Dots', category: 'geometric', css: 'radial-gradient(circle, #000 1px, transparent 1px), linear-gradient(#f5f5f5, #f5f5f5)' },
+        { id: 'geo-grid', name: 'Grid', category: 'geometric', css: 'linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, #ffffff 1px)' },
+        { id: 'geo-diagonal', name: 'Diagonal Lines', category: 'geometric', css: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px), #ffffff' },
+        { id: 'geo-hexagon', name: 'Hexagon Dark', category: 'geometric', css: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' },
+        // Noise/grain textures
+        { id: 'noise-light', name: 'Light Grain', category: 'noise', css: 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)' },
+        { id: 'noise-dark', name: 'Dark Grain', category: 'noise', css: 'linear-gradient(135deg, #1f1f1f 0%, #0f0f0f 100%)' },
+        { id: 'noise-warm', name: 'Warm Grain', category: 'noise', css: 'linear-gradient(135deg, #3d3024 0%, #2a2018 100%)' },
+        { id: 'noise-cool', name: 'Cool Grain', category: 'noise', css: 'linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%)' },
+        // Luxury textures
+        { id: 'luxury-gold', name: 'Gold Shimmer', category: 'luxury', css: 'linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%)' },
+        { id: 'luxury-silver', name: 'Silver Shine', category: 'luxury', css: 'linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 25%, #a8a8a8 50%, #e0e0e0 75%, #b0b0b0 100%)' },
+        { id: 'luxury-rose', name: 'Rose Gold', category: 'luxury', css: 'linear-gradient(135deg, #b76e79 0%, #ecc5c0 25%, #c78283 50%, #e8c4c4 75%, #b76e79 100%)' },
+        { id: 'luxury-marble', name: 'Marble White', category: 'luxury', css: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 25%, #f0f0f0 50%, #e5e5e5 75%, #f8f8f8 100%)' },
+        { id: 'luxury-onyx', name: 'Black Onyx', category: 'luxury', css: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #0f0f0f 50%, #151515 75%, #0a0a0a 100%)' },
+    ];
+
+    // 3D Text Effect Presets
+    readonly textEffectPresets = [
+        { id: 'none', name: 'None', icon: '—' },
+        { id: '3d-shadow', name: '3D Shadow', icon: '🎭', shadow: '3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,0.3)' },
+        { id: '3d-depth', name: 'Deep 3D', icon: '📦', shadow: '1px 1px 0 #333, 2px 2px 0 #333, 3px 3px 0 #333, 4px 4px 0 #333, 5px 5px 0 #333' },
+        { id: 'neon-glow', name: 'Neon Glow', icon: '💡', shadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 40px #6366f1, 0 0 80px #6366f1' },
+        { id: 'fire-glow', name: 'Fire Glow', icon: '🔥', shadow: '0 0 10px #ff6b35, 0 0 20px #f7c59f, 0 0 40px #ff6b35' },
+        { id: 'retro', name: 'Retro Offset', icon: '📼', shadow: '4px 4px 0 #ec4899, -2px -2px 0 #22d3ee' },
+        { id: 'emboss', name: 'Emboss', icon: '🏷️', shadow: '-1px -1px 0 rgba(255,255,255,0.5), 1px 1px 2px rgba(0,0,0,0.3)' },
+        { id: 'outline', name: 'Bold Outline', icon: '⭕', shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000' },
+        { id: 'long-shadow', name: 'Long Shadow', icon: '📐', shadow: '1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1), 3px 3px 0 rgba(0,0,0,0.1), 4px 4px 0 rgba(0,0,0,0.1), 5px 5px 0 rgba(0,0,0,0.1), 6px 6px 0 rgba(0,0,0,0.1), 7px 7px 0 rgba(0,0,0,0.1), 8px 8px 0 rgba(0,0,0,0.1)' },
+    ];
+
+    // Shapes Library
+    readonly shapeCategories = [
+        { id: 'basic', name: 'Basic', icon: '⬜' },
+        { id: 'arrows', name: 'Arrows', icon: '➡️' },
+        { id: 'decorative', name: 'Decorative', icon: '✨' },
+    ];
+
+    readonly shapeLibrary = [
+        // Basic shapes
+        { id: 'rect', name: 'Rectangle', category: 'basic', icon: '⬜' },
+        { id: 'circle', name: 'Circle', category: 'basic', icon: '⚪' },
+        { id: 'ellipse', name: 'Ellipse', category: 'basic', icon: '⬭' },
+        { id: 'triangle', name: 'Triangle', category: 'basic', icon: '🔺' },
+        { id: 'diamond', name: 'Diamond', category: 'basic', icon: '🔷' },
+        { id: 'line', name: 'Line', category: 'basic', icon: '➖' },
+        // Arrows
+        { id: 'arrow', name: 'Arrow', category: 'arrows', icon: '➡️' },
+        { id: 'arrow-up', name: 'Arrow Up', category: 'arrows', icon: '⬆️' },
+        { id: 'arrow-down', name: 'Arrow Down', category: 'arrows', icon: '⬇️' },
+        // Decorative
+        { id: 'star', name: 'Star', category: 'decorative', icon: '⭐' },
+        { id: 'heart', name: 'Heart', category: 'decorative', icon: '❤️' },
+        { id: 'badge', name: 'Badge', category: 'decorative', icon: '🏷️' },
+    ];
+
+    // Border/Frame Presets
+    readonly borderPresets = [
+        { id: 'none', name: 'None', width: 0, style: 'none', color: 'transparent' },
+        { id: 'thin-black', name: 'Thin Black', width: 2, style: 'solid', color: '#000000' },
+        { id: 'thin-white', name: 'Thin White', width: 2, style: 'solid', color: '#ffffff' },
+        { id: 'medium-black', name: 'Medium Black', width: 6, style: 'solid', color: '#000000' },
+        { id: 'medium-white', name: 'Medium White', width: 6, style: 'solid', color: '#ffffff' },
+        { id: 'thick-black', name: 'Thick Black', width: 12, style: 'solid', color: '#000000' },
+        { id: 'thick-white', name: 'Thick White', width: 12, style: 'solid', color: '#ffffff' },
+        { id: 'double-black', name: 'Double Line', width: 6, style: 'double', color: '#000000' },
+        { id: 'dashed', name: 'Dashed', width: 4, style: 'dashed', color: '#000000' },
+        { id: 'dotted', name: 'Dotted', width: 4, style: 'dotted', color: '#000000' },
+        { id: 'gold-frame', name: 'Gold Frame', width: 8, style: 'solid', color: '#d4a574' },
+        { id: 'gradient-frame', name: 'Purple Gradient', width: 8, style: 'solid', color: '#6366f1' },
+    ];
+
+    // Magic Resize Size Categories
+    readonly sizeCategories = [
+        { id: 'social-square', name: 'Social (Square)', icon: '⬜' },
+        { id: 'social-story', name: 'Social (Story)', icon: '📱' },
+        { id: 'social-wide', name: 'Social (Wide)', icon: '🖼️' },
+        { id: 'business', name: 'Business Cards', icon: '💳' },
+        { id: 'print', name: 'Print', icon: '🖨️' },
+        { id: 'digital', name: 'Digital', icon: '💻' },
+    ];
+
+    // Enterprise Templates (35+ organized by category)
     readonly templateCategories = [
         { id: 'blank', name: 'Blank', icon: '📄' },
         { id: 'quotes', name: 'Quotes', icon: '💬' },
         { id: 'poems', name: 'Poems', icon: '📜' },
+        { id: 'motivational', name: 'Motivation', icon: '🔥' },
+        { id: 'aesthetic', name: 'Aesthetic', icon: '🎨' },
         { id: 'festivals', name: 'Festivals', icon: '🎉' },
         { id: 'social', name: 'Social', icon: '📱' },
         { id: 'business', name: 'Business', icon: '💼' },
     ];
 
     readonly templates = [
-        // Blank
-        { id: 'blank', name: 'Blank Canvas', category: 'blank', icon: '📄' },
-        { id: 'blank-dark', name: 'Dark Canvas', category: 'blank', icon: '🌙' },
-        { id: 'blank-gradient', name: 'Gradient Canvas', category: 'blank', icon: '🌈' },
-        // Quotes
-        { id: 'quote-minimal', name: 'Minimal Quote', category: 'quotes', icon: '💬' },
-        { id: 'quote-elegant', name: 'Elegant Quote', category: 'quotes', icon: '✨' },
-        { id: 'quote-bold', name: 'Bold Quote', category: 'quotes', icon: '💪' },
-        { id: 'quote-motivational', name: 'Motivational', category: 'quotes', icon: '🚀' },
+        // === BLANK ===
+        { id: 'blank', name: 'Clean White', category: 'blank', icon: '⬜' },
+        { id: 'blank-dark', name: 'Dark Mode', category: 'blank', icon: '⬛' },
+        { id: 'blank-gradient', name: 'Purple Dream', category: 'blank', icon: '💜' },
+        { id: 'blank-sunset', name: 'Sunset Glow', category: 'blank', icon: '🌅' },
+        { id: 'blank-ocean', name: 'Ocean Depth', category: 'blank', icon: '🌊' },
+
+        // === QUOTES ===
+        { id: 'quote-minimal', name: 'Minimal Dark', category: 'quotes', icon: '✨' },
+        { id: 'quote-elegant', name: 'Elegant Purple', category: 'quotes', icon: '💎' },
+        { id: 'quote-bold', name: 'Bold Impact', category: 'quotes', icon: '💪' },
+        { id: 'quote-glass', name: 'Glass Card', category: 'quotes', icon: '🪟' },
+        { id: 'quote-neon', name: 'Neon Glow', category: 'quotes', icon: '⚡' },
         { id: 'quote-love', name: 'Love Quote', category: 'quotes', icon: '❤️' },
-        // Poems
-        { id: 'poem-classic', name: 'Classic Poem', category: 'poems', icon: '📜' },
-        { id: 'poem-modern', name: 'Modern Verse', category: 'poems', icon: '✍️' },
-        { id: 'poem-haiku', name: 'Haiku Style', category: 'poems', icon: '🌸' },
-        { id: 'poem-tamil', name: 'Tamil Classical', category: 'poems', icon: '🏛️' },
-        // Festivals
+
+        // === POEMS ===
+        { id: 'poem-classic', name: 'Classic Parchment', category: 'poems', icon: '📜' },
+        { id: 'poem-modern', name: 'Modern Minimal', category: 'poems', icon: '✍️' },
+        { id: 'poem-tamil', name: 'சென்தமிழ் Classical', category: 'poems', icon: '🏛️' },
+        { id: 'poem-nature', name: 'Nature Inspired', category: 'poems', icon: '🌿' },
+        { id: 'poem-night', name: 'Starry Night', category: 'poems', icon: '🌙' },
+
+        // === MOTIVATIONAL ===
+        { id: 'motive-fire', name: 'On Fire', category: 'motivational', icon: '🔥' },
+        { id: 'motive-success', name: 'Success Path', category: 'motivational', icon: '🚀' },
+        { id: 'motive-strength', name: 'Inner Strength', category: 'motivational', icon: '💪' },
+        { id: 'motive-dream', name: 'Dream Big', category: 'motivational', icon: '✨' },
+        { id: 'motive-focus', name: 'Stay Focused', category: 'motivational', icon: '🎯' },
+
+        // === AESTHETIC ===
+        { id: 'aesthetic-pastel', name: 'Pastel Dreams', category: 'aesthetic', icon: '🎀' },
+        { id: 'aesthetic-retrowave', name: 'Retrowave', category: 'aesthetic', icon: '🌆' },
+        { id: 'aesthetic-minimal', name: 'Clean Minimal', category: 'aesthetic', icon: '⚪' },
+        { id: 'aesthetic-gradient', name: 'Mesh Gradient', category: 'aesthetic', icon: '🎨' },
+        { id: 'aesthetic-dark', name: 'Dark Academia', category: 'aesthetic', icon: '📚' },
+
+        // === FESTIVALS ===
         { id: 'pongal', name: 'Pongal Wishes', category: 'festivals', icon: '🌾' },
-        { id: 'diwali', name: 'Diwali Wishes', category: 'festivals', icon: '🪔' },
-        { id: 'newyear-tamil', name: 'Tamil New Year', category: 'festivals', icon: '🎊' },
-        { id: 'newyear', name: 'New Year', category: 'festivals', icon: '🎆' },
-        { id: 'christmas', name: 'Christmas', category: 'festivals', icon: '🎄' },
-        { id: 'eid', name: 'Eid Mubarak', category: 'festivals', icon: '🌙' },
-        { id: 'birthday', name: 'Birthday', category: 'festivals', icon: '🎂' },
-        { id: 'wedding', name: 'Wedding', category: 'festivals', icon: '💒' },
-        // Social Media
+        { id: 'diwali', name: 'Diwali Lights', category: 'festivals', icon: '🪔' },
+        { id: 'newyear-tamil', name: 'தமிழ் புத்தாண்டு', category: 'festivals', icon: '🎊' },
+        { id: 'newyear', name: 'New Year 2026', category: 'festivals', icon: '🎆' },
+        { id: 'christmas', name: 'Merry Christmas', category: 'festivals', icon: '🎄' },
+        { id: 'birthday', name: 'Birthday Bash', category: 'festivals', icon: '🎂' },
+        { id: 'wedding', name: 'Wedding Bliss', category: 'festivals', icon: '💒' },
+
+        // === SOCIAL MEDIA ===
         { id: 'instagram', name: 'Instagram Post', category: 'social', icon: '📸' },
-        { id: 'instagram-story', name: 'Instagram Story', category: 'social', icon: '📱' },
+        { id: 'instagram-story', name: 'Insta Story', category: 'social', icon: '📱' },
         { id: 'whatsapp', name: 'WhatsApp Status', category: 'social', icon: '💬' },
-        { id: 'facebook', name: 'Facebook Post', category: 'social', icon: '👍' },
-        { id: 'twitter', name: 'Twitter/X Post', category: 'social', icon: '🐦' },
-        { id: 'youtube', name: 'YouTube Thumbnail', category: 'social', icon: '▶️' },
-        // Business
+        { id: 'youtube', name: 'YouTube Thumb', category: 'social', icon: '▶️' },
+        { id: 'twitter', name: 'X / Twitter', category: 'social', icon: '🐦' },
+
+        // === BUSINESS ===
         { id: 'announcement', name: 'Announcement', category: 'business', icon: '📢' },
-        { id: 'sale', name: 'Sale Banner', category: 'business', icon: '🏷️' },
+        { id: 'sale', name: 'Flash Sale', category: 'business', icon: '🏷️' },
         { id: 'thankyou', name: 'Thank You Card', category: 'business', icon: '🙏' },
-        { id: 'invitation', name: 'Invitation', category: 'business', icon: '📩' },
+        { id: 'invitation', name: 'Event Invite', category: 'business', icon: '📩' },
+        { id: 'launch', name: 'Product Launch', category: 'business', icon: '🚀' },
     ];
 
     constructor(
@@ -373,6 +547,20 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.saveHistory();
     }
 
+    // Variable font weight (100-900)
+    setFontWeight(weight: number): void {
+        this.fontWeight.set(weight);
+        this.canvasService.updateSelectedText({ fontWeight: weight });
+        this.saveHistory();
+    }
+
+    // Get filtered fonts by category
+    getFilteredFonts(): { name: string; category: string; variable: boolean; weights: string }[] {
+        const category = this.selectedFontCategory();
+        if (category === 'all') return this.fontLibrary;
+        return this.fontLibrary.filter(f => f.category === category);
+    }
+
     toggleUnderline(): void {
         const newUnderline = !this.isUnderline();
         this.isUnderline.set(newUnderline);
@@ -438,6 +626,33 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     setTextShadowColor(color: string): void {
         this.textShadowColor.set(color);
         if (this.textShadowEnabled()) this.updateTextShadow();
+    }
+
+    // Apply 3D text effect preset
+    applyTextEffectPreset(presetId: string): void {
+        const preset = this.textEffectPresets.find(p => p.id === presetId);
+        if (!preset) return;
+
+        if (presetId === 'none') {
+            // Remove shadow
+            this.textShadowEnabled.set(false);
+            this.canvasService.updateSelectedText({ shadow: null });
+        } else if (preset.shadow) {
+            // Parse shadow string and apply - using first shadow for Fabric.js
+            const shadows = preset.shadow.split(',').map(s => s.trim());
+            if (shadows.length > 0) {
+                const parts = shadows[0].match(/(-?\d+)px\s+(-?\d+)px\s+(\d+)px?\s*(.*)/);
+                if (parts) {
+                    this.textShadowEnabled.set(true);
+                    this.textShadowX.set(parseInt(parts[1]) || 0);
+                    this.textShadowY.set(parseInt(parts[2]) || 0);
+                    this.textShadowBlur.set(parseInt(parts[3]) || 0);
+                    this.textShadowColor.set(parts[4] || '#000000');
+                    this.updateTextShadow();
+                }
+            }
+        }
+        this.saveHistory();
     }
 
     setTextStroke(width: number, color?: string): void {
@@ -658,341 +873,239 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     applyTemplate(templateId: string): void {
         this.canvasService.clear();
 
-        // Apply template-specific settings
         switch (templateId) {
-            // === BLANK TEMPLATES ===
+            // === BLANK ===
             case 'blank':
                 this.canvasService.setBackgroundColor('#ffffff');
                 break;
             case 'blank-dark':
-                this.canvasService.setBackgroundColor('#1e293b');
+                this.canvasService.setBackgroundColor('#0f172a');
                 break;
             case 'blank-gradient':
                 this.canvasService.setBackgroundGradient(['#667eea', '#764ba2']);
                 break;
+            case 'blank-sunset':
+                this.canvasService.setBackgroundGradient(['#f97316', '#ec4899']);
+                break;
+            case 'blank-ocean':
+                this.canvasService.setBackgroundGradient(['#0891b2', '#1e3a8a']);
+                break;
 
-            // === QUOTE TEMPLATES ===
+            // === QUOTES ===
             case 'quote-minimal':
-                this.canvasService.setBackgroundColor('#1e293b');
-                this.canvasService.addText({
-                    text: '"உங்கள் மேற்கோள் இங்கே"',
-                    fill: '#ffffff',
-                    fontSize: 48,
-                    fontFamily: 'Noto Serif Tamil',
-                    textAlign: 'center'
-                });
+                this.canvasService.setBackgroundColor('#0f172a');
+                this.canvasService.addText({ text: '"', fill: '#6366f1', fontSize: 200, fontFamily: 'Playfair Display', top: 80, opacity: 0.3 });
+                this.canvasService.addText({ text: 'உங்கள் மேற்கோள் இங்கே', fill: '#f1f5f9', fontSize: 48, fontFamily: 'Noto Serif Tamil', textAlign: 'center' } as any);
+                this.canvasService.addText({ text: '— ஆசிரியர்', fill: '#64748b', fontSize: 24, fontFamily: 'Noto Sans Tamil', top: 520 });
                 break;
             case 'quote-elegant':
-                this.canvasService.setBackgroundGradient(['#667eea', '#764ba2']);
-                this.canvasService.addText({
-                    text: '"வாழ்க்கை அழகானது"',
-                    fill: '#ffffff',
-                    fontSize: 56,
-                    fontFamily: 'Noto Serif Tamil',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.setBackgroundGradient(['#4f46e5', '#7c3aed']);
+                this.canvasService.addText({ text: '✦', fill: '#fbbf24', fontSize: 60, top: 120 });
+                this.canvasService.addText({ text: '"வாழ்க்கை அழகானது"', fill: '#ffffff', fontSize: 52, fontFamily: 'Noto Serif Tamil', fontWeight: 'bold' } as any);
+                this.canvasService.addText({ text: '— ஆசிரியர் பெயர்', fill: '#c7d2fe', fontSize: 24, top: 520 });
                 break;
             case 'quote-bold':
                 this.canvasService.setBackgroundColor('#000000');
-                this.canvasService.addText({
-                    text: '"தைரியமாக இரு"',
-                    fill: '#fbbf24',
-                    fontSize: 72,
-                    fontFamily: 'Noto Sans Tamil',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: 'தைரியமாக', fill: '#fbbf24', fontSize: 80, fontFamily: 'Noto Sans Tamil', fontWeight: 'bold', top: 250 } as any);
+                this.canvasService.addText({ text: 'இரு', fill: '#ffffff', fontSize: 80, fontFamily: 'Noto Sans Tamil', fontWeight: 'bold', top: 360 } as any);
                 break;
-            case 'quote-motivational':
-                this.canvasService.setBackgroundGradient(['#f97316', '#ea580c']);
-                this.canvasService.addText({
-                    text: '🚀 வெற்றி உங்களுடையது! 🚀',
-                    fill: '#ffffff',
-                    fontSize: 52,
-                    fontFamily: 'Noto Sans Tamil',
-                    fontWeight: 'bold'
-                } as any);
+            case 'quote-glass':
+                this.canvasService.setBackgroundGradient(['#6366f1', '#a855f7']);
+                this.canvasService.addText({ text: '"உங்கள் கனவை நோக்கி"', fill: '#ffffff', fontSize: 44, fontFamily: 'Noto Serif Tamil' } as any);
+                break;
+            case 'quote-neon':
+                this.canvasService.setBackgroundColor('#0a0a0a');
+                this.canvasService.addText({ text: 'DREAM', fill: '#22d3ee', fontSize: 90, fontFamily: 'Bebas Neue', top: 250 });
+                this.canvasService.addText({ text: 'BIG', fill: '#f472b6', fontSize: 90, fontFamily: 'Bebas Neue', top: 360 });
                 break;
             case 'quote-love':
-                this.canvasService.setBackgroundGradient(['#ec4899', '#f472b6']);
-                this.canvasService.addText({
-                    text: '❤️ காதல் மேற்கோள் ❤️',
-                    fill: '#ffffff',
-                    fontSize: 48,
-                    fontFamily: 'Noto Serif Tamil'
-                });
+                this.canvasService.setBackgroundGradient(['#ec4899', '#f43f5e']);
+                this.canvasService.addText({ text: '❤️', fill: '#ffffff', fontSize: 80, top: 150 });
+                this.canvasService.addText({ text: 'காதல் மேற்கோள்', fill: '#ffffff', fontSize: 48, fontFamily: 'Noto Serif Tamil' } as any);
                 break;
 
-            // === POEM TEMPLATES ===
+            // === POEMS ===
             case 'poem-classic':
                 this.canvasService.setBackgroundColor('#fef3c7');
-                this.canvasService.addText({
-                    text: 'கவிதை தலைப்பு',
-                    fill: '#92400e',
-                    fontSize: 40,
-                    fontFamily: 'Noto Serif Tamil',
-                    top: 150
-                });
-                this.canvasService.addText({
-                    text: 'இங்கே உங்கள் கவிதை...\nவரிகள் எழுதுங்கள்...',
-                    fill: '#78350f',
-                    fontSize: 28,
-                    fontFamily: 'Noto Sans Tamil',
-                    top: 350
-                });
+                this.canvasService.addText({ text: '📜 கவிதை தலைப்பு', fill: '#78350f', fontSize: 36, fontFamily: 'Noto Serif Tamil', top: 120 });
+                this.canvasService.addText({ text: 'இங்கே உங்கள் கவிதை\nவரிகள் எழுதுங்கள்\nஅழகான தமிழில்...', fill: '#92400e', fontSize: 28, fontFamily: 'Noto Sans Tamil', textAlign: 'center' } as any);
+                this.canvasService.addText({ text: '— கவிஞர்', fill: '#a16207', fontSize: 22, top: 520 });
                 break;
             case 'poem-modern':
                 this.canvasService.setBackgroundGradient(['#0f172a', '#1e293b']);
-                this.canvasService.addText({
-                    text: 'நவீன கவிதை',
-                    fill: '#38bdf8',
-                    fontSize: 36,
-                    fontFamily: 'Outfit',
-                    top: 150
-                });
-                this.canvasService.addText({
-                    text: 'உங்கள் வரிகள்...',
-                    fill: '#94a3b8',
-                    fontSize: 24,
-                    fontFamily: 'Outfit',
-                    top: 350
-                });
-                break;
-            case 'poem-haiku':
-                this.canvasService.setBackgroundGradient(['#fecaca', '#fef3c7']);
-                this.canvasService.addText({
-                    text: 'ஹைக்கூ\n\nமூன்று வரிகள்\nஐந்து ஏழு ஐந்து\nஇயற்கை அழகு',
-                    fill: '#7c2d12',
-                    fontSize: 32,
-                    fontFamily: 'Noto Serif Tamil',
-                    textAlign: 'center'
-                } as any);
+                this.canvasService.addText({ text: 'நவீன கவிதை', fill: '#38bdf8', fontSize: 32, fontFamily: 'Outfit', top: 140 });
+                this.canvasService.addText({ text: 'உங்கள் வரிகள்\nஇங்கே தட்டச்சு செய்க...', fill: '#e2e8f0', fontSize: 26, fontFamily: 'Noto Sans Tamil', textAlign: 'center' } as any);
                 break;
             case 'poem-tamil':
-                this.canvasService.setBackgroundColor('#fdf4ff');
-                this.canvasService.addText({
-                    text: '🏛️ செந்தமிழ் பா 🏛️',
-                    fill: '#86198f',
-                    fontSize: 44,
-                    fontFamily: 'Noto Serif Tamil',
-                    top: 150
-                });
-                this.canvasService.addText({
-                    text: 'யாமறிந்த மொழிகளிலே\nதமிழ்மொழி போல்\nஇனிதாவது எங்குமில்லை',
-                    fill: '#581c87',
-                    fontSize: 28,
-                    fontFamily: 'Noto Serif Tamil',
-                    top: 350
-                });
+                this.canvasService.setBackgroundGradient(['#fdf4ff', '#fae8ff']);
+                this.canvasService.addText({ text: '🏛️ செந்தமிழ் பா 🏛️', fill: '#86198f', fontSize: 40, fontFamily: 'Noto Serif Tamil', top: 120 });
+                this.canvasService.addText({ text: 'யாமறிந்த மொழிகளிலே\nதமிழ்மொழி போல்\nஇனிதாவது எங்குமில்லை', fill: '#701a75', fontSize: 28, fontFamily: 'Noto Serif Tamil', textAlign: 'center' } as any);
+                break;
+            case 'poem-nature':
+                this.canvasService.setBackgroundGradient(['#dcfce7', '#bbf7d0']);
+                this.canvasService.addText({ text: '🌿 இயற்கை கவிதை', fill: '#166534', fontSize: 36, fontFamily: 'Noto Serif Tamil', top: 130 });
+                this.canvasService.addText({ text: 'மரங்களின் ஓசை\nகாற்றின் இசை...', fill: '#15803d', fontSize: 28, fontFamily: 'Noto Sans Tamil', textAlign: 'center' } as any);
+                break;
+            case 'poem-night':
+                this.canvasService.setBackgroundGradient(['#1e1b4b', '#312e81']);
+                this.canvasService.addText({ text: '🌙 ✨', fill: '#fbbf24', fontSize: 50, top: 100 });
+                this.canvasService.addText({ text: 'நிலவொளி கவிதை', fill: '#e0e7ff', fontSize: 36, fontFamily: 'Noto Serif Tamil', top: 200 });
+                this.canvasService.addText({ text: 'கனவுகளின் வானில்...', fill: '#a5b4fc', fontSize: 26, fontFamily: 'Noto Sans Tamil' } as any);
                 break;
 
-            // === FESTIVAL TEMPLATES ===
+            // === MOTIVATIONAL ===
+            case 'motive-fire':
+                this.canvasService.setBackgroundGradient(['#dc2626', '#f97316']);
+                this.canvasService.addText({ text: '🔥', fill: '#ffffff', fontSize: 80, top: 120 });
+                this.canvasService.addText({ text: 'NEVER GIVE UP', fill: '#ffffff', fontSize: 60, fontFamily: 'Bebas Neue', fontWeight: 'bold' } as any);
+                this.canvasService.addText({ text: 'ஒருபோதும் விட்டுக்கொடுக்காதே', fill: '#fef08a', fontSize: 28, fontFamily: 'Noto Sans Tamil', top: 480 });
+                break;
+            case 'motive-success':
+                this.canvasService.setBackgroundGradient(['#4f46e5', '#06b6d4']);
+                this.canvasService.addText({ text: '🚀', fill: '#ffffff', fontSize: 70, top: 100 });
+                this.canvasService.addText({ text: 'SUCCESS', fill: '#ffffff', fontSize: 72, fontFamily: 'Bebas Neue', top: 250 });
+                this.canvasService.addText({ text: 'வெற்றி உங்களுடையது', fill: '#bfdbfe', fontSize: 30, fontFamily: 'Noto Sans Tamil', top: 420 });
+                break;
+            case 'motive-strength':
+                this.canvasService.setBackgroundColor('#0f172a');
+                this.canvasService.addText({ text: '💪', fill: '#fbbf24', fontSize: 70, top: 120 });
+                this.canvasService.addText({ text: 'INNER STRENGTH', fill: '#fbbf24', fontSize: 54, fontFamily: 'Bebas Neue' } as any);
+                this.canvasService.addText({ text: 'உள் வலிமை', fill: '#94a3b8', fontSize: 28, fontFamily: 'Noto Sans Tamil', top: 480 });
+                break;
+            case 'motive-dream':
+                this.canvasService.setBackgroundGradient(['#7c3aed', '#ec4899']);
+                this.canvasService.addText({ text: '✨ DREAM BIG ✨', fill: '#ffffff', fontSize: 56, fontFamily: 'Outfit', fontWeight: 'bold' } as any);
+                this.canvasService.addText({ text: 'பெரிதாக கனவு காண்', fill: '#fce7f3', fontSize: 30, fontFamily: 'Noto Sans Tamil', top: 450 });
+                break;
+            case 'motive-focus':
+                this.canvasService.setBackgroundColor('#000000');
+                this.canvasService.addText({ text: '🎯', fill: '#ef4444', fontSize: 80, top: 120 });
+                this.canvasService.addText({ text: 'STAY FOCUSED', fill: '#ffffff', fontSize: 60, fontFamily: 'Bebas Neue' } as any);
+                this.canvasService.addText({ text: 'கவனத்தை இழக்காதே', fill: '#6b7280', fontSize: 26, fontFamily: 'Noto Sans Tamil', top: 480 });
+                break;
+
+            // === AESTHETIC ===
+            case 'aesthetic-pastel':
+                this.canvasService.setBackgroundGradient(['#fce7f3', '#ddd6fe']);
+                this.canvasService.addText({ text: '✿', fill: '#ec4899', fontSize: 60, top: 130 });
+                this.canvasService.addText({ text: 'soft aesthetic', fill: '#a855f7', fontSize: 44, fontFamily: 'Pacifico' } as any);
+                break;
+            case 'aesthetic-retrowave':
+                this.canvasService.setBackgroundGradient(['#1e1b4b', '#831843']);
+                this.canvasService.addText({ text: 'RETRO', fill: '#22d3ee', fontSize: 80, fontFamily: 'Bebas Neue', top: 200 });
+                this.canvasService.addText({ text: 'WAVE', fill: '#f472b6', fontSize: 80, fontFamily: 'Bebas Neue', top: 300 });
+                break;
+            case 'aesthetic-minimal':
+                this.canvasService.setBackgroundColor('#fafafa');
+                this.canvasService.addText({ text: 'minimal', fill: '#171717', fontSize: 56, fontFamily: 'Outfit', fontWeight: '300' } as any);
+                break;
+            case 'aesthetic-gradient':
+                this.canvasService.setBackgroundGradient(['#f472b6', '#c084fc', '#60a5fa']);
+                this.canvasService.addText({ text: 'VIBRANT', fill: '#ffffff', fontSize: 64, fontFamily: 'Outfit', fontWeight: 'bold' } as any);
+                break;
+            case 'aesthetic-dark':
+                this.canvasService.setBackgroundColor('#1c1917');
+                this.canvasService.addText({ text: '📚', fill: '#d6d3d1', fontSize: 50, top: 140 });
+                this.canvasService.addText({ text: 'Dark Academia', fill: '#d6d3d1', fontSize: 48, fontFamily: 'Playfair Display' } as any);
+                break;
+
+            // === FESTIVALS ===
             case 'pongal':
                 this.canvasService.setBackgroundGradient(['#fef08a', '#fb923c']);
-                this.canvasService.addText({
-                    text: '🌾 பொங்கல் வாழ்த்துக்கள்! 🌾',
-                    fill: '#78350f',
-                    fontSize: 52,
-                    fontFamily: 'Noto Serif Tamil',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '🌾', fill: '#78350f', fontSize: 70, top: 100 });
+                this.canvasService.addText({ text: 'பொங்கல்', fill: '#78350f', fontSize: 64, fontFamily: 'Noto Serif Tamil', fontWeight: 'bold' } as any);
+                this.canvasService.addText({ text: 'வாழ்த்துக்கள்!', fill: '#92400e', fontSize: 48, fontFamily: 'Noto Serif Tamil', top: 420 });
                 break;
             case 'diwali':
                 this.canvasService.setBackgroundGradient(['#7c3aed', '#ec4899']);
-                this.canvasService.addText({
-                    text: '🪔 தீபாவளி நல்வாழ்த்துக்கள்! 🪔',
-                    fill: '#fef08a',
-                    fontSize: 48,
-                    fontFamily: 'Noto Serif Tamil',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '🪔 தீபாவளி 🪔', fill: '#fef08a', fontSize: 52, fontFamily: 'Noto Serif Tamil', fontWeight: 'bold', top: 220 } as any);
+                this.canvasService.addText({ text: 'நல்வாழ்த்துக்கள்!', fill: '#ffffff', fontSize: 44, fontFamily: 'Noto Serif Tamil', top: 380 });
                 break;
             case 'newyear-tamil':
                 this.canvasService.setBackgroundGradient(['#059669', '#10b981']);
-                this.canvasService.addText({
-                    text: '🎊 தமிழ் புத்தாண்டு வாழ்த்துக்கள்! 🎊',
-                    fill: '#ffffff',
-                    fontSize: 44,
-                    fontFamily: 'Noto Serif Tamil',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '🎊', fill: '#ffffff', fontSize: 70, top: 100 });
+                this.canvasService.addText({ text: 'தமிழ் புத்தாண்டு', fill: '#ffffff', fontSize: 48, fontFamily: 'Noto Serif Tamil', fontWeight: 'bold' } as any);
+                this.canvasService.addText({ text: 'வாழ்த்துக்கள்!', fill: '#d1fae5', fontSize: 40, fontFamily: 'Noto Serif Tamil', top: 420 });
                 break;
             case 'newyear':
                 this.canvasService.setBackgroundGradient(['#1e3a8a', '#3b82f6']);
-                this.canvasService.addText({
-                    text: '🎆 Happy New Year! 🎆',
-                    fill: '#fef08a',
-                    fontSize: 56,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '🎆', fill: '#fbbf24', fontSize: 70, top: 100 });
+                this.canvasService.addText({ text: '2026', fill: '#fbbf24', fontSize: 100, fontFamily: 'Bebas Neue', top: 220 });
+                this.canvasService.addText({ text: 'HAPPY NEW YEAR', fill: '#ffffff', fontSize: 40, fontFamily: 'Outfit', top: 420 });
                 break;
             case 'christmas':
                 this.canvasService.setBackgroundGradient(['#dc2626', '#16a34a']);
-                this.canvasService.addText({
-                    text: '🎄 Merry Christmas! 🎄',
-                    fill: '#ffffff',
-                    fontSize: 52,
-                    fontFamily: 'Playfair Display',
-                    fontWeight: 'bold'
-                } as any);
-                break;
-            case 'eid':
-                this.canvasService.setBackgroundGradient(['#059669', '#0d9488']);
-                this.canvasService.addText({
-                    text: '🌙 Eid Mubarak! 🌙',
-                    fill: '#ffffff',
-                    fontSize: 52,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '🎄', fill: '#ffffff', fontSize: 80, top: 100 });
+                this.canvasService.addText({ text: 'Merry Christmas', fill: '#ffffff', fontSize: 48, fontFamily: 'Playfair Display', fontWeight: 'bold' } as any);
                 break;
             case 'birthday':
                 this.canvasService.setBackgroundGradient(['#f472b6', '#a855f7']);
-                this.canvasService.addText({
-                    text: '🎂 Happy Birthday! 🎂',
-                    fill: '#ffffff',
-                    fontSize: 56,
-                    fontFamily: 'Pacifico'
-                });
+                this.canvasService.addText({ text: '🎂 🎈 🎉', fill: '#ffffff', fontSize: 60, top: 120 });
+                this.canvasService.addText({ text: 'Happy Birthday!', fill: '#ffffff', fontSize: 52, fontFamily: 'Pacifico' } as any);
                 break;
             case 'wedding':
                 this.canvasService.setBackgroundGradient(['#fecdd3', '#fef3c7']);
-                this.canvasService.addText({
-                    text: '💒 திருமண வாழ்த்துக்கள்! 💒',
-                    fill: '#9f1239',
-                    fontSize: 44,
-                    fontFamily: 'Noto Serif Tamil',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '💒', fill: '#9f1239', fontSize: 60, top: 100 });
+                this.canvasService.addText({ text: 'திருமண வாழ்த்துக்கள்!', fill: '#9f1239', fontSize: 40, fontFamily: 'Noto Serif Tamil', fontWeight: 'bold' } as any);
                 break;
 
-            // === SOCIAL MEDIA TEMPLATES ===
+            // === SOCIAL ===
             case 'instagram':
                 this.canvasService.setBackgroundGradient(['#833ab4', '#fd1d1d', '#fcb045']);
-                this.canvasService.addText({
-                    text: '📸 Instagram Post',
-                    fill: '#ffffff',
-                    fontSize: 48,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '📸', fill: '#ffffff', fontSize: 60, top: 150 });
+                this.canvasService.addText({ text: 'Your Content Here', fill: '#ffffff', fontSize: 44, fontFamily: 'Outfit', fontWeight: 'bold' } as any);
                 break;
             case 'instagram-story':
                 this.canvasService.setBackgroundGradient(['#405de6', '#833ab4']);
-                this.canvasService.addText({
-                    text: 'Story Content Here',
-                    fill: '#ffffff',
-                    fontSize: 40,
-                    fontFamily: 'Outfit'
-                });
+                this.canvasService.addText({ text: 'Add Your Story', fill: '#ffffff', fontSize: 40, fontFamily: 'Outfit' } as any);
                 break;
             case 'whatsapp':
                 this.canvasService.setBackgroundGradient(['#25d366', '#128c7e']);
-                this.canvasService.addText({
-                    text: '💬 WhatsApp Status',
-                    fill: '#ffffff',
-                    fontSize: 44,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold'
-                } as any);
-                break;
-            case 'facebook':
-                this.canvasService.setBackgroundGradient(['#1877f2', '#3b5998']);
-                this.canvasService.addText({
-                    text: '👍 Facebook Post',
-                    fill: '#ffffff',
-                    fontSize: 48,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold'
-                } as any);
-                break;
-            case 'twitter':
-                this.canvasService.setBackgroundColor('#000000');
-                this.canvasService.addText({
-                    text: '🐦 X / Twitter Post',
-                    fill: '#ffffff',
-                    fontSize: 44,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '💬', fill: '#ffffff', fontSize: 60, top: 150 });
+                this.canvasService.addText({ text: 'WhatsApp Status', fill: '#ffffff', fontSize: 44, fontFamily: 'Outfit', fontWeight: 'bold' } as any);
                 break;
             case 'youtube':
                 this.canvasService.setBackgroundGradient(['#ff0000', '#cc0000']);
-                this.canvasService.addText({
-                    text: '▶️ YouTube Thumbnail',
-                    fill: '#ffffff',
-                    fontSize: 52,
-                    fontFamily: 'Bebas Neue'
-                });
+                this.canvasService.addText({ text: '▶️', fill: '#ffffff', fontSize: 80, top: 150 });
+                this.canvasService.addText({ text: 'THUMBNAIL', fill: '#ffffff', fontSize: 60, fontFamily: 'Bebas Neue' } as any);
+                break;
+            case 'twitter':
+                this.canvasService.setBackgroundColor('#000000');
+                this.canvasService.addText({ text: '𝕏', fill: '#ffffff', fontSize: 80, top: 150 });
+                this.canvasService.addText({ text: 'Your Post Here', fill: '#ffffff', fontSize: 36, fontFamily: 'Outfit' } as any);
                 break;
 
-            // === BUSINESS TEMPLATES ===
+            // === BUSINESS ===
             case 'announcement':
                 this.canvasService.setBackgroundGradient(['#4f46e5', '#7c3aed']);
-                this.canvasService.addText({
-                    text: '📢 ANNOUNCEMENT',
-                    fill: '#ffffff',
-                    fontSize: 56,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold',
-                    top: 200
-                } as any);
-                this.canvasService.addText({
-                    text: 'Your message here...',
-                    fill: '#c7d2fe',
-                    fontSize: 28,
-                    fontFamily: 'Outfit',
-                    top: 400
-                });
+                this.canvasService.addText({ text: '📢', fill: '#fbbf24', fontSize: 60, top: 120 });
+                this.canvasService.addText({ text: 'ANNOUNCEMENT', fill: '#ffffff', fontSize: 52, fontFamily: 'Outfit', fontWeight: 'bold' } as any);
+                this.canvasService.addText({ text: 'Your message here...', fill: '#c7d2fe', fontSize: 26, fontFamily: 'Outfit', top: 450 });
                 break;
             case 'sale':
                 this.canvasService.setBackgroundGradient(['#dc2626', '#f97316']);
-                this.canvasService.addText({
-                    text: '🏷️ SALE',
-                    fill: '#ffffff',
-                    fontSize: 80,
-                    fontFamily: 'Bebas Neue',
-                    top: 200
-                });
-                this.canvasService.addText({
-                    text: 'Up to 50% OFF!',
-                    fill: '#fef08a',
-                    fontSize: 44,
-                    fontFamily: 'Outfit',
-                    fontWeight: 'bold',
-                    top: 400
-                } as any);
+                this.canvasService.addText({ text: '🔥 SALE 🔥', fill: '#ffffff', fontSize: 72, fontFamily: 'Bebas Neue', top: 200 });
+                this.canvasService.addText({ text: 'UP TO 50% OFF', fill: '#fef08a', fontSize: 44, fontFamily: 'Outfit', fontWeight: 'bold', top: 380 } as any);
                 break;
             case 'thankyou':
                 this.canvasService.setBackgroundGradient(['#10b981', '#059669']);
-                this.canvasService.addText({
-                    text: '🙏 Thank You!',
-                    fill: '#ffffff',
-                    fontSize: 56,
-                    fontFamily: 'Playfair Display',
-                    fontWeight: 'bold'
-                } as any);
+                this.canvasService.addText({ text: '🙏', fill: '#ffffff', fontSize: 70, top: 140 });
+                this.canvasService.addText({ text: 'Thank You!', fill: '#ffffff', fontSize: 56, fontFamily: 'Playfair Display', fontWeight: 'bold' } as any);
                 break;
             case 'invitation':
                 this.canvasService.setBackgroundGradient(['#a855f7', '#6366f1']);
-                this.canvasService.addText({
-                    text: "📩 You're Invited!",
-                    fill: '#ffffff',
-                    fontSize: 52,
-                    fontFamily: 'Playfair Display',
-                    top: 200
-                });
-                this.canvasService.addText({
-                    text: 'Event details here...',
-                    fill: '#e0e7ff',
-                    fontSize: 28,
-                    fontFamily: 'Outfit',
-                    top: 400
-                });
+                this.canvasService.addText({ text: '📩', fill: '#fbbf24', fontSize: 50, top: 120 });
+                this.canvasService.addText({ text: "You're Invited!", fill: '#ffffff', fontSize: 48, fontFamily: 'Playfair Display' } as any);
+                this.canvasService.addText({ text: 'Event details here...', fill: '#e0e7ff', fontSize: 24, fontFamily: 'Outfit', top: 450 });
+                break;
+            case 'launch':
+                this.canvasService.setBackgroundGradient(['#0f172a', '#1e3a8a']);
+                this.canvasService.addText({ text: '🚀', fill: '#38bdf8', fontSize: 70, top: 100 });
+                this.canvasService.addText({ text: 'NEW LAUNCH', fill: '#ffffff', fontSize: 56, fontFamily: 'Bebas Neue', top: 250 });
+                this.canvasService.addText({ text: 'Coming Soon...', fill: '#94a3b8', fontSize: 28, fontFamily: 'Outfit', top: 420 });
                 break;
 
             default:
-                // Blank canvas fallback
                 this.canvasService.setBackgroundColor('#ffffff');
         }
 
