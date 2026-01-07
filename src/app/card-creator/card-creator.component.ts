@@ -258,6 +258,57 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         { id: 'long-shadow', name: 'Long Shadow', icon: '📐', shadow: '1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1), 3px 3px 0 rgba(0,0,0,0.1), 4px 4px 0 rgba(0,0,0,0.1), 5px 5px 0 rgba(0,0,0,0.1), 6px 6px 0 rgba(0,0,0,0.1), 7px 7px 0 rgba(0,0,0,0.1), 8px 8px 0 rgba(0,0,0,0.1)' },
     ];
 
+    // Shapes Library
+    readonly shapeCategories = [
+        { id: 'basic', name: 'Basic', icon: '⬜' },
+        { id: 'arrows', name: 'Arrows', icon: '➡️' },
+        { id: 'decorative', name: 'Decorative', icon: '✨' },
+    ];
+
+    readonly shapeLibrary = [
+        // Basic shapes
+        { id: 'rect', name: 'Rectangle', category: 'basic', icon: '⬜' },
+        { id: 'circle', name: 'Circle', category: 'basic', icon: '⚪' },
+        { id: 'ellipse', name: 'Ellipse', category: 'basic', icon: '⬭' },
+        { id: 'triangle', name: 'Triangle', category: 'basic', icon: '🔺' },
+        { id: 'diamond', name: 'Diamond', category: 'basic', icon: '🔷' },
+        { id: 'line', name: 'Line', category: 'basic', icon: '➖' },
+        // Arrows
+        { id: 'arrow', name: 'Arrow', category: 'arrows', icon: '➡️' },
+        { id: 'arrow-up', name: 'Arrow Up', category: 'arrows', icon: '⬆️' },
+        { id: 'arrow-down', name: 'Arrow Down', category: 'arrows', icon: '⬇️' },
+        // Decorative
+        { id: 'star', name: 'Star', category: 'decorative', icon: '⭐' },
+        { id: 'heart', name: 'Heart', category: 'decorative', icon: '❤️' },
+        { id: 'badge', name: 'Badge', category: 'decorative', icon: '🏷️' },
+    ];
+
+    // Border/Frame Presets
+    readonly borderPresets = [
+        { id: 'none', name: 'None', width: 0, style: 'none', color: 'transparent' },
+        { id: 'thin-black', name: 'Thin Black', width: 2, style: 'solid', color: '#000000' },
+        { id: 'thin-white', name: 'Thin White', width: 2, style: 'solid', color: '#ffffff' },
+        { id: 'medium-black', name: 'Medium Black', width: 6, style: 'solid', color: '#000000' },
+        { id: 'medium-white', name: 'Medium White', width: 6, style: 'solid', color: '#ffffff' },
+        { id: 'thick-black', name: 'Thick Black', width: 12, style: 'solid', color: '#000000' },
+        { id: 'thick-white', name: 'Thick White', width: 12, style: 'solid', color: '#ffffff' },
+        { id: 'double-black', name: 'Double Line', width: 6, style: 'double', color: '#000000' },
+        { id: 'dashed', name: 'Dashed', width: 4, style: 'dashed', color: '#000000' },
+        { id: 'dotted', name: 'Dotted', width: 4, style: 'dotted', color: '#000000' },
+        { id: 'gold-frame', name: 'Gold Frame', width: 8, style: 'solid', color: '#d4a574' },
+        { id: 'gradient-frame', name: 'Purple Gradient', width: 8, style: 'solid', color: '#6366f1' },
+    ];
+
+    // Magic Resize Size Categories
+    readonly sizeCategories = [
+        { id: 'social-square', name: 'Social (Square)', icon: '⬜' },
+        { id: 'social-story', name: 'Social (Story)', icon: '📱' },
+        { id: 'social-wide', name: 'Social (Wide)', icon: '🖼️' },
+        { id: 'business', name: 'Business Cards', icon: '💳' },
+        { id: 'print', name: 'Print', icon: '🖨️' },
+        { id: 'digital', name: 'Digital', icon: '💻' },
+    ];
+
     // Enterprise Templates (35+ organized by category)
     readonly templateCategories = [
         { id: 'blank', name: 'Blank', icon: '📄' },

@@ -74,13 +74,34 @@ export interface CanvasSize {
 }
 
 export const CANVAS_SIZES: CanvasSize[] = [
+    // Social Media - Square
     { name: 'Instagram Post', width: 1080, height: 1080, icon: '📸' },
+    { name: 'Facebook Post', width: 1200, height: 1200, icon: '👍' },
+    { name: 'LinkedIn Post', width: 1200, height: 1200, icon: '💼' },
+    // Social Media - Portrait/Story
     { name: 'Instagram Story', width: 1080, height: 1920, icon: '📱' },
     { name: 'WhatsApp Status', width: 1080, height: 1920, icon: '💬' },
-    { name: 'Facebook Post', width: 1200, height: 630, icon: '👍' },
-    { name: 'Twitter Post', width: 1200, height: 675, icon: '🐦' },
+    { name: 'TikTok Video', width: 1080, height: 1920, icon: '🎵' },
+    { name: 'Pinterest Pin', width: 1000, height: 1500, icon: '📌' },
+    // Social Media - Landscape
+    { name: 'Twitter/X Post', width: 1200, height: 675, icon: '🐦' },
+    { name: 'Facebook Cover', width: 1640, height: 624, icon: '🖼️' },
+    { name: 'LinkedIn Banner', width: 1584, height: 396, icon: '🎯' },
     { name: 'YouTube Thumbnail', width: 1280, height: 720, icon: '▶️' },
+    { name: 'YouTube Banner', width: 2560, height: 1440, icon: '📺' },
+    // Business Cards
+    { name: 'Business Card (US)', width: 1050, height: 600, icon: '💳' },
+    { name: 'Business Card (EU)', width: 1004, height: 650, icon: '🇪🇺' },
+    // Print Formats
     { name: 'A4 Portrait', width: 2480, height: 3508, icon: '📄' },
+    { name: 'A4 Landscape', width: 3508, height: 2480, icon: '📃' },
+    { name: 'A5 Portrait', width: 1748, height: 2480, icon: '📋' },
+    { name: 'Letter (US)', width: 2550, height: 3300, icon: '📝' },
+    { name: 'Postcard', width: 1800, height: 1200, icon: '📮' },
+    // Digital
+    { name: 'Presentation 16:9', width: 1920, height: 1080, icon: '🖥️' },
+    { name: 'Presentation 4:3', width: 1024, height: 768, icon: '💻' },
+    { name: 'Email Header', width: 600, height: 200, icon: '📧' },
     { name: 'Custom', width: 800, height: 600, icon: '✏️' },
 ];
 
