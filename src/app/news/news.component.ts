@@ -92,12 +92,6 @@ import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
               </p>
             </div>
           </a>
-
-          <!-- Mid Ad after 4 articles -->
-          <div class="card centered ad-card full-width" *ngIf="articles.length > 4">
-            <small class="muted">{{ 'COMMON.SPONSORED' | translate }}</small>
-            <app-ad-unit adSlot="1234567890"></app-ad-unit>
-          </div>
         </div>
 
         <ng-template #loading>
