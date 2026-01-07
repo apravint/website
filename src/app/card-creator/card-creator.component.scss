@@ -588,21 +588,27 @@ $glass-blur: 16px;
 }
 
 // ==================
-// CANVAS AREA
+// CANVAS AREA - Premium Dark
 // ==================
 .canvas-area {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: repeating-conic-gradient(var(--border) 0% 25%,
-      transparent 0% 50%) 50% / 20px 20px;
+  // Dark checkered pattern
+  background:
+    repeating-conic-gradient(rgba(255, 255, 255, 0.02) 0% 25%,
+      transparent 0% 50%) 50% / 20px 20px,
+    $premium-bg;
   overflow: hidden;
   padding: 20px;
 }
 
 .canvas-wrapper {
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba($premium-accent, 0.1);
   border-radius: 4px;
   overflow: hidden;
 
@@ -612,13 +618,33 @@ $glass-blur: 16px;
 }
 
 // ==================
-// RIGHT PANEL
+// RIGHT PANEL - Glassmorphism
 // ==================
 .right-panel {
   width: 220px;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
+  background: rgba($premium-surface, 0.6);
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  border-left: 1px solid $glass-border;
   overflow-y: auto;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $premium-border;
+    border-radius: 3px;
+
+    &:hover {
+      background: $premium-border-hover;
+    }
+  }
 }
 
 .action-grid {
@@ -634,11 +660,11 @@ $glass-blur: 16px;
   align-items: center;
   gap: 0.25rem;
   padding: 0.75rem 0.5rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: $glass-bg;
+  border: 1px solid $premium-border;
+  border-radius: 12px;
   cursor: pointer;
-  color: var(--text);
+  color: $premium-text;
   transition: all 0.2s ease;
 
   .icon {
@@ -647,12 +673,13 @@ $glass-blur: 16px;
 
   span:last-child {
     font-size: 0.7rem;
-    color: var(--muted);
+    color: $premium-muted;
   }
 
   &:hover {
-    border-color: var(--accent);
-    background: rgba(var(--primary-rgb), 0.05);
+    border-color: $premium-accent;
+    background: rgba($premium-accent, 0.08);
+    box-shadow: 0 0 20px rgba($premium-accent, 0.1);
   }
 }
 
