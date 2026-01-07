@@ -207,6 +207,57 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         ['#74ebd5', '#acb6e5'],
     ];
 
+    // Premium Texture Library (CSS patterns and gradients for backgrounds)
+    readonly textureCategories = [
+        { id: 'paper', name: 'Paper', icon: '📄' },
+        { id: 'fabric', name: 'Fabric', icon: '🧵' },
+        { id: 'geometric', name: 'Geometric', icon: '🔷' },
+        { id: 'noise', name: 'Noise', icon: '📺' },
+        { id: 'luxury', name: 'Luxury', icon: '✨' },
+    ];
+
+    readonly textures = [
+        // Paper textures (CSS gradients simulating paper)
+        { id: 'paper-cream', name: 'Cream Paper', category: 'paper', css: 'linear-gradient(135deg, #fef9ef 0%, #f5f0e3 100%)' },
+        { id: 'paper-kraft', name: 'Kraft Paper', category: 'paper', css: 'linear-gradient(180deg, #c4a77d 0%, #b8956e 100%)' },
+        { id: 'paper-recycled', name: 'Recycled', category: 'paper', css: 'linear-gradient(135deg, #e8e0d5 0%, #d4ccc0 50%, #e0d8cd 100%)' },
+        { id: 'paper-white', name: 'Cotton White', category: 'paper', css: 'linear-gradient(145deg, #ffffff 0%, #f8f8f8 50%, #ffffff 100%)' },
+        // Fabric textures
+        { id: 'fabric-linen', name: 'Linen', category: 'fabric', css: 'linear-gradient(90deg, #f5f5dc 25%, #f0f0d0 50%, #f5f5dc 75%)' },
+        { id: 'fabric-denim', name: 'Denim Blue', category: 'fabric', css: 'linear-gradient(145deg, #4a6fa5 0%, #3a5a89 100%)' },
+        { id: 'fabric-velvet', name: 'Velvet Purple', category: 'fabric', css: 'linear-gradient(135deg, #4a1a6b 0%, #2d1042 100%)' },
+        { id: 'fabric-silk', name: 'Silk Rose', category: 'fabric', css: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #fce4ec 100%)' },
+        // Geometric patterns
+        { id: 'geo-dots', name: 'Polka Dots', category: 'geometric', css: 'radial-gradient(circle, #000 1px, transparent 1px), linear-gradient(#f5f5f5, #f5f5f5)' },
+        { id: 'geo-grid', name: 'Grid', category: 'geometric', css: 'linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, #ffffff 1px)' },
+        { id: 'geo-diagonal', name: 'Diagonal Lines', category: 'geometric', css: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px), #ffffff' },
+        { id: 'geo-hexagon', name: 'Hexagon Dark', category: 'geometric', css: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' },
+        // Noise/grain textures
+        { id: 'noise-light', name: 'Light Grain', category: 'noise', css: 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)' },
+        { id: 'noise-dark', name: 'Dark Grain', category: 'noise', css: 'linear-gradient(135deg, #1f1f1f 0%, #0f0f0f 100%)' },
+        { id: 'noise-warm', name: 'Warm Grain', category: 'noise', css: 'linear-gradient(135deg, #3d3024 0%, #2a2018 100%)' },
+        { id: 'noise-cool', name: 'Cool Grain', category: 'noise', css: 'linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%)' },
+        // Luxury textures
+        { id: 'luxury-gold', name: 'Gold Shimmer', category: 'luxury', css: 'linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%)' },
+        { id: 'luxury-silver', name: 'Silver Shine', category: 'luxury', css: 'linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 25%, #a8a8a8 50%, #e0e0e0 75%, #b0b0b0 100%)' },
+        { id: 'luxury-rose', name: 'Rose Gold', category: 'luxury', css: 'linear-gradient(135deg, #b76e79 0%, #ecc5c0 25%, #c78283 50%, #e8c4c4 75%, #b76e79 100%)' },
+        { id: 'luxury-marble', name: 'Marble White', category: 'luxury', css: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 25%, #f0f0f0 50%, #e5e5e5 75%, #f8f8f8 100%)' },
+        { id: 'luxury-onyx', name: 'Black Onyx', category: 'luxury', css: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #0f0f0f 50%, #151515 75%, #0a0a0a 100%)' },
+    ];
+
+    // 3D Text Effect Presets
+    readonly textEffectPresets = [
+        { id: 'none', name: 'None', icon: '—' },
+        { id: '3d-shadow', name: '3D Shadow', icon: '🎭', shadow: '3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,0.3)' },
+        { id: '3d-depth', name: 'Deep 3D', icon: '📦', shadow: '1px 1px 0 #333, 2px 2px 0 #333, 3px 3px 0 #333, 4px 4px 0 #333, 5px 5px 0 #333' },
+        { id: 'neon-glow', name: 'Neon Glow', icon: '💡', shadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 40px #6366f1, 0 0 80px #6366f1' },
+        { id: 'fire-glow', name: 'Fire Glow', icon: '🔥', shadow: '0 0 10px #ff6b35, 0 0 20px #f7c59f, 0 0 40px #ff6b35' },
+        { id: 'retro', name: 'Retro Offset', icon: '📼', shadow: '4px 4px 0 #ec4899, -2px -2px 0 #22d3ee' },
+        { id: 'emboss', name: 'Emboss', icon: '🏷️', shadow: '-1px -1px 0 rgba(255,255,255,0.5), 1px 1px 2px rgba(0,0,0,0.3)' },
+        { id: 'outline', name: 'Bold Outline', icon: '⭕', shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000' },
+        { id: 'long-shadow', name: 'Long Shadow', icon: '📐', shadow: '1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1), 3px 3px 0 rgba(0,0,0,0.1), 4px 4px 0 rgba(0,0,0,0.1), 5px 5px 0 rgba(0,0,0,0.1), 6px 6px 0 rgba(0,0,0,0.1), 7px 7px 0 rgba(0,0,0,0.1), 8px 8px 0 rgba(0,0,0,0.1)' },
+    ];
+
     // Enterprise Templates (35+ organized by category)
     readonly templateCategories = [
         { id: 'blank', name: 'Blank', icon: '📄' },
@@ -524,6 +575,33 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     setTextShadowColor(color: string): void {
         this.textShadowColor.set(color);
         if (this.textShadowEnabled()) this.updateTextShadow();
+    }
+
+    // Apply 3D text effect preset
+    applyTextEffectPreset(presetId: string): void {
+        const preset = this.textEffectPresets.find(p => p.id === presetId);
+        if (!preset) return;
+
+        if (presetId === 'none') {
+            // Remove shadow
+            this.textShadowEnabled.set(false);
+            this.canvasService.updateSelectedText({ shadow: null });
+        } else if (preset.shadow) {
+            // Parse shadow string and apply - using first shadow for Fabric.js
+            const shadows = preset.shadow.split(',').map(s => s.trim());
+            if (shadows.length > 0) {
+                const parts = shadows[0].match(/(-?\d+)px\s+(-?\d+)px\s+(\d+)px?\s*(.*)/);
+                if (parts) {
+                    this.textShadowEnabled.set(true);
+                    this.textShadowX.set(parseInt(parts[1]) || 0);
+                    this.textShadowY.set(parseInt(parts[2]) || 0);
+                    this.textShadowBlur.set(parseInt(parts[3]) || 0);
+                    this.textShadowColor.set(parts[4] || '#000000');
+                    this.updateTextShadow();
+                }
+            }
+        }
+        this.saveHistory();
     }
 
     setTextStroke(width: number, color?: string): void {
