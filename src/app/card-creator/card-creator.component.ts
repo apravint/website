@@ -40,8 +40,8 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly selectedTextAlign = signal<'left' | 'center' | 'right'>('center');
     readonly isBold = signal(false);
     readonly isItalic = signal(false);
-
-    // Advanced text formatting state
+    readonly fontWeight = signal(400); // Variable font weight: 100-900
+    readonly selectedFontCategory = signal('all'); // Font category filter
     readonly isUnderline = signal(false);
     readonly isStrikethrough = signal(false);
     readonly letterSpacing = signal(0);
@@ -57,29 +57,55 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly textBackgroundColor = signal('');
     readonly textTransform = signal<'none' | 'uppercase' | 'lowercase' | 'capitalize'>('none');
 
-    // Google Fonts for text
-    readonly fonts = [
-        'Noto Sans Tamil',
-        'Noto Serif Tamil',
-        'Mukta Malar',
-        'Catamaran',
-        'Hind Madurai',
-        'Meera Inimai',
-        'Poppins',
-        'Inter',
-        'Outfit',
-        'Roboto',
-        'Open Sans',
-        'Lato',
-        'Montserrat',
-        'Playfair Display',
-        'Dancing Script',
-        'Pacifico',
-        'Bebas Neue',
-        'Oswald',
-        'Raleway',
-        'Ubuntu'
+    // Premium Font Library with Variable Font Support
+    readonly fontCategories = [
+        { id: 'tamil', name: 'தமிழ் Tamil', icon: '🏛️' },
+        { id: 'modern', name: 'Modern Sans', icon: '✨' },
+        { id: 'classic', name: 'Classic Serif', icon: '📚' },
+        { id: 'display', name: 'Display', icon: '🎨' },
+        { id: 'script', name: 'Script & Hand', icon: '✍️' },
     ];
+
+    readonly fontLibrary: { name: string; category: string; variable: boolean; weights: string }[] = [
+        // Tamil Fonts
+        { name: 'Noto Sans Tamil', category: 'tamil', variable: true, weights: '100-900' },
+        { name: 'Noto Serif Tamil', category: 'tamil', variable: true, weights: '100-900' },
+        { name: 'Mukta Malar', category: 'tamil', variable: false, weights: '200-800' },
+        { name: 'Catamaran', category: 'tamil', variable: false, weights: '100-900' },
+        { name: 'Hind Madurai', category: 'tamil', variable: false, weights: '300-700' },
+        { name: 'Meera Inimai', category: 'tamil', variable: false, weights: '400' },
+        // Modern Sans (Variable)
+        { name: 'Inter', category: 'modern', variable: true, weights: '100-900' },
+        { name: 'Outfit', category: 'modern', variable: true, weights: '100-900' },
+        { name: 'Plus Jakarta Sans', category: 'modern', variable: true, weights: '200-800' },
+        { name: 'DM Sans', category: 'modern', variable: true, weights: '100-900' },
+        { name: 'Space Grotesk', category: 'modern', variable: true, weights: '300-700' },
+        { name: 'Manrope', category: 'modern', variable: true, weights: '200-800' },
+        { name: 'Sora', category: 'modern', variable: true, weights: '100-800' },
+        { name: 'Poppins', category: 'modern', variable: false, weights: '100-900' },
+        { name: 'Roboto', category: 'modern', variable: false, weights: '100-900' },
+        // Classic Serif
+        { name: 'Playfair Display', category: 'classic', variable: true, weights: '400-900' },
+        { name: 'Cormorant', category: 'classic', variable: true, weights: '300-700' },
+        { name: 'Libre Baskerville', category: 'classic', variable: false, weights: '400-700' },
+        { name: 'Lora', category: 'classic', variable: true, weights: '400-700' },
+        { name: 'Merriweather', category: 'classic', variable: false, weights: '300-900' },
+        // Display Fonts
+        { name: 'Bebas Neue', category: 'display', variable: false, weights: '400' },
+        { name: 'Oswald', category: 'display', variable: true, weights: '200-700' },
+        { name: 'Anton', category: 'display', variable: false, weights: '400' },
+        { name: 'Abril Fatface', category: 'display', variable: false, weights: '400' },
+        { name: 'Righteous', category: 'display', variable: false, weights: '400' },
+        // Script & Handwriting
+        { name: 'Dancing Script', category: 'script', variable: true, weights: '400-700' },
+        { name: 'Pacifico', category: 'script', variable: false, weights: '400' },
+        { name: 'Caveat', category: 'script', variable: true, weights: '400-700' },
+        { name: 'Satisfy', category: 'script', variable: false, weights: '400' },
+        { name: 'Great Vibes', category: 'script', variable: false, weights: '400' },
+    ];
+
+    // Flat fonts array for backward compatibility
+    readonly fonts = this.fontLibrary.map(f => f.name);
 
     // Premium Color Palettes (60+ designer colors)
     readonly colorPalettes = {
@@ -417,6 +443,20 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isItalic.set(newItalic);
         this.canvasService.updateSelectedText({ fontStyle: newItalic ? 'italic' : 'normal' });
         this.saveHistory();
+    }
+
+    // Variable font weight (100-900)
+    setFontWeight(weight: number): void {
+        this.fontWeight.set(weight);
+        this.canvasService.updateSelectedText({ fontWeight: weight });
+        this.saveHistory();
+    }
+
+    // Get filtered fonts by category
+    getFilteredFonts(): { name: string; category: string; variable: boolean; weights: string }[] {
+        const category = this.selectedFontCategory();
+        if (category === 'all') return this.fontLibrary;
+        return this.fontLibrary.filter(f => f.category === category);
     }
 
     toggleUnderline(): void {
