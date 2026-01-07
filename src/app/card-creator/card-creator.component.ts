@@ -508,6 +508,12 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.saveHistory();
     }
 
+    // Shape methods
+    addShape(shapeId: string): void {
+        this.canvasService.addShape(shapeId as any);
+        this.saveHistory();
+    }
+
     // Text formatting methods
     setTextFont(font: string): void {
         this.selectedFont.set(font);

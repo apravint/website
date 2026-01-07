@@ -56,6 +56,11 @@
                     <span class="tab-icon">🖼️</span>
                     <span class="tab-label">Image</span>
                 </button>
+                <button class="tab-btn" [class.active]="activePanel() === 'shapes'" (click)="setActivePanel('shapes')"
+                    title="Shapes">
+                    <span class="tab-icon">⬜</span>
+                    <span class="tab-label">Shapes</span>
+                </button>
                 <button class="tab-btn" [class.active]="activePanel() === 'background'"
                     (click)="setActivePanel('background')" title="Background">
                     <span class="tab-icon">🎨</span>
@@ -272,6 +277,18 @@
                         <input type="file" accept="image/*" (change)="onImageUpload($event)" hidden>
                     </label>
                     <p class="hint">Supports PNG, JPG, GIF, WebP</p>
+                </div>
+
+                <!-- Shapes Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'shapes'">
+                    <h4>Basic Shapes</h4>
+                    <div class="shapes-grid">
+                        <button *ngFor="let shape of shapeLibrary" class="shape-btn" (click)="addShape(shape.id)"
+                            [title]="shape.name">
+                            <span class="shape-icon">{{ shape.icon }}</span>
+                            <span class="shape-name">{{ shape.name }}</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Background Panel -->

@@ -587,6 +587,43 @@ $glass-blur: 16px;
   }
 }
 
+// Shapes Grid
+.shapes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.shape-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  background: $glass-bg;
+  border: 1px solid $premium-border;
+  border-radius: 12px;
+  cursor: pointer;
+  color: $premium-text;
+  transition: all 0.2s ease;
+
+  .shape-icon {
+    font-size: 1.5rem;
+  }
+
+  .shape-name {
+    font-size: 0.65rem;
+    color: $premium-muted;
+  }
+
+  &:hover {
+    border-color: $premium-accent;
+    background: rgba($premium-accent, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($premium-accent, 0.15);
+  }
+}
+
 // ==================
 // CANVAS AREA - Premium Dark
 // ==================
