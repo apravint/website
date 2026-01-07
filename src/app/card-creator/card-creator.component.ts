@@ -19,7 +19,7 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
 
     // State
-    readonly activePanel = signal<'text' | 'image' | 'background' | 'templates' | null>('text');
+    readonly activePanel = signal<'text' | 'image' | 'shapes' | 'background' | 'templates' | null>('text');
     readonly showExportModal = signal(false);
     readonly showTemplatesModal = signal(false);
     readonly selectedSizeIndex = signal(0);
@@ -474,7 +474,7 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Panel actions
-    setActivePanel(panel: 'text' | 'image' | 'background' | 'templates'): void {
+    setActivePanel(panel: 'text' | 'image' | 'shapes' | 'background' | 'templates'): void {
         this.activePanel.set(this.activePanel() === panel ? null : panel);
     }
 
