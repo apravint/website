@@ -1490,3 +1490,196 @@ $glass-blur: 16px;
     padding: 0.5rem;
   }
 }
+
+// ==================
+// PREMIUM ENHANCEMENTS
+// ==================
+
+// Animated gradient background for export button
+.btn-export {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
+    transform: translateX(-100%);
+  }
+
+  &:hover::before {
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Glowing focus rings
+.toolbar-btn:focus-visible,
+.tab-btn:focus-visible,
+.add-btn:focus-visible,
+.action-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px $premium-bg, 0 0 0 4px $premium-accent;
+}
+
+// Smooth hover lift for buttons
+.add-btn,
+.action-btn,
+.template-card,
+.gradient-btn {
+  transform: translateY(0);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Enhanced panel headers
+.panel-section h4 {
+  position: relative;
+  padding-left: 12px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 14px;
+    background: linear-gradient(180deg, $premium-accent, #8b5cf6);
+    border-radius: 2px;
+  }
+}
+
+// Animated active tab indicator
+.tab-btn.active {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: $premium-accent;
+    border-radius: 1px;
+    animation: tabPulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes tabPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Premium input focus states
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: $premium-accent !important;
+  box-shadow: 0 0 0 3px rgba($premium-accent, 0.15) !important;
+}
+
+// Smooth color picker transitions
+.color-btn {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    transition: border-color 0.2s ease;
+  }
+
+  &:hover::after {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  &.active::after {
+    border-color: $premium-accent;
+  }
+}
+
+// Enhanced canvas wrapper glow
+.canvas-wrapper {
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 25px 60px rgba(0, 0, 0, 0.6),
+      0 0 100px rgba($premium-accent, 0.15);
+  }
+}
+
+// Subtle pulse on selection
+@keyframes selectionPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba($premium-accent, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba($premium-accent, 0.3);
+  }
+}
+
+// Loading shimmer for templates
+.template-card {
+  &.loading {
+    background: linear-gradient(90deg,
+        $premium-elevated,
+        rgba(255, 255, 255, 0.05),
+        $premium-elevated );
+    background-size: 200% 100%;
+    animation: loadingShimmer 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes loadingShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Smooth scrollbar fade
+.panel-content {
+  &:hover::-webkit-scrollbar-thumb {
+    background: $premium-border-hover;
+  }
+}
+
+// Premium tooltip style (if needed)
+[title] {
+  position: relative;
+}
