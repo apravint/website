@@ -1,113 +1,112 @@
 # Pravin Tamilan - Personal Website
 
-A modern Angular 19 personal website featuring a portfolio, Tamil poetry (Kavithai) collection with Firebase integration, and a powerful Card Creator tool for designing social media graphics.
+A modern Angular 19 personal website featuring a portfolio, Tamil poetry (Kavithai) collection, client-side IPTV player, and a powerful Card Creator tool for designing social media graphics.
 
-## ✨ Features
+[![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/apravint?style=social)](https://x.com/apravint)
+[![Build Status](https://github.com/apravint/website/actions/workflows/angular.yml/badge.svg)](https://github.com/apravint/website/actions)
+
+---
+
+## ✨ Key Features
 
 ### 🎨 Card Creator
-A professional-grade graphic design tool for creating social media cards and posters:
-- **Canvas Sizes**: Instagram Post/Story, WhatsApp Status, Facebook, Twitter/X, YouTube Thumbnail
-- **Text Editing**:
-  - Multiple fonts (20+ Google Fonts including Tamil fonts)
-  - Font size, color, and alignment controls
-  - Bold, Italic, Underline, Strikethrough
-  - Letter spacing and line height
-  - Text shadow with customizable offset, blur, and color
-  - Text stroke/outline
-  - Text opacity and background color
-  - Text transform (uppercase, lowercase, capitalize)
-- **Templates**: 25+ pre-designed templates for quotes, poems, festivals, social media, and business
-- **Backgrounds**: 30+ gradient presets and 50+ solid color options
-- **Export**: PNG, JPEG, SVG formats with quality options (1x, 2x, 4x)
+A professional-grade graphic design tool for creating social media cards, poetry posts, and posters:
+- **Canvas Presets**: Optimized formats for Instagram Post/Story, WhatsApp Status, Facebook, X/Twitter, and YouTube Thumbnail.
+- **Advanced Text Editing**:
+  - 20+ Google Fonts (including premium Tamil fonts).
+  - Font size, color, alignment, styling (Bold, Italic, Underline, Strikethrough).
+  - Customizable letter spacing, line height, text opacity, and text transforms.
+  - Shadows (offset, blur, color) and text outlines/strokes.
+- **Presets & Backdrops**: 25+ pre-designed templates, 30+ gradient backgrounds, and solid color palettes.
+- **Exporting Options**: PNG, JPEG, SVG format options, customizable export multipliers (1x, 2x, 4x), WebP export, 300 DPI print marks, and size indicators.
 
-### 📜 Kavithai (Tamil Poetry)
-- Browse and read Tamil poems with Firebase backend
-- AI-powered poetry assistant
-- Share poems on social media
+### 📺 client-side IPTV Player
+A completely serverless IPTV player built directly into the client:
+- **M3U Parser**: Parses local or custom playlists entirely on the client side.
+- **HLS Playback**: Integrates `Hls.js` dynamically via CDN for adaptive bitrate streaming of live channels.
+- **User Interface**: Volume, mute, fullscreen controls, search filtering, and playback state indicators.
+- **Legal Preloads**: Comes preloaded with verified public broadcasters (NASA TV, DW News, NHK World, France 24, Red Bull TV).
 
-### 📰 News
-- Trending Tamil news from Google News RSS
-- Clean reading experience
+### 📜 Tamil Poetry (Kavithai)
+- **Poem Browser**: Dynamic display of Tamil poems, backed by a robust Firestore integration.
+- **AI Poetry Assistant**: Interactive assistant to help explore poetry and generate custom compositions.
+- **Flexible Reading Toolbar**: Toggle themes (Parchment, Onyx, Serif, Sans-serif) and adjust text sizes for optimal legibility.
+- **Social Sharing**: One-click sharing of formatted verses to WhatsApp, X (Twitter), and clipboard.
 
-### 📱 Pages
-- Home / Portfolio
-- About
-- Download (App downloads)
-- Privacy Policy
+### 📰 News Feed
+- Aggregates trending Tamil news from Google News RSS feeds.
+- Responsive bento-style card design with clean layout settings.
+
+---
+
+## 💅 Modern Design System
+
+The application has been upgraded with a sleek, premium, and interactive user interface:
+- **Obsidian Theme**: A deep obsidian-dark background (`#05070f`) with subtle, glowing blue accent fields.
+- **Aurora Glow Effect**: Custom CSS keyframe-animated glow spheres drifting in the background.
+- **Glassmorphic Floating Navbar**: A responsive glass pill navigation navbar with blur backdrops and active state highlights.
+- **Micro-Animations**: Hover-triggered translations, bento card elevation offsets, and interactive status markers.
+
+---
+
+## 🛠️ Tech Stack & Dependencies
+
+- **Framework**: Angular 19 (Signals, Control Flow, and Standalone Components)
+- **Styling**: SCSS (utilizing CSS Custom Properties & responsive utility grids)
+- **Canvas engine**: Fabric.js 6.x (locked to maintain stable object-editor behavior)
+- **Database**: Firebase / Firestore (designed with resilient fallback logic for offline/misconfigured setups)
+- **Hosting/Deployment**: GitHub Pages (staged build output inside `docs/` directory)
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js v20.19+ or v22.12+
+- Node.js v20+ or v22+
 - Angular CLI
 
-### Development Server
-
+### Installation & Run
 ```bash
 npm install
 ng serve
 ```
+Open `http://localhost:4200/` to test changes interactively.
 
-Navigate to `http://localhost:4200/`. The app auto-reloads on file changes.
-
-### Build
-
-```bash
-ng build --configuration production
-```
-
-Build artifacts are stored in the `dist/` directory.
-
-### Testing
-
-```bash
-# Unit tests
-ng test
-
-# Headless (CI)
-npm test -- --watch=false
-```
-
-## 🔧 Firebase Setup
-
-For local development with Firebase features:
-
-1. Open `src/environments/environment.ts`
-2. Replace `YOUR_FIREBASE_API_KEY` and `YOUR_FIREBASE_APP_ID` with your credentials
-3. To prevent tracking local changes:
+### Firebase Setup
+If you want to configure your own poetry database:
+1. Edit `src/environments/environment.ts` and paste your Firebase Web API config.
+2. Avoid committing local credentials by running:
    ```bash
    git update-index --assume-unchanged src/environments/environment.ts
    ```
 
-## 🛠️ Tech Stack
+### Running Tests
+```bash
+# Run unit specs in watch mode
+ng test
 
-- **Framework**: Angular 19
-- **Styling**: SCSS with CSS custom properties
-- **Canvas**: Fabric.js 6.x
-- **Backend**: Firebase (Firestore, Auth)
-- **Deployment**: GitHub Pages
+# CI Headless testing
+npm test -- --watch=false
+```
 
-## 📁 Project Structure
+---
+
+## 📂 Codebase Structure
 
 ```
 src/app/
-├── card-creator/       # Card design tool
-│   ├── services/       # Canvas, Export, History services
-│   └── models/         # Canvas element models
-├── kavithai/           # Tamil poetry page
-├── news/               # News feed
-├── about/              # About page
-├── download/           # Downloads page
-├── privacy/            # Privacy policy
-├── navbar/             # Navigation
-└── shared/             # Shared services
+├── card-creator/       # Graphics canvas designer (Fabric.js 6)
+├── iptv/               # Client-side IPTV & HLS player
+├── kavithai/           # Tamil poetry collection & reader options
+├── news/               # Google News RSS aggregator
+├── navbar/             # Floating pill glassmorphic navbar
+├── footer/             # Social links & contact panel
+└── shared/             # SEO metadata & share integration services
 ```
 
-## 📝 Notes
+---
 
-- This project was generated with Angular CLI v19.0.6
-- For more Angular CLI commands: [Angular CLI Reference](https://angular.dev/tools/cli)
+## 📄 License & Credits
 
-## 📄 License
-
-© Pravin Tamilan. All rights reserved.
+- © Pravin Tamilan. All rights reserved.
+- Twitter profile: [@apravint](https://x.com/apravint)
