@@ -3,6 +3,7 @@ import { KavithaiComponent } from './kavithai.component';
 import { of, throwError } from 'rxjs';
 import { KavithaiService } from './kavithai.service';
 import { SeoService } from '../shared/seo.service';
+import { ActivatedRoute } from '@angular/router';
 
 describe('KavithaiComponent', () => {
   let seoSpy: jasmine.SpyObj<SeoService>;
@@ -13,7 +14,11 @@ describe('KavithaiComponent', () => {
       imports: [KavithaiComponent],
       providers: [
         { provide: KavithaiService, useValue: { getKavithaigal: () => of([]) } },
-        { provide: SeoService, useValue: seoSpy }
+        { provide: SeoService, useValue: seoSpy },
+        {
+          provide: ActivatedRoute,
+          useValue: { queryParams: of({}) }
+        }
       ]
     }).compileComponents();
   });

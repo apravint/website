@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HomeComponent } from './home.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TranslationService } from '../shared/translation.service';
+import { KavithaiService } from '../kavithai/kavithai.service';
 import { of } from 'rxjs';
 
 describe('HomeComponent', () => {
@@ -19,6 +20,11 @@ describe('HomeComponent', () => {
               if (k.includes('HOME.HERO.TITLE')) return 'Tamil Kavithai';
               return k;
             }, translations$: of({})
+          }
+        },
+        {
+          provide: KavithaiService, useValue: {
+            getKavithaigal: () => of([])
           }
         }
       ]
