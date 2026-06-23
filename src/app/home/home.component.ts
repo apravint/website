@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Injector } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SeoService } from '../shared/seo.service';
@@ -33,7 +33,7 @@ interface Skill {
 })
 export class HomeComponent implements OnInit {
   private githubService = inject(GitHubService);
-  private kavithaiService = inject(KavithaiService);
+  private injector = inject(Injector);
 
   today = new Date().toDateString();
   showGreeting = true;
@@ -122,17 +122,29 @@ export class HomeComponent implements OnInit {
 
   private fetchFeaturedPoem(): void {
     this.loadingPoem = true;
-    this.kavithaiService.getKavithaigal().pipe(
-      catchError(err => {
-        console.error('Error fetching poems for home', err);
-        this.loadingPoem = false;
-        return of([]);
-      })
-    ).subscribe(poems => {
-      this.allPoems = poems;
+    try {
+      const kavithaiService = this.injector.get(KavithaiService);
+      kavithaiService.getKavithaigal().pipe(
+        catchError(err => {
+          console.error('Error fetching poems for home', err);
+          this.loadingPoem = false;
+          return of([]);
+        })
+      ).subscribe({
+        next: (poems) => {
+          this.allPoems = poems;
+          this.loadingPoem = false;
+          this.pickRandomPoem();
+        },
+        error: (err) => {
+          console.error('Subscription error for poems', err);
+          this.loadingPoem = false;
+        }
+      });
+    } catch (err) {
+      console.error('KavithaiService injection failed. Firestore may be unconfigured.', err);
       this.loadingPoem = false;
-      this.pickRandomPoem();
-    });
+    }
   }
 
   pickRandomPoem(): void {

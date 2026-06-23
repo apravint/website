@@ -1,0 +1,172 @@
+<section class="animate-fade-in iptv-page">
+  <!-- Hero Header -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container">
+      <h1><span class="text-gradient">Client-Side IPTV Player</span></h1>
+      <p class="lead">Parse, organize, and stream public TV feeds or your custom M3U playlist locally in the browser.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    
+    <!-- Legal Disclaimer Banner -->
+    <div class="disclaimer-alert">
+      <span class="alert-icon">⚖️</span>
+      <div class="alert-content">
+        <strong>Important Disclaimer</strong>
+        <p>This application is a purely client-side parsing utility. It does not host, index, broadcast, or transmit any video streams. Users must supply their own M3U playlists. Please ensure you own the distribution rights to any streaming feeds you load.</p>
+      </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div class="error-banner animate-fade-in" *ngIf="errorMessage">
+      <span>⚠️ {{ errorMessage }}</span>
+      <button class="close-error" (click)="errorMessage = ''">✕</button>
+    </div>
+
+    <!-- SETUP VIEW (No Playlist Loaded) -->
+    <div class="setup-container card glass" *ngIf="parsedChannels.length === 0">
+      <div class="setup-header">
+        <h3>📋 Load M3U Playlist</h3>
+        <p class="muted">Paste a remote playlist link, upload a local playlist file, or test with our legal public sample channels.</p>
+      </div>
+
+      <div class="setup-options">
+        <!-- Remote URL -->
+        <div class="form-group">
+          <label for="url-input">Playlist URL (.m3u / .m3u8)</label>
+          <div class="input-with-action">
+            <input 
+              id="url-input"
+              type="url" 
+              [(ngModel)]="playlistUrl" 
+              placeholder="e.g., https://example.com/playlist.m3u" 
+              [disabled]="isLoading"
+              (keyup.enter)="fetchPlaylistFromUrl()"
+            />
+            <button class="btn btn-primary" (click)="fetchPlaylistFromUrl()" [disabled]="isLoading || !playlistUrl.trim()">
+              <span>Fetch URL</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+        <!-- File Upload -->
+        <div class="upload-dropzone">
+          <label class="dropzone-label">
+            <span class="upload-icon">📂</span>
+            <strong>Select M3U File</strong>
+            <span class="upload-sub">Click to select a local .m3u / .txt file</span>
+            <input type="file" accept=".m3u,.m3u8,.txt" (change)="onFileUpload($event)" [disabled]="isLoading"/>
+          </label>
+        </div>
+
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+        <!-- Presets -->
+        <div class="preset-action">
+          <button class="btn btn-sample" (click)="loadSamplePlaylist()" [disabled]="isLoading">
+            <span>🎲 Load Public Legal Channels</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div class="loading-overlay" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Parsing playlist data...</p>
+      </div>
+    </div>
+
+    <!-- WORKSPACE VIEW (Playlist Loaded) -->
+    <div class="workspace-layout animate-fade-in" *ngIf="parsedChannels.length > 0">
+      
+      <!-- Video Player Column -->
+      <div class="player-panel">
+        <div class="video-container shadow">
+          <video 
+            #videoPlayer 
+            controls 
+            preload="auto"
+            [src]="currentChannel && currentChannel.url"
+            [poster]="currentChannel && currentChannel.logo || 'assets/placeholder-tv.png'"
+          >
+            Your browser does not support HTML5 video tags.
+          </video>
+          
+          <!-- Idle Overlay -->
+          <div class="player-idle-overlay" *ngIf="!currentChannel">
+            <span class="icon">📺</span>
+            <p>Select a channel from the browser list to start streaming</p>
+          </div>
+        </div>
+
+        <!-- Metadata Section -->
+        <div class="channel-details-card card" *ngIf="currentChannel">
+          <div class="channel-meta-info">
+            <img [src]="currentChannel.logo || 'assets/placeholder-tv.png'" [alt]="currentChannel.name" class="channel-view-logo">
+            <div class="meta-txt">
+              <h4>{{ currentChannel.name }}</h4>
+              <span class="meta-badge">{{ currentChannel.category }}</span>
+              <p class="meta-desc">Live streaming via client-side HLS decoder</p>
+            </div>
+          </div>
+          <button class="btn btn-reset" (click)="parsedChannels = []; currentChannel = null; errorMessage = ''">
+            <span>🔄 Load New Playlist</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Channel Browser Sidebar Column -->
+      <div class="sidebar-panel card">
+        <div class="sidebar-header">
+          <h3>Channel Browser</h3>
+          <span class="count-badge">{{ getFilteredChannels().length }} channels</span>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="sidebar-filters">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search channels..." 
+            class="search-input"
+          />
+          
+          <select [(ngModel)]="selectedCategory" class="category-select">
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <!-- Channels List -->
+        <div class="channels-scroller">
+          <button 
+            *ngFor="let ch of getFilteredChannels()" 
+            class="channel-row-btn" 
+            [class.active]="currentChannel?.url === ch.url"
+            (click)="playChannel(ch)"
+          >
+            <img [src]="ch.logo || 'assets/placeholder-tv.png'" [alt]="ch.name" class="channel-row-logo">
+            <div class="channel-row-name">
+              <span>{{ ch.name }}</span>
+              <small class="muted">{{ ch.category }}</small>
+            </div>
+            <span class="play-state-indicator" *ngIf="currentChannel?.url === ch.url">🔊</span>
+          </button>
+          
+          <div class="sidebar-empty" *ngIf="getFilteredChannels().length === 0">
+            <p>No matching channels found.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>

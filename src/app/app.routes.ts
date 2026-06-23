@@ -36,5 +36,9 @@ export const routes: Routes = [
 		path: 'download',
 		loadComponent: () => import('./download/download.component').then(m => m.DownloadComponent)
 	},
+	{
+		path: 'iptv',
+		loadComponent: () => import('./iptv/iptv.component').then(m => m.IptvComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];
