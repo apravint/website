@@ -802,6 +802,35 @@ $glass-blur: 16px;
   padding: 1.5rem;
 }
 
+.file-size-estimate {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .size-badge {
+    font-weight: 700;
+    background: rgba(79, 70, 229, 0.08);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(79, 70, 229, 0.15);
+  }
+}
+
+.print-notice-banner {
+  margin-top: 1rem;
+  padding: 12px;
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
 .form-group {
   margin-bottom: 1.25rem;
 

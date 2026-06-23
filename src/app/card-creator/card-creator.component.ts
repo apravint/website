@@ -30,8 +30,22 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly selectedSize = computed(() => this.canvasSizes[this.selectedSizeIndex()]);
 
     // Export options
-    readonly exportFormat = signal<'png' | 'jpeg' | 'svg'>('png');
-    readonly exportQuality = signal<'medium' | 'high' | 'max'>('high');
+    readonly exportFormat = signal<'png' | 'jpeg' | 'webp' | 'svg' | 'pdf'>('png');
+    readonly exportQuality = signal<'low' | 'medium' | 'high' | 'max' | 'print'>('high');
+
+    // Estimated size calculation
+    getEstimatedSize(): string {
+        const canvas = this.canvasService.getCanvas();
+        if (!canvas) return 'Unknown';
+        try {
+            return this.exportService.estimateFileSize(canvas, {
+                format: this.exportFormat(),
+                quality: this.exportQuality()
+            });
+        } catch {
+            return 'Unknown';
+        }
+    }
 
     // Text formatting state
     readonly selectedFont = signal('Noto Sans Tamil');
@@ -854,13 +868,17 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoading.set(true);
 
         try {
-            const options: ExportOptions = {
-                format: this.exportFormat(),
-                quality: this.exportQuality()
-            };
-
             const filename = `card-${Date.now()}`;
-            await this.exportService.downloadImage(canvas, filename, options);
+            
+            if (this.exportQuality() === 'print' && this.exportFormat() === 'png') {
+                await this.exportService.downloadPrintReady(canvas, filename);
+            } else {
+                const options: ExportOptions = {
+                    format: this.exportFormat(),
+                    quality: this.exportQuality()
+                };
+                await this.exportService.downloadImage(canvas, filename, options);
+            }
             this.closeExportModal();
         } catch (error) {
             console.error('Export failed:', error);

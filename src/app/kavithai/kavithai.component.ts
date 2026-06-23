@@ -1,6 +1,7 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { KavithaiService } from './kavithai.service';
 import { TranslatePipe } from '../shared/translate.pipe';
 import { catchError, tap } from 'rxjs/operators';
@@ -19,15 +20,21 @@ import { environment } from '../../environments/environment';
     templateUrl: './kavithai.component.html',
     styleUrls: ['./kavithai.component.scss']
 })
-export class KavithaiComponent {
+export class KavithaiComponent implements OnInit {
     private kavithaiService = inject(KavithaiService);
     private seo = inject(SeoService);
     private favoritesService = inject(FavoritesService);
     private shareService = inject(ShareService);
     private cdr = inject(ChangeDetectorRef);
+    private route = inject(ActivatedRoute);
 
     // Tab state
     activeTab: 'browse' | 'ai' = 'browse';
+
+    // Reading preference state
+    textSize: 'small' | 'medium' | 'large' = 'medium';
+    textStyle: 'sans' | 'serif' = 'serif';
+    paperTheme: 'clean' | 'parchment' | 'dark-onyx' = 'clean';
 
     // Browse poems state
     errorMessage = '';
@@ -50,6 +57,15 @@ export class KavithaiComponent {
             title: 'Poems - Tamil Kavithai',
             description: 'Browse poems and poetry in Tamil from the Tamil Kavithai collection, or create your own with AI.',
             url: 'https://pravintamilan.com/kavithai'
+        });
+    }
+
+    ngOnInit(): void {
+        this.route.queryParams.subscribe(params => {
+            if (params['tab'] === 'ai') {
+                this.activeTab = 'ai';
+                this.cdr.detectChanges();
+            }
         });
     }
 

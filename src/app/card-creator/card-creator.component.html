@@ -371,6 +371,11 @@
                                 (ngModelChange)="exportFormat.set($event)">
                             JPEG
                         </label>
+                        <label class="radio-btn" [class.active]="exportFormat() === 'webp'">
+                            <input type="radio" name="format" value="webp" [ngModel]="exportFormat()"
+                                (ngModelChange)="exportFormat.set($event)">
+                            WebP
+                        </label>
                         <label class="radio-btn" [class.active]="exportFormat() === 'svg'">
                             <input type="radio" name="format" value="svg" [ngModel]="exportFormat()"
                                 (ngModelChange)="exportFormat.set($event)">
@@ -380,8 +385,13 @@
                 </div>
 
                 <div class="form-group" *ngIf="exportFormat() !== 'svg'">
-                    <label>Quality</label>
+                    <label>Resolution & Output Quality</label>
                     <div class="radio-group">
+                        <label class="radio-btn" [class.active]="exportQuality() === 'low'">
+                            <input type="radio" name="quality" value="low" [ngModel]="exportQuality()"
+                                (ngModelChange)="exportQuality.set($event)">
+                            Low (0.5x)
+                        </label>
                         <label class="radio-btn" [class.active]="exportQuality() === 'medium'">
                             <input type="radio" name="quality" value="medium" [ngModel]="exportQuality()"
                                 (ngModelChange)="exportQuality.set($event)">
@@ -395,9 +405,24 @@
                         <label class="radio-btn" [class.active]="exportQuality() === 'max'">
                             <input type="radio" name="quality" value="max" [ngModel]="exportQuality()"
                                 (ngModelChange)="exportQuality.set($event)">
-                            Max (4x)
+                            Ultra (4x)
+                        </label>
+                        <label class="radio-btn" [class.active]="exportQuality() === 'print'" *ngIf="exportFormat() === 'png'">
+                            <input type="radio" name="quality" value="print" [ngModel]="exportQuality()"
+                                (ngModelChange)="exportQuality.set($event)">
+                            Print (300 DPI)
                         </label>
                     </div>
+                </div>
+
+                <!-- Print Options Details -->
+                <div class="print-notice-banner" *ngIf="exportQuality() === 'print' && exportFormat() === 'png'">
+                    <span>ℹ️ <strong>Print-Ready PDF/PNG</strong> output adds standard 3mm bleed limits and safety crop alignment markings for publishing.</span>
+                </div>
+
+                <!-- File Size Estimate -->
+                <div class="file-size-estimate" *ngIf="exportFormat() !== 'svg'">
+                    <span>Estimated File Size: <span class="size-badge">{{ getEstimatedSize() }}</span></span>
                 </div>
             </div>
 

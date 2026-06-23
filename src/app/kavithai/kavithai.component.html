@@ -20,10 +20,32 @@
 
         <!-- Browse Poems Tab -->
         <div class="tab-content" *ngIf="activeTab === 'browse'">
-            <div class="tab-header">
+            <div class="browse-controls-row">
+                <!-- Surprise Me -->
                 <button class="surprise-btn" (click)="surpriseMe()" [disabled]="loading">
                     🎲 {{ 'KAVITHAI.SURPRISE_ME' | translate }}
                 </button>
+
+                <!-- Reading Format Panel -->
+                <div class="reading-controls-bar">
+                    <div class="control-group">
+                        <span class="control-label">🔤 Style</span>
+                        <button class="control-btn" [class.active]="textStyle === 'serif'" (click)="textStyle = 'serif'">Serif</button>
+                        <button class="control-btn" [class.active]="textStyle === 'sans'" (click)="textStyle = 'sans'">Sans</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">📏 Size</span>
+                        <button class="control-btn" [class.active]="textSize === 'small'" (click)="textSize = 'small'">A-</button>
+                        <button class="control-btn" [class.active]="textSize === 'medium'" (click)="textSize = 'medium'">A</button>
+                        <button class="control-btn" [class.active]="textSize === 'large'" (click)="textSize = 'large'">A+</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">🎨 Theme</span>
+                        <button class="theme-dot clean" [class.active]="paperTheme === 'clean'" (click)="paperTheme = 'clean'" title="Clean Light"></button>
+                        <button class="theme-dot parchment" [class.active]="paperTheme === 'parchment'" (click)="paperTheme = 'parchment'" title="Parchment Paper"></button>
+                        <button class="theme-dot onyx" [class.active]="paperTheme === 'dark-onyx'" (click)="paperTheme = 'dark-onyx'" title="Onyx Dark"></button>
+                    </div>
+                </div>
             </div>
 
             <div class="grid-layout">
@@ -37,7 +59,8 @@
 
                 @for (k of kavithaigal$ | async; track k; let i = $index) {
                 <div class="card hover-effect poem-card" [id]="'poem-' + getPoemId(k)"
-                    [class.highlighted]="highlightedPoemId === getPoemId(k)">
+                    [class.highlighted]="highlightedPoemId === getPoemId(k)"
+                    [ngClass]="['read-size-' + textSize, 'read-style-' + textStyle, 'read-theme-' + paperTheme]">
                     @if (k.title) {
                     <h3 class="kavithai-title">{{ k.title }}</h3>
                     }

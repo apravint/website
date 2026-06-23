@@ -1,85 +1,240 @@
 <section class="hero-section animate-fade-in">
+  <div class="bg-mesh-glow"></div>
   <div class="container">
     <div class="hero-content">
       <div class="hero-text">
-        <span class="badge">{{ 'HOME.HERO.BADGE' | translate }}</span>
-        <h1>{{ 'HOME.HERO.TITLE_PREFIX' | translate }} <br> <span class="text-gradient">{{ 'HOME.HERO.TITLE_HIGHLIGHT' |
-            translate }}</span> {{ 'HOME.HERO.TITLE_SUFFIX' | translate }}</h1>
+        <span class="badge">
+          <span class="pulse-dot"></span>
+          {{ 'HOME.HERO.BADGE' | translate }}
+        </span>
+        <h1>
+          {{ 'HOME.HERO.TITLE_PREFIX' | translate }}
+          <br>
+          <span class="text-gradient font-bold">{{ 'HOME.HERO.TITLE_HIGHLIGHT' | translate }}</span>
+          <br>
+          {{ 'HOME.HERO.TITLE_SUFFIX' | translate }}
+        </h1>
         <p class="lead">{{ 'HOME.HERO.DESC' | translate }}</p>
         <div class="hero-actions">
-          <a routerLink="/about" class="btn btn-primary">{{ 'HOME.HERO.BTN_ABOUT' | translate }}</a>
-          <a routerLink="/contact" class="btn btn-outline">{{ 'HOME.HERO.BTN_CONTACT' | translate }}</a>
+          <a routerLink="/about" class="btn btn-primary">
+            <span>{{ 'HOME.HERO.BTN_ABOUT' | translate }}</span>
+            <span class="icon-arrow">→</span>
+          </a>
+          <a routerLink="/news" class="btn btn-outline">
+            <span>📰 Latest News</span>
+          </a>
         </div>
       </div>
+      
       <div class="hero-visual">
-        <div class="gradient-sphere"></div>
+        <div class="orbit-container">
+          <div class="central-core">
+            <span class="core-logo">PT</span>
+            <div class="core-pulse"></div>
+          </div>
+          <!-- Orbit 1 (Inner) -->
+          <div class="orbit-path path-1">
+            <div class="orbit-node node-angular" title="Angular">
+              <span class="node-icon">🅰️</span>
+            </div>
+            <div class="orbit-node node-ts" title="TypeScript">
+              <span class="node-icon">TS</span>
+            </div>
+          </div>
+          <!-- Orbit 2 (Middle) -->
+          <div class="orbit-path path-2">
+            <div class="orbit-node node-node" title="Node.js">
+              <span class="node-icon">🟢</span>
+            </div>
+            <div class="orbit-node node-python" title="Python">
+              <span class="node-icon">🐍</span>
+            </div>
+          </div>
+          <!-- Orbit 3 (Outer) -->
+          <div class="orbit-path path-3">
+            <div class="orbit-node node-firebase" title="Firebase">
+              <span class="node-icon">🔥</span>
+            </div>
+            <div class="orbit-node node-gemini" title="Gemini AI">
+              <span class="node-icon">✨</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <section class="container content-section animate-fade-in delay-200">
-  <div class="grid-layout">
-    <!-- GitHub Stats Card (Full Width) -->
-    <div class="card github-card full-width" *ngIf="githubStats">
-      <div class="github-header">
-        <div class="github-profile">
-          <img [src]="githubStats.avatar" [alt]="githubStats.name" class="github-avatar">
-          <div class="github-info">
-            <h3 class="github-name">{{ githubStats.name }}</h3>
-            <a [href]="githubStats.profileUrl" target="_blank" rel="noopener" class="github-username">
-              <span class="github-icon-small">🐙</span> @{{ githubStats.username }}
+  <div class="bento-grid">
+    
+    <!-- GitHub Stats Card (Bento Double Span) -->
+    <div class="bento-card github-bento-card span-2" *ngIf="githubStats">
+      <div class="card-glow"></div>
+      <div class="github-bento-header">
+        <div class="github-profile-section">
+          <div class="avatar-container">
+            <img [src]="githubStats.avatar" [alt]="githubStats.name" class="github-avatar-img">
+            <span class="status-indicator"></span>
+          </div>
+          <div class="github-meta">
+            <h3>{{ githubStats.name }}</h3>
+            <a [href]="githubStats.profileUrl" target="_blank" rel="noopener" class="username-link">
+              <span>🐙 @{{ githubStats.username }}</span>
             </a>
-            <p class="github-bio" *ngIf="githubStats.bio">{{ githubStats.bio }}</p>
+            <p class="bio-text" *ngIf="githubStats.bio">{{ githubStats.bio }}</p>
           </div>
         </div>
-        <a [href]="githubStats.profileUrl" target="_blank" rel="noopener" class="btn btn-github">
-          {{ 'HOME.GITHUB.VIEW_PROFILE' | translate }} →
+        <a [href]="githubStats.profileUrl" target="_blank" rel="noopener" class="action-link-btn">
+          <span>GitHub</span>
+          <span class="arrow">↗</span>
         </a>
       </div>
-      <div class="github-stats-grid">
-        <div class="stat-item">
-          <span class="stat-icon">📦</span>
-          <span class="stat-value">{{ githubStats.publicRepos }}</span>
-          <span class="stat-label">{{ 'HOME.GITHUB.REPOS' | translate }}</span>
+      <div class="github-metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon-bg">📦</div>
+          <div class="metric-data">
+            <span class="value">{{ githubStats.publicRepos }}</span>
+            <span class="label">{{ 'HOME.GITHUB.REPOS' | translate }}</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-icon">👥</span>
-          <span class="stat-value">{{ githubStats.followers }}</span>
-          <span class="stat-label">{{ 'HOME.GITHUB.FOLLOWERS' | translate }}</span>
+        <div class="metric-card">
+          <div class="metric-icon-bg">⭐</div>
+          <div class="metric-data">
+            <span class="value">{{ totalStars }}</span>
+            <span class="label">{{ 'HOME.GITHUB.STARS' | translate }}</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-icon">➡️</span>
-          <span class="stat-value">{{ githubStats.following }}</span>
-          <span class="stat-label">{{ 'HOME.GITHUB.FOLLOWING' | translate }}</span>
+        <div class="metric-card">
+          <div class="metric-icon-bg">👥</div>
+          <div class="metric-data">
+            <span class="value">{{ githubStats.followers }}</span>
+            <span class="label">{{ 'HOME.GITHUB.FOLLOWERS' | translate }}</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading State for GitHub -->
-    <div class="card github-card loading-card full-width" *ngIf="loadingGitHub && !githubStats">
-      <div class="loading-spinner"></div>
-      <p class="muted">Loading GitHub stats...</p>
+    <div class="bento-card loading-card span-2" *ngIf="loadingGitHub && !githubStats">
+      <div class="loader-circle"></div>
+      <p class="muted">Connecting to GitHub API...</p>
     </div>
 
-    <div class="card">
+    <!-- Interactive Skills Radar Card (Bento Single Span) -->
+    <div class="bento-card skills-card">
+      <div class="skills-header">
+        <h3>⚡ Tech Skills</h3>
+        <div class="skill-tabs">
+          <button class="tab-pill" [class.active]="selectedSkillCategory === 'all'" (click)="changeSkillCategory('all')">All</button>
+          <button class="tab-pill" [class.active]="selectedSkillCategory === 'frontend'" (click)="changeSkillCategory('frontend')">UI</button>
+          <button class="tab-pill" [class.active]="selectedSkillCategory === 'backend'" (click)="changeSkillCategory('backend')">API</button>
+          <button class="tab-pill" [class.active]="selectedSkillCategory === 'devops'" (click)="changeSkillCategory('devops')">Cloud</button>
+        </div>
+      </div>
+      <div class="skills-list">
+        <div class="skill-bar-item" *ngFor="let skill of filterSkills(selectedSkillCategory)">
+          <div class="skill-info">
+            <span class="skill-name">{{ skill.name }}</span>
+            <span class="skill-val">{{ skill.percentage }}%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" [style.width.%]="skill.percentage"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Random Tamil Poem Card (Bento Single Span) -->
+    <div class="bento-card kavithai-preview-card">
+      <div class="kavithai-card-bg"></div>
+      <div class="card-top-action">
+        <span class="card-label">📜 Featured Poem</span>
+        <button class="btn-refresh-poem" (click)="pickRandomPoem()" [disabled]="loadingPoem" title="Refresh Poem">
+          <span class="refresh-icon">🔄</span>
+        </button>
+      </div>
+      
+      <div class="poem-wrapper">
+        <div *ngIf="loadingPoem" class="poem-loading">
+          <div class="typing-loader"></div>
+        </div>
+        <div *ngIf="!loadingPoem && featuredPoem" class="poem-display animate-fade-in">
+          <h4 class="poem-title" *ngIf="featuredPoem.title">{{ featuredPoem.title }}</h4>
+          <p class="poem-desc">{{ featuredPoem.description }}</p>
+          <span class="poem-author">— {{ featuredPoem.user }}</span>
+        </div>
+        <div *ngIf="!loadingPoem && !featuredPoem" class="poem-empty">
+          <p>Unable to load poems. Check network connections.</p>
+        </div>
+      </div>
+
+      <div class="card-footer-action">
+        <a routerLink="/kavithai" class="card-link">Browse All Poems →</a>
+      </div>
+    </div>
+
+    <!-- AI Assistant Promo Card (Bento Single Span) -->
+    <div class="bento-card ai-invite-card">
+      <div class="glow-overlay"></div>
+      <div class="ai-invite-content">
+        <div class="robot-avatar">
+          <span class="bot-emoji">🤖</span>
+          <span class="glow-ring"></span>
+        </div>
+        <h3>Creative AI Poet</h3>
+        <p class="invite-desc">Collaborate with Gemini to craft custom Tamil poems, explain deep verses, or write custom letters instantly.</p>
+        
+        <div class="simulate-chat">
+          <div class="chat-bubble user">Write a poem about rain...</div>
+          <div class="chat-bubble bot">மழைத்துளி மண்ணில் விழும்போது... 🌧️</div>
+        </div>
+
+        <a routerLink="/kavithai" [queryParams]="{tab: 'ai'}" class="btn btn-primary full-width mt-auto">
+          <span>Compose with AI</span>
+          <span class="icon">✨</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- New Year Greeting Widget (Bento Single Span) -->
+    <div class="bento-card greeting-bento-card">
+      <div class="greeting-badge">2026</div>
       <h3>{{ 'HOME.CARDS.NEW_YEAR_TITLE' | translate }}</h3>
-      <p>{{ 'HOME.CARDS.NEW_YEAR_DESC' | translate }}</p>
+      <p class="greeting-text">{{ 'HOME.CARDS.NEW_YEAR_DESC' | translate }}</p>
+      <div class="greeting-pattern"></div>
     </div>
 
-    <div class="card">
-      <h3>{{ 'HOME.CARDS.ABOUT_TITLE' | translate }}</h3>
-      <p>{{ 'HOME.CARDS.ABOUT_DESC_1' | translate }}</p>
-      <p>{{ 'HOME.CARDS.ABOUT_DESC_2' | translate }}</p>
+    <!-- Featured Projects Showcase (Bento Double Span) -->
+    <div class="bento-card projects-bento-card span-2">
+      <h3>🚀 Highlighted Projects</h3>
+      <p class="section-subtitle">A few of my favorite open source utilities and platforms.</p>
+      
+      <div class="projects-subgrid">
+        <div class="project-bento-card" *ngFor="let proj of featuredProjects">
+          <div class="project-header">
+            <span class="project-icon">{{ proj.icon }}</span>
+            <div class="project-links">
+              <a *ngIf="proj.githubUrl" [href]="proj.githubUrl" target="_blank" rel="noopener" class="proj-link" title="GitHub Source">🐙</a>
+            </div>
+          </div>
+          <h4>{{ proj.title }}</h4>
+          <p class="proj-desc">{{ proj.description }}</p>
+          <div class="proj-tags">
+            <span class="tag" *ngFor="let tag of proj.tags">{{ tag }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Legal Links for Compliance -->
-    <div class="legal-links-section">
-      <p class="legal-text">
-        By using this site, you agree to our
-        <a routerLink="/privacy">Privacy Policy</a> and
-        <a routerLink="/terms">Terms of Service</a>.
+    <!-- Legal Links Compliance Section (Bento Double Span) -->
+    <div class="bento-card legal-bento-card span-2">
+      <p class="legal-disclaimer">
+        © 2026 Pravin Tamilan. Designed with pure CSS and Angular. By browsing this website, you agree to our 
+        <a routerLink="/privacy" class="legal-link">Privacy Policy</a> and 
+        <a routerLink="/terms" class="legal-link">Terms of Service</a>.
       </p>
     </div>
+
   </div>
 </section>
