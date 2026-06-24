@@ -37,6 +37,16 @@ A completely serverless IPTV player built directly into the client:
 - Aggregates trending Tamil news from Google News RSS feeds.
 - Responsive bento-style card design with clean layout settings.
 
+### 💻 Interactive Terminal Simulator
+- A browser-based Termux emulator that lets visitors interact with your portfolio using commands.
+- Custom actions: `neofetch` (system info ASCII), `cowsay` (talking ASCII cow), `kavithai` (poem printer), and `about`/`skills`/`projects` commands.
+- Canvas-rendered `cmatrix` falling code screensaver effect (exitable on click or ESC).
+- Command history memory navigating with arrow keys.
+
+### 📚 Termux & Antigravity Guides
+- Bilingual developer tutorials (English & Tamil) detailing mobile website construction.
+- Step-by-step setup walkthrough for F-Droid Termux packages, git config, dev server running, automated testing, and code deploying with Antigravity AI.
+
 ---
 
 ## 💅 Modern Design System

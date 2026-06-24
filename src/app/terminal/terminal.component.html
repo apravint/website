@@ -1,0 +1,61 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero / Header -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content">
+      <h1><span class="text-gradient">Termux Simulator</span></h1>
+      <p class="lead">An interactive browser-based CLI emulator. Type commands to explore my developer ecosystem, projects, and poetry.</p>
+    </div>
+  </div>
+
+  <div class="container terminal-section">
+    <!-- Window Pane Container -->
+    <div class="terminal-window glass-card" (click)="focusInput()">
+      <!-- Window Title Bar -->
+      <div class="window-header">
+        <div class="header-buttons">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="window-title">pravintamilan@termux: ~</div>
+      </div>
+
+      <!-- Window Workspace -->
+      <div class="window-body" #terminalBody [class.matrix-active]="isMatrixMode">
+        
+        <!-- Standard Command Console Mode -->
+        <div class="terminal-content" *ngIf="!isMatrixMode">
+          <div class="output-line" *ngFor="let line of history">
+            <span [ngClass]="'line-' + line.type">{{ line.text }}</span>
+          </div>
+
+          <!-- Active Prompt Command Input -->
+          <div class="input-line">
+            <span class="prefix">{{ promptPrefix }}</span>
+            <input 
+              #cmdInput
+              type="text" 
+              class="terminal-input"
+              [(ngModel)]="command"
+              (keydown.enter)="handleCommandSubmit()"
+              (keydown)="handleKeyUp($event)"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              aria-label="Terminal prompt"
+            />
+          </div>
+        </div>
+
+        <!-- Matrix Overlay Screensaver Mode -->
+        <div class="matrix-overlay" *ngIf="isMatrixMode" (click)="stopMatrixEffect()">
+          <canvas #matrixCanvas class="matrix-canvas"></canvas>
+          <div class="matrix-exit-hint">Press anywhere or ESC to exit screensaver</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

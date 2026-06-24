@@ -10,7 +10,8 @@
         "NEWS": "News",
         "APP": "App",
         "IPTV": "IPTV",
-        "TUTORIALS": "Guides"
+        "TUTORIALS": "Guides",
+        "TERMINAL": "Terminal"
     },
     "NEWS": {
         "TITLE": "Trending News",
