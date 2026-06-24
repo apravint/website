@@ -1,0 +1,136 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero Header -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content">
+      <div class="hero-header-badge">⚽ FIFA World Cup 2026</div>
+      <h1><span class="text-gradient">World Cup 2026 Hub</span></h1>
+      <p class="lead">Live standings, match schedules, results, and real-time updates for the historic 48-team tournament in North America.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Search and Filter Bar -->
+    <div class="control-bar glass-card">
+      <div class="tabs-navigation">
+        <button class="tab-btn" [class.active]="activeTab === 'standings'" (click)="activeTab = 'standings'; searchQuery = ''">📊 Standings</button>
+        <button class="tab-btn" [class.active]="activeTab === 'matches'" (click)="activeTab = 'matches'; searchQuery = ''">📅 Matches</button>
+        <button class="tab-btn" [class.active]="activeTab === 'news'" (click)="activeTab = 'news'; searchQuery = ''">📰 Latest News</button>
+      </div>
+
+      <div class="search-box" *ngIf="activeTab !== 'news'">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          placeholder="Search team or group..." 
+          [(ngModel)]="searchQuery" 
+          class="search-input"
+        />
+      </div>
+    </div>
+
+    <!-- 1. STANDINGS TAB VIEW -->
+    <div class="tab-content" *ngIf="activeTab === 'standings'">
+      <div class="groups-grid">
+        <div class="group-card glass-card" *ngFor="let group of getFilteredGroups()">
+          <h3>{{ group.name }}</h3>
+          <div class="table-responsive">
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th class="text-center">P</th>
+                  <th class="text-center">W</th>
+                  <th class="text-center">D</th>
+                  <th class="text-center">L</th>
+                  <th class="text-center">GD</th>
+                  <th class="text-center">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let team of group.teams; let i = index" [class.top-two]="i < 2">
+                  <td class="team-name">
+                    <span class="position-badge">{{ i + 1 }}</span>
+                    <span class="team-flag">{{ team.flag }}</span>
+                    <span class="team-label">{{ team.name }}</span>
+                  </td>
+                  <td class="text-center stats-cell">{{ team.played }}</td>
+                  <td class="text-center stats-cell">{{ team.won }}</td>
+                  <td class="text-center stats-cell">{{ team.drawn }}</td>
+                  <td class="text-center stats-cell">{{ team.lost }}</td>
+                  <td class="text-center stats-cell" [class.positive-gd]="team.gd > 0" [class.negative-gd]="team.gd < 0">
+                    {{ team.gd > 0 ? '+' : '' }}{{ team.gd }}
+                  </td>
+                  <td class="text-center pts-cell">{{ team.points }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="no-results glass-card" *ngIf="getFilteredGroups().length === 0">
+        <p>No matching groups or teams found.</p>
+      </div>
+    </div>
+
+    <!-- 2. MATCHES TAB VIEW -->
+    <div class="tab-content" *ngIf="activeTab === 'matches'">
+      <div class="matches-list">
+        <div class="match-row-card glass-card" *ngFor="let match of getFilteredMatches()">
+          <div class="match-meta">
+            <span class="group-badge">{{ match.group }}</span>
+            <span class="match-date">{{ match.date }} at {{ match.time }}</span>
+            <span class="match-venue">{{ match.venue }}</span>
+          </div>
+
+          <div class="match-teams-score">
+            <div class="team-side home">
+              <span class="team-title">{{ match.team1 }}</span>
+              <span class="team-flag-huge">{{ match.flag1 }}</span>
+            </div>
+
+            <div class="score-display">
+              <span class="score" [class.pending]="match.score1 === null">{{ match.score1 !== null ? match.score1 : '-' }}</span>
+              <span class="divider">:</span>
+              <span class="score" [class.pending]="match.score2 === null">{{ match.score2 !== null ? match.score2 : '-' }}</span>
+            </div>
+
+            <div class="team-side away">
+              <span class="team-flag-huge">{{ match.flag2 }}</span>
+              <span class="team-title">{{ match.team2 }}</span>
+            </div>
+          </div>
+
+          <div class="match-status">
+            <span class="status-badge" [ngClass]="match.status.toLowerCase()">{{ match.status }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="no-results glass-card" *ngIf="getFilteredMatches().length === 0">
+        <p>No matching fixtures or venues found.</p>
+      </div>
+    </div>
+
+    <!-- 3. NEWS TAB VIEW -->
+    <div class="tab-content" *ngIf="activeTab === 'news'">
+      <div class="news-loading-wrapper" *ngIf="isNewsLoading">
+        <div class="spinner"></div>
+        <p>Fetching latest World Cup updates...</p>
+      </div>
+
+      <div class="error-banner glass-card" *ngIf="newsError">
+        <span>⚠️ {{ newsError }}</span>
+      </div>
+
+      <div class="sports-news-grid" *ngIf="!isNewsLoading && !newsError">
+        <a [href]="item.link" target="_blank" rel="noopener noreferrer" class="news-sports-card glass-card animate-up" *ngFor="let item of newsItems">
+          <div class="news-source-tag">⚽ Sports News</div>
+          <h4>{{ item.title }}</h4>
+          <p class="news-date">{{ item.pubDate | date:'mediumDate' }} • {{ item.author || 'FIFA Updates' }}</p>
+          <div class="card-arrow">Read Article →</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>

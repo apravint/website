@@ -48,5 +48,9 @@ export const routes: Routes = [
 		path: 'terminal',
 		loadComponent: () => import('./terminal/terminal.component').then(m => m.TerminalComponent)
 	},
+	{
+		path: 'worldcup',
+		loadComponent: () => import('./world-cup/world-cup.component').then(m => m.WorldCupComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

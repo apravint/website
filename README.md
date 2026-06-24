@@ -37,6 +37,14 @@ A completely serverless IPTV player built directly into the client:
 - Aggregates trending Tamil news from Google News RSS feeds.
 - Responsive bento-style card design with clean layout settings.
 
+### 🏆 World Cup 2026 Hub
+- A dedicated sports dashboard for the 48-team tournament hosted in North America.
+- Live standings tables for all 12 groups (A to L) showing qualified zone indicators, played matches, goal difference, and points.
+- Dynamic match schedules, scores, and venues with live status badges.
+- Real-time tournament news and updates parsed client-side using a public Google News RSS reader.
+
+---
+
 ### 💻 Interactive Terminal Simulator
 - A browser-based Termux emulator that lets visitors interact with your portfolio using commands.
 - Custom actions: `neofetch` (system info ASCII), `cowsay` (talking ASCII cow), `kavithai` (poem printer), and `about`/`skills`/`projects` commands.
