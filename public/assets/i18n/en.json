@@ -9,7 +9,8 @@
         "MARKET": "Market",
         "NEWS": "News",
         "APP": "App",
-        "IPTV": "IPTV"
+        "IPTV": "IPTV",
+        "TUTORIALS": "Guides"
     },
     "NEWS": {
         "TITLE": "Trending News",

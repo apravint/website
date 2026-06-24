@@ -40,5 +40,9 @@ export const routes: Routes = [
 		path: 'iptv',
 		loadComponent: () => import('./iptv/iptv.component').then(m => m.IptvComponent)
 	},
+	{
+		path: 'tutorials',
+		loadComponent: () => import('./tutorials/tutorials.component').then(m => m.TutorialsComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

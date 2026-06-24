@@ -1,0 +1,148 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero Banner -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content">
+      <h1><span class="text-gradient">{{ 'NAV.TUTORIALS' | translate }}</span></h1>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'en'">Learn how to build, test, and deploy modern applications on your Android phone using Termux and Google Antigravity.</p>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'ta'">ஆண்ட்ராய்டு கைபேசியில் Termux மற்றும் Google Antigravity-ஐப் பயன்படுத்தி செயலிகளை உருவாக்கி, சோதித்து, பதிவேற்றுவது எப்படி என்று கற்றுக் கொள்ளுங்கள்.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- English Version -->
+    <div class="tutorial-container" *ngIf="getCurrentLanguage() === 'en'">
+      <div class="intro-card glass-card">
+        <span class="badge">Guide</span>
+        <h2>Building Websites on Android: Termux + Antigravity CLI Guide</h2>
+        <p class="lead-text">
+          Developing modern web applications no longer requires a bulky laptop. By combining <strong>Termux</strong> (a powerful Linux terminal emulator for Android) and <strong>Google Antigravity (AGY)</strong>, you can turn your phone into a complete developer workstation with AI pair-programming support.
+        </p>
+      </div>
+
+      <!-- Step-by-Step Grid -->
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card glass-card">
+          <div class="step-number">01</div>
+          <h3>Setting Up Termux on Android</h3>
+          <p>Avoid the Google Play Store version as it is deprecated. Instead, download the latest version from F-Droid or GitHub releases.</p>
+          <p>Once installed, open Termux and run the following command to update core directories and install basic utilities:</p>
+          <pre><code>pkg update && pkg upgrade
+pkg install git nodejs-lts python build-essential openssh</code></pre>
+          <p class="tip-text">💡 <strong>Tip:</strong> Run <code>termux-setup-storage</code> to grant file permission so you can access your phone’s internal storage.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card glass-card">
+          <div class="step-number">02</div>
+          <h3>Setting Up Your Workspace</h3>
+          <p>Clone your Angular codebase, navigate inside it, and install all dependencies:</p>
+          <pre><code># Clone code
+git clone git@github.com:your-username/website.git
+cd website
+
+# Install dependencies
+npm install</code></pre>
+          <p>To run the development server locally on your phone, execute:</p>
+          <pre><code>npm run start</code></pre>
+          <p>Open browser at <code>http://localhost:4200</code> on your Android device to preview the live site.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card glass-card">
+          <div class="step-number">03</div>
+          <h3>Deploying with Google Antigravity</h3>
+          <p>Antigravity acts as an advanced pair-programming agent inside your Termux environment, helping you write code, troubleshoot vulnerabilities, and run builds seamlessly.</p>
+          <p>To deploy changes to GitHub Pages, run your local deploy script:</p>
+          <pre><code>./deploy.sh</code></pre>
+          <p>This script automatically builds the production bundle and moves it to the deployment directory (e.g., <code>docs/</code>). Then commit and push:</p>
+          <pre><code>git add .
+git commit -m "feat: design upgrade via Antigravity"
+git push origin main</code></pre>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card glass-card">
+          <div class="step-number">04</div>
+          <h3>Unit Testing Headless on Termux</h3>
+          <p>Since Termux is a CLI environment without a desktop browser, you must run your unit specs in headless mode (e.g., ChromeHeadless). Our CI pipeline automates this step on every GitHub push, ensuring your tests pass before going live.</p>
+          <pre><code># Headless unit testing command
+npm test -- --watch=false --browsers=ChromeHeadless</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tamil Version -->
+    <div class="tutorial-container" *ngIf="getCurrentLanguage() === 'ta'">
+      <div class="intro-card glass-card">
+        <span class="badge">பயிற்சி கையேடு</span>
+        <h2>ஆண்ட்ராய்டில் வெப்சைட் உருவாக்குவது எப்படி: Termux + Antigravity கையேடு</h2>
+        <p class="lead-text">
+          இப்போது வெப்சைட் அல்லது செயலிகளை உருவாக்க உங்களிடம் கணினி இருக்க வேண்டிய அவசியமில்லை. <strong>Termux</strong> (ஆண்ட்ராய்டுக்கான லினக்ஸ் டெர்மினல்) மற்றும் <strong>Google Antigravity (AGY)</strong> ஆகியவற்றை இணைத்து, உங்கள் மொபைல் போனை ஒரு முழுமையான டெவலப்பர் கம்ப்யூட்டராக மாற்றலாம்.
+        </p>
+      </div>
+
+      <!-- Step-by-Step Grid -->
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card glass-card">
+          <div class="step-number">01</div>
+          <h3>ஆண்ட்ராய்டில் Termux அமைத்தல்</h3>
+          <p>Play Store-இல் உள்ள பதிப்பு தற்போது காலாவதியானது. எனவே, எஃப்-டிராய்டு (F-Droid) அல்லது GitHub-லிருந்து Termux-ஐப் பதிவிறக்கம் செய்யவும்.</p>
+          <p>நிறுவிய பின், Termux-ஐத் திறந்து, தேவையான பேக்கேஜ்களை நிறுவ பின்வரும் கட்டளையை இயக்கவும்:</p>
+          <pre><code>pkg update && pkg upgrade
+pkg install git nodejs-lts python build-essential openssh</code></pre>
+          <p class="tip-text">💡 <strong>குறிப்பு:</strong> உங்கள் மொபைல் மெமரியை அணுக <code>termux-setup-storage</code> கட்டளையை இயக்கவும்.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card glass-card">
+          <div class="step-number">02</div>
+          <h3>கோடிங் வொர்க்ஸ்பேஸ் அமைத்தல்</h3>
+          <p>உங்கள் Angular குறியீட்டைப் பதிவிறக்கி, அதற்குள் சென்று, தேவையான ஃபைல்களை நிறுவவும்:</p>
+          <pre><code># குறியீட்டைப் பெறுக
+git clone git@github.com:your-username/website.git
+cd website
+
+# டிபென்டென்சிகளை நிறுவ
+npm install</code></pre>
+          <p>உள்ளூர் வெப் சர்வரைத் தொடங்க பின்வருமாறு இயக்கவும்:</p>
+          <pre><code>npm run start</code></pre>
+          <p>உங்கள் மொபைல் பிரவுசரில் <code>http://localhost:4200</code> பக்கத்தைத் திறந்து வெப்சைட்டைப் பார்வையிடலாம்.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card glass-card">
+          <div class="step-number">03</div>
+          <h3>Google Antigravity கொண்டு பதிவேற்றுதல்</h3>
+          <p>Antigravity என்பது உங்கள் Termux சூழலில் இருந்து கொண்டு உங்களுக்குக் கோடிங் செய்ய, பிழைகளைத் திருத்த, மற்றும் பில்ட் எடுக்க உதவும் ஒரு மேம்பட்ட செயற்கை நுண்ணறிவு (AI) உதவியாளர் ஆகும்.</p>
+          <p>வெப்சைட்டை லைவாக GitHub பக்கங்களில் வெளியிட, பில்ட் ஸ்கிரிப்ட்டை இயக்கவும்:</p>
+          <pre><code>./deploy.sh</code></pre>
+          <p>இது உங்கள் குறியீட்டைத் தானாகவே பில்ட் செய்து <code>docs/</code> கோப்புக்குள் நகர்த்தும். பின் கமிட் செய்து புஷ் செய்யவும்:</p>
+          <pre><code>git add .
+git commit -m "feat: design upgrade via Antigravity"
+git push origin main</code></pre>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card glass-card">
+          <div class="step-number">04</div>
+          <h3>டெர்மினலில் யூனிட் டெஸ்டிங்</h3>
+          <p>பிரவுசர் இல்லாத டெர்மினல் என்பதால், நீங்கள் ஹெட்லெஸ் முறையில் டெஸ்ட்களை ரன் செய்ய வேண்டும். கமிட் செய்யும் போது எங்களது GitHub Actions தானாகவே டெஸ்ட்களை சரிபார்த்துக்கொள்ளும்.</p>
+          <pre><code># டெஸ்ட் கட்டளை
+npm test -- --watch=false --browsers=ChromeHeadless</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Note -->
+    <div class="values-section glass-card final-action">
+      <span class="value-icon">🚀</span>
+      <h4 *ngIf="getCurrentLanguage() === 'en'">Get Started on Mobile Development</h4>
+      <h4 *ngIf="getCurrentLanguage() === 'ta'">மொபைல் கோடிங் பயணத்தை தொடங்குங்கள்</h4>
+      <p *ngIf="getCurrentLanguage() === 'en'">With Termux and agentic code coding assistants, you can build full-fledged digital platforms directly in the palm of your hand.</p>
+      <p *ngIf="getCurrentLanguage() === 'ta'">Termux மற்றும் செயற்கை நுண்ணறிவு குறியீட்டு உதவியாளர்களைப் பயன்படுத்தி, உங்கள் உள்ளங்கையில் இருந்தே முழுமையான டிஜிட்டல் தளங்களை எளிதாக உருவாக்கலாம்.</p>
+    </div>
+  </div>
+</section>
