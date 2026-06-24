@@ -345,6 +345,14 @@
     }
 }
 
+.design-btn {
+    &:hover {
+        background: rgba(168, 85, 247, 0.1);
+        border-color: #a855f7;
+        color: #a855f7;
+    }
+}
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.18); }
@@ -445,6 +453,39 @@
     .message {
         display: flex;
         max-width: 85%;
+    }
+
+    .msg-content-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .ai-msg-actions {
+        margin-top: 6px;
+        align-self: flex-start;
+    }
+
+    .ai-action-btn {
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        &:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: rgba(var(--primary-rgb), 0.05);
+            transform: translateY(-1px);
+        }
     }
 
     .user-msg {

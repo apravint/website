@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { KavithaiService } from './kavithai.service';
 import { TranslatePipe } from '../shared/translate.pipe';
 import { catchError, tap } from 'rxjs/operators';
@@ -27,6 +27,7 @@ export class KavithaiComponent implements OnInit {
     private shareService = inject(ShareService);
     private cdr = inject(ChangeDetectorRef);
     private route = inject(ActivatedRoute);
+    private router = inject(Router);
 
     // Tab state
     activeTab: 'browse' | 'ai' = 'browse';
@@ -119,6 +120,15 @@ export class KavithaiComponent implements OnInit {
     shareToTwitter(poem: any): void {
         const text = this.formatPoemForShare(poem);
         this.shareService.shareToTwitter(text, 'https://pravintamilan.com/kavithai');
+    }
+
+    designCard(poem: any): void {
+        const text = this.formatPoemForShare(poem);
+        this.router.navigate(['/create'], { queryParams: { text } });
+    }
+
+    designCardFromText(text: string): void {
+        this.router.navigate(['/create'], { queryParams: { text } });
     }
 
     shareToWhatsApp(poem: any): void {

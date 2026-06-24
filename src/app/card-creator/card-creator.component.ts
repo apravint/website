@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListener, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CanvasService } from './services/canvas.service';
 import { HistoryService } from './services/history.service';
 import { ExportService, ExportOptions } from './services/export.service';
@@ -399,7 +400,8 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     constructor(
         public canvasService: CanvasService,
         public historyService: HistoryService,
-        private exportService: ExportService
+        private exportService: ExportService,
+        private route: ActivatedRoute
     ) { }
 
     ngOnInit(): void {
@@ -409,6 +411,29 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         this.initializeCanvas();
+        this.checkQueryParameters();
+    }
+
+    private checkQueryParameters(): void {
+        this.route.queryParams.subscribe(params => {
+            const poemText = params['text'];
+            if (poemText) {
+                setTimeout(() => {
+                    const canvas = this.canvasService.getCanvas();
+                    if (canvas) {
+                        this.canvasService.addText({
+                            text: poemText,
+                            fontSize: 32,
+                            fontFamily: 'Noto Serif Tamil',
+                            textAlign: 'center',
+                            left: this.canvasService.canvasWidth() / 2,
+                            top: this.canvasService.canvasHeight() / 2,
+                        });
+                        this.saveHistory();
+                    }
+                }, 500);
+            }
+        });
     }
 
     ngOnDestroy(): void {

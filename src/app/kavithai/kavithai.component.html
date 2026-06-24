@@ -90,6 +90,11 @@
                             (click)="copyPoem(k)" aria-label="Copy poem" title="Copy to clipboard">
                             <span class="icon">{{ copiedId === getPoemId(k) ? '✓' : '📋' }}</span>
                         </button>
+
+                        <button class="action-btn design-btn" (click)="designCard(k)" aria-label="Design card"
+                            title="Create graphic card">
+                            <span class="icon">✨</span>
+                        </button>
                     </div>
                 </div>
 
@@ -132,10 +137,17 @@
                     </div>
 
                     <div class="chat-window">
-                        <div *ngFor="let msg of aiMessages"
+                        <div *ngFor="let msg of aiMessages; let first = first"
                             [ngClass]="{'message': true, 'user-msg': msg.role === 'user', 'ai-msg': msg.role === 'ai'}">
-                            <div class="msg-bubble">
-                                {{ msg.text }}
+                            <div class="msg-content-wrapper">
+                                <div class="msg-bubble">
+                                    {{ msg.text }}
+                                </div>
+                                <div class="ai-msg-actions" *ngIf="msg.role === 'ai' && !first">
+                                    <button class="ai-action-btn" (click)="designCardFromText(msg.text)">
+                                        ✨ Create Graphic Card
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div *ngIf="aiLoading" class="message ai-msg">
