@@ -39,6 +39,22 @@
         "PREVIEW_LABEL": "Simulated Device Preview",
         "DEFAULT_WALLPAPERS": "Curated Wallpapers"
     },
+    "VIDEOS": {
+        "TITLE": "Video Gallery",
+        "SUBTITLE": "Watch video tutorials, guides, and creative Tamil poetry recitals.",
+        "SEARCH_PLACEHOLDER": "Search YouTube videos...",
+        "RESET": "Reset Filters",
+        "API_STATUS_CONNECTED": "YouTube Search Enabled",
+        "API_STATUS_SETUP": "Setup YouTube API Key",
+        "KEY_MODAL_TITLE": "YouTube Search Configuration",
+        "KEY_MODAL_DESC": "We integrate with YouTube Data API to search millions of videos. Get a free Google YouTube API key and paste it below to enable live search.",
+        "KEY_INPUT_PLACEHOLDER": "Paste YouTube API Key here...",
+        "SAVE_KEY": "Save Key",
+        "CLEAR_KEY": "Clear Key",
+        "CANCEL": "Cancel",
+        "SEARCHING": "Searching YouTube...",
+        "NO_RESULTS": "No videos match your search query."
+    },
     "NEWS": {
         "TITLE": "Trending News",
         "SUBTITLE": "Stay informed with the latest headlines from around the world.",

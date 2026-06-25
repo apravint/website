@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
@@ -17,11 +18,12 @@ interface VideoItem {
 @Component({
   selector: 'app-videos',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, HttpClientModule, TranslatePipe],
   templateUrl: './videos.component.html',
   styleUrls: ['./videos.component.scss']
 })
 export class VideosComponent implements OnInit {
+  private http = inject(HttpClient);
   private sanitizer = inject(DomSanitizer);
   private seo = inject(SeoService);
   public translationService = inject(TranslationService);
@@ -58,6 +60,12 @@ export class VideosComponent implements OnInit {
 
   filteredVideos: VideoItem[] = [];
 
+  // Search API State
+  youtubeApiKey = '';
+  isSearching = false;
+  searchError = '';
+  showKeyModal = false;
+
   // Cinema Lightbox Modal Player State
   selectedVideo: VideoItem | null = null;
   safeVideoUrl: SafeResourceUrl | null = null;
@@ -72,6 +80,11 @@ export class VideosComponent implements OnInit {
 
   ngOnInit(): void {
     this.filteredVideos = [...this.videos];
+    
+    // Retrieve stored YouTube API Key
+    if (typeof localStorage !== 'undefined') {
+      this.youtubeApiKey = localStorage.getItem('youtube-api-key') || '';
+    }
   }
 
   getCurrentLanguage(): string {
@@ -117,5 +130,66 @@ export class VideosComponent implements OnInit {
   closePlayer(): void {
     this.selectedVideo = null;
     this.safeVideoUrl = null;
+  }
+
+  // YouTube API Search
+  searchVideos(): void {
+    const query = this.searchQuery.trim();
+    if (!query) {
+      this.filterVideos();
+      return;
+    }
+
+    if (!this.youtubeApiKey) {
+      this.showKeyModal = true;
+      return;
+    }
+
+    this.isSearching = true;
+    this.searchError = '';
+
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${this.youtubeApiKey}`;
+
+    this.http.get<any>(url).subscribe({
+      next: (response) => {
+        if (response && response.items) {
+          this.filteredVideos = response.items.map((item: any) => {
+            return {
+              id: item.id.videoId,
+              title: item.snippet.title,
+              category: 'Coding', // Default category
+              description: item.snippet.description || '',
+              duration: 'HD' // Fallback duration
+            };
+          });
+          if (this.filteredVideos.length === 0) {
+            this.searchError = 'No videos found.';
+          }
+        } else {
+          this.searchError = 'No videos found.';
+        }
+        this.isSearching = false;
+      },
+      error: (err) => {
+        console.error('Error fetching videos from YouTube', err);
+        this.searchError = 'Invalid API key or network error. Please check settings.';
+        this.isSearching = false;
+      }
+    });
+  }
+
+  saveYoutubeKey(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('youtube-api-key', this.youtubeApiKey.trim());
+    }
+    this.showKeyModal = false;
+    this.searchVideos();
+  }
+
+  clearYoutubeKey(): void {
+    this.youtubeApiKey = '';
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('youtube-api-key');
+    }
   }
 }

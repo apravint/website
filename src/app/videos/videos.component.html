@@ -4,31 +4,42 @@
     <div class="bg-glow"></div>
     <div class="container hero-content text-center">
       <h1>
-        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'en'">Video Gallery</span>
-        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'ta'">ஒளிக்காட்சிகள்</span>
+        <span class="text-gradient">{{ 'VIDEOS.TITLE' | translate }}</span>
       </h1>
-      <p class="lead" *ngIf="getCurrentLanguage() === 'en'">Watch video tutorials, guides, and creative Tamil poetry recitals.</p>
-      <p class="lead" *ngIf="getCurrentLanguage() === 'ta'">மென்பொருள் பயிற்சிகள், விளக்கக் குறிப்புகள் மற்றும் தமிழ் கவிதை வாசிப்புகள்.</p>
+      <p class="lead">{{ 'VIDEOS.SUBTITLE' | translate }}</p>
     </div>
   </div>
 
   <div class="container main-gallery">
     <!-- Controls Panel -->
     <div class="controls-panel glass-card">
-      <!-- Search Input -->
-      <div class="search-box">
-        <input 
-          type="text" 
-          class="search-input" 
-          [(ngModel)]="searchQuery" 
-          (ngModelChange)="filterVideos()"
-          placeholder="{{ getCurrentLanguage() === 'en' ? 'Search videos by title or description...' : 'ஒளிக்காட்சிகளைத் தேடுக...' }}"
-        />
-        <span class="search-icon">🔍</span>
+      <div class="search-bar-row">
+        <!-- Search Input -->
+        <div class="search-box">
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="searchVideos()"
+            placeholder="{{ 'VIDEOS.SEARCH_PLACEHOLDER' | translate }}"
+          />
+          <span class="search-icon" (click)="searchVideos()">🔍</span>
+        </div>
+
+        <!-- API status button -->
+        <button 
+          (click)="showKeyModal = true" 
+          class="api-status-btn"
+          [class.connected]="!!youtubeApiKey"
+          [attr.aria-label]="(youtubeApiKey ? 'VIDEOS.API_STATUS_CONNECTED' : 'VIDEOS.API_STATUS_SETUP') | translate"
+        >
+          <span class="status-indicator"></span>
+          {{ (youtubeApiKey ? 'VIDEOS.API_STATUS_CONNECTED' : 'VIDEOS.API_STATUS_SETUP') | translate }} ⚙️
+        </button>
       </div>
 
       <!-- Category Filter Pills -->
-      <div class="category-pills">
+      <div class="category-pills" *ngIf="!searchQuery">
         <button 
           *ngFor="let cat of categories" 
           class="pill-btn" 
@@ -43,11 +54,23 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div *ngIf="isSearching" class="loading-state text-center">
+      <div class="spinner"></div>
+      <p>{{ 'VIDEOS.SEARCHING' | translate }}</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="searchError" class="error-state text-center glass-card">
+      <span class="error-icon">⚠️</span>
+      <p>{{ searchError }}</p>
+      <button class="tbar-btn key-btn" (click)="searchError = ''; searchQuery = ''; filterVideos()">{{ 'VIDEOS.RESET' | translate }}</button>
+    </div>
+
     <!-- Empty State -->
-    <div class="empty-state text-center glass-card" *ngIf="filteredVideos.length === 0">
-      <p class="lead-text" *ngIf="getCurrentLanguage() === 'en'">No videos match your search query.</p>
-      <p class="lead-text" *ngIf="getCurrentLanguage() === 'ta'">உங்கள் தேடலுக்குரிய ஒளிக்காட்சிகள் எதுவும் கிடைக்கவில்லை.</p>
-      <button class="tbar-btn key-btn" (click)="searchQuery = ''; activeCategory = 'All'; filterVideos()">Reset Filters</button>
+    <div class="empty-state text-center glass-card" *ngIf="filteredVideos.length === 0 && !isSearching && !searchError">
+      <p class="lead-text">{{ 'VIDEOS.NO_RESULTS' | translate }}</p>
+      <button class="tbar-btn key-btn" (click)="searchQuery = ''; activeCategory = 'All'; filterVideos()">{{ 'VIDEOS.RESET' | translate }}</button>
     </div>
 
     <!-- Videos CSS Grid -->
@@ -114,5 +137,41 @@
       </div>
     </div>
     <div class="modal-click-trap" (click)="closePlayer()"></div>
+  </div>
+
+  <!-- YouTube API Key Modal Configuration -->
+  <div class="modal-backdrop" *ngIf="showKeyModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ 'VIDEOS.KEY_MODAL_TITLE' | translate }}</h3>
+        <button (click)="showKeyModal = false" class="close-modal-btn" aria-label="Close settings">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-description">{{ 'VIDEOS.KEY_MODAL_DESC' | translate }}</p>
+        
+        <div class="form-group">
+          <input 
+            type="password" 
+            [(ngModel)]="youtubeApiKey" 
+            [placeholder]="'VIDEOS.KEY_INPUT_PLACEHOLDER' | translate" 
+            class="key-input"
+            aria-label="YouTube API Key"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button *ngIf="youtubeApiKey" (click)="clearYoutubeKey()" class="btn-danger">
+          {{ 'VIDEOS.CLEAR_KEY' | translate }}
+        </button>
+        <div class="modal-action-right">
+          <button (click)="showKeyModal = false" class="btn-secondary">
+            {{ 'VIDEOS.CANCEL' | translate }}
+          </button>
+          <button (click)="saveYoutubeKey()" class="btn-primary">
+            {{ 'VIDEOS.SAVE_KEY' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
