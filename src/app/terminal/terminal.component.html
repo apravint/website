@@ -40,6 +40,7 @@
               [(ngModel)]="command"
               (keydown.enter)="handleCommandSubmit()"
               (keydown)="handleKeyUp($event)"
+              (keydown.tab)="$event.preventDefault(); handleKeyPress('tab')"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
@@ -56,6 +57,34 @@
         </div>
 
       </div>
+
+      <!-- Window Action Bar / Toolbar for Mobile Shortcuts -->
+      <div class="window-toolbar">
+        <div class="toolbar-section">
+          <span class="toolbar-label">Keys:</span>
+          <div class="toolbar-buttons">
+            <button class="tbar-btn key-btn" (click)="handleKeyPress('esc')" title="Escape">ESC</button>
+            <button class="tbar-btn key-btn" (click)="handleKeyPress('tab')" title="Tab Autocomplete">TAB</button>
+            <button class="tbar-btn key-btn" (click)="handleKeyPress('up')" title="Previous Command">▲</button>
+            <button class="tbar-btn key-btn" (click)="handleKeyPress('down')" title="Next Command">▼</button>
+            <button class="tbar-btn key-btn cancel-btn" (click)="handleKeyPress('ctrl+c')" title="Cancel Command">Ctrl+C</button>
+          </div>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-section flex-grow">
+          <span class="toolbar-label">Commands:</span>
+          <div class="toolbar-buttons scrollable-buttons">
+            <button class="tbar-btn cmd-btn" (click)="handleQuickCommand('help')">help</button>
+            <button class="tbar-btn cmd-btn" (click)="handleQuickCommand('neofetch')">neofetch</button>
+            <button class="tbar-btn cmd-btn" (click)="handleQuickCommand('skills')">skills</button>
+            <button class="tbar-btn cmd-btn" (click)="handleQuickCommand('projects')">projects</button>
+            <button class="tbar-btn cmd-btn" (click)="handleQuickCommand('kavithai')">kavithai</button>
+            <button class="tbar-btn cmd-btn animation-btn" (click)="handleQuickCommand('cmatrix')">cmatrix</button>
+            <button class="tbar-btn cmd-btn" (click)="handleQuickCommand('clear')">clear</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

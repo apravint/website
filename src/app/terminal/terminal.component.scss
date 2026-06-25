@@ -197,3 +197,130 @@
 .window-body::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.15);
 }
+
+/* Window Toolbar Styling */
+.window-toolbar {
+  background: rgba(15, 18, 32, 0.95);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  user-select: none;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &.flex-grow {
+    flex: 1;
+    min-width: 250px;
+  }
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  display: inline-block;
+  
+  @media (max-width: 600px) {
+    display: none;
+  }
+}
+
+.toolbar-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.toolbar-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  
+  &.scrollable-buttons {
+    flex: 1;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+/* Button style */
+.tbar-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  &.key-btn {
+    background: rgba(137, 221, 255, 0.05);
+    border-color: rgba(137, 221, 255, 0.15);
+    color: #89ddff;
+    
+    &:hover {
+      background: rgba(137, 221, 255, 0.12);
+      border-color: rgba(137, 221, 255, 0.3);
+      color: #b8eaff;
+      box-shadow: 0 0 8px rgba(137, 221, 255, 0.25);
+    }
+  }
+  
+  &.cancel-btn {
+    background: rgba(247, 118, 142, 0.05);
+    border-color: rgba(247, 118, 142, 0.15);
+    color: #f7768e;
+    
+    &:hover {
+      background: rgba(247, 118, 142, 0.12);
+      border-color: rgba(247, 118, 142, 0.3);
+      color: #ff9fb1;
+      box-shadow: 0 0 8px rgba(247, 118, 142, 0.25);
+    }
+  }
+  
+  &.animation-btn {
+    background: rgba(115, 218, 202, 0.05);
+    border-color: rgba(115, 218, 202, 0.15);
+    color: #73daca;
+    
+    &:hover {
+      background: rgba(115, 218, 202, 0.12);
+      border-color: rgba(115, 218, 202, 0.3);
+      color: #a4f2e5;
+      box-shadow: 0 0 8px rgba(115, 218, 202, 0.25);
+    }
+  }
+}

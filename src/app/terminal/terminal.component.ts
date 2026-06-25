@@ -127,6 +127,76 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  // Execute quick commands from the toolbar
+  handleQuickCommand(cmdText: string): void {
+    if (this.isMatrixMode) {
+      if (cmdText === 'clear' || cmdText === 'exit' || cmdText === 'q') {
+        this.stopMatrixEffect();
+      }
+      return;
+    }
+    this.command = cmdText;
+    this.handleCommandSubmit();
+    this.focusInput();
+  }
+
+  // Simulate hardware keypresses from toolbar
+  handleKeyPress(keyType: 'esc' | 'tab' | 'up' | 'down' | 'ctrl+c'): void {
+    if (keyType === 'esc') {
+      if (this.isMatrixMode) {
+        this.stopMatrixEffect();
+      } else {
+        this.command = '';
+      }
+      this.focusInput();
+    } else if (keyType === 'tab') {
+      if (this.isMatrixMode) return;
+      const current = this.command.trim().toLowerCase();
+      const availableCmds = ['about', 'clear', 'cmatrix', 'contact', 'cowsay', 'help', 'kavithai', 'neofetch', 'projects', 'skills', 'socials'];
+      
+      if (!current) {
+        // Echo current line and list available commands
+        this.history.push({ text: this.promptPrefix + this.command, type: 'input' });
+        this.history.push({ text: availableCmds.join('   '), type: 'output' });
+        this.focusInput();
+        return;
+      }
+      
+      const matches = availableCmds.filter(c => c.startsWith(current));
+      if (matches.length === 1) {
+        this.command = matches[0] + ' ';
+      } else if (matches.length > 1) {
+        this.history.push({ text: this.promptPrefix + this.command, type: 'input' });
+        this.history.push({ text: matches.join('   '), type: 'output' });
+      }
+      this.focusInput();
+    } else if (keyType === 'up') {
+      if (this.historyIndex > 0) {
+        this.historyIndex--;
+        this.command = this.commandHistory[this.historyIndex];
+      }
+      this.focusInput();
+    } else if (keyType === 'down') {
+      if (this.historyIndex < this.commandHistory.length - 1) {
+        this.historyIndex++;
+        this.command = this.commandHistory[this.historyIndex];
+      } else {
+        this.historyIndex = this.commandHistory.length;
+        this.command = '';
+      }
+      this.focusInput();
+    } else if (keyType === 'ctrl+c') {
+      if (this.isMatrixMode) {
+        this.stopMatrixEffect();
+      } else {
+        this.history.push({ text: this.promptPrefix + this.command + '^C', type: 'input' });
+        this.command = '';
+        this.historyIndex = this.commandHistory.length;
+      }
+      this.focusInput();
+    }
+  }
+
   // Command parser
   private executeCommand(cmd: string, args: string[], rawCmd: string): void {
     switch (cmd) {
