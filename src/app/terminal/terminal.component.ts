@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { SeoService } from '../shared/seo.service';
 
 interface TerminalLine {
@@ -21,6 +22,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('matrixCanvas') private matrixCanvas!: ElementRef<HTMLCanvasElement>;
 
   private seo = inject(SeoService);
+  private route = inject(ActivatedRoute);
 
   // Command input field
   command = '';
@@ -45,6 +47,17 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit(): void {
     this.showWelcomeMessage();
+
+    // Check for auto-run command query parameter
+    this.route.queryParams.subscribe(params => {
+      const runCmd = params['run'];
+      if (runCmd) {
+        setTimeout(() => {
+          this.command = runCmd;
+          this.handleCommandSubmit();
+        }, 600);
+      }
+    });
   }
 
   ngOnDestroy(): void {

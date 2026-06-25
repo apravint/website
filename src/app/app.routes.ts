@@ -68,5 +68,9 @@ export const routes: Routes = [
 		path: 'wallpapers',
 		loadComponent: () => import('./wallpapers/wallpapers.component').then(m => m.WallpapersComponent)
 	},
+	{
+		path: 'linux',
+		loadComponent: () => import('./linux/linux.component').then(m => m.LinuxComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

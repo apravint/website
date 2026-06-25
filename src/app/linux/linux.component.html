@@ -1,0 +1,113 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero Banner -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content text-center">
+      <h1>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'en'">Linux Commands Guide</span>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'ta'">லினக்ஸ் கட்டளைகள்</span>
+      </h1>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'en'">Master core Linux and Termux shell terminal command parameters. Read syntax, examples, and test them instantly in the simulator.</p>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'ta'">லினக்ஸ் மற்றும் Termux டெர்மினல் கட்டளைகளை எளிதாகக் கற்றுக் கொள்ளுங்கள். விளக்கங்கள், இலக்கணங்களைப் படித்து, சிமுலேட்டரில் உடனே இயக்கிப் பாருங்கள்.</p>
+    </div>
+  </div>
+
+  <div class="container main-linux-container">
+    <!-- Controls Panel -->
+    <div class="controls-panel glass-card">
+      <!-- Search Input -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          class="search-input" 
+          [(ngModel)]="searchQuery" 
+          (ngModelChange)="filterCommands()"
+          placeholder="{{ getCurrentLanguage() === 'en' ? 'Search commands (e.g. ls, mkdir, ping)...' : 'கட்டளைகளைத் தேடுக (எ.கா. ls, mkdir)...' }}"
+          aria-label="Search linux commands"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills">
+        <button 
+          *ngFor="let cat of categories" 
+          class="pill-btn" 
+          [class.active]="activeCategory === cat"
+          (click)="selectCategory(cat)"
+        >
+          <span *ngIf="cat === 'All'">{{ getCurrentLanguage() === 'en' ? 'All' : 'அனைத்தும்' }}</span>
+          <span *ngIf="cat === 'Navigation'">{{ getCurrentLanguage() === 'en' ? 'Navigation' : 'வழிசெலுத்தல்' }}</span>
+          <span *ngIf="cat === 'Files'">{{ getCurrentLanguage() === 'en' ? 'File Ops' : 'கோப்புகள்' }}</span>
+          <span *ngIf="cat === 'System'">{{ getCurrentLanguage() === 'en' ? 'System' : 'கணினி' }}</span>
+          <span *ngIf="cat === 'Processes'">{{ getCurrentLanguage() === 'en' ? 'Processes' : 'செயலிகள்' }}</span>
+          <span *ngIf="cat === 'Network'">{{ getCurrentLanguage() === 'en' ? 'Network' : 'இணையம்' }}</span>
+          <span *ngIf="cat === 'Permissions'">{{ getCurrentLanguage() === 'en' ? 'Permissions' : 'அனுமதிகள்' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state text-center glass-card" *ngIf="filteredCommands.length === 0">
+      <span class="error-icon">🔍</span>
+      <p class="lead-text" *ngIf="getCurrentLanguage() === 'en'">No command fits your search query.</p>
+      <p class="lead-text" *ngIf="getCurrentLanguage() === 'ta'">உங்கள் தேடலுக்குரிய கட்டளைகள் எதுவும் கிடைக்கவில்லை.</p>
+      <button class="key-btn" (click)="searchQuery = ''; activeCategory = 'All'; filterCommands()">Reset filters</button>
+    </div>
+
+    <!-- Commands Directory Grid -->
+    <div class="commands-grid" *ngIf="filteredCommands.length > 0">
+      <div 
+        class="command-card glass-card" 
+        *ngFor="let cmd of filteredCommands"
+      >
+        <div class="card-header-bar">
+          <h2 class="command-name"><code>{{ cmd.name }}</code></h2>
+          <span class="category-badge" [ngClass]="cmd.category.toLowerCase()">{{ cmd.category }}</span>
+        </div>
+
+        <div class="card-body">
+          <p class="command-description">
+            {{ getCurrentLanguage() === 'en' ? cmd.descriptionEn : cmd.descriptionTa }}
+          </p>
+
+          <!-- Syntax Block -->
+          <div class="syntax-block">
+            <span class="block-label">Syntax:</span>
+            <pre><code>{{ cmd.syntax }}</code></pre>
+          </div>
+
+          <!-- Practical Example Block -->
+          <div class="example-block">
+            <div class="example-header">
+              <span class="block-label">Example:</span>
+              <div class="action-buttons">
+                <!-- Copy button -->
+                <button 
+                  (click)="copyToClipboard(cmd)" 
+                  class="action-btn copy-btn"
+                  [attr.aria-label]="'Copy example'"
+                >
+                  {{ copiedCommandName === cmd.name ? '✓ Copied' : '📋 Copy' }}
+                </button>
+                <!-- Try in terminal -->
+                <button 
+                  (click)="tryInTerminal(cmd)" 
+                  class="action-btn run-btn"
+                  [attr.aria-label]="'Try in simulated terminal'"
+                >
+                  ⚡ Try in Terminal
+                </button>
+              </div>
+            </div>
+            <pre><code class="bash-code">{{ cmd.example }}</code></pre>
+          </div>
+
+          <p class="command-explanation">
+            <strong>Detail:</strong> {{ getCurrentLanguage() === 'en' ? cmd.explanationEn : cmd.explanationTa }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
