@@ -52,5 +52,13 @@ export const routes: Routes = [
 		path: 'worldcup',
 		loadComponent: () => import('./world-cup/world-cup.component').then(m => m.WorldCupComponent)
 	},
+	{
+		path: 'calendar',
+		loadComponent: () => import('./tamil-calendar/tamil-calendar.component').then(m => m.TamilCalendarComponent)
+	},
+	{
+		path: 'thirukkural',
+		loadComponent: () => import('./thirukkural/thirukkural.component').then(m => m.ThirukkuralComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

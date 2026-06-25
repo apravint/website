@@ -1,0 +1,195 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero Section -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content text-center">
+      <h1>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'en'">Thirukkural</span>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'ta'">திருக்குறள்</span>
+      </h1>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'en'">1330 sacred couplets on virtue, wealth, and love by Sage Thiruvalluvar.</p>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'ta'">திருவள்ளுவர் இயற்றிய அறம், பொருள், இன்பம் பற்றிய 1330 அருமையான ஈரடி குறட்பாக்கள்.</p>
+    </div>
+  </div>
+
+  <div class="container main-content">
+    
+    <!-- Kural of the Day (Random) -->
+    <div class="random-kural-section" *ngIf="randomKural && !searchQuery && selectedSection === 'All'">
+      <div class="random-kural-card glass-card">
+        <div class="card-glow"></div>
+        <div class="random-header">
+          <span class="badge highlight">
+            <span *ngIf="getCurrentLanguage() === 'en'">Kural of the Day</span>
+            <span *ngIf="getCurrentLanguage() === 'ta'">இன்றைய குறள்</span>
+          </span>
+          <button class="icon-btn refresh-btn" (click)="generateRandomKural()" title="Get another random kural">🔄</button>
+        </div>
+        
+        <div class="kural-meta">
+          <span class="kural-num">#{{ randomKural.number }}</span>
+          <span class="kural-divider">•</span>
+          <span class="kural-chap">{{ randomKural.chapter }}</span>
+          <span class="kural-divider">•</span>
+          <span class="kural-sec">
+            {{ getCurrentLanguage() === 'en' ? sectionsEn[randomKural.section] : randomKural.section }}
+          </span>
+        </div>
+
+        <div class="couplet-text">
+          <p class="kural-line">{{ randomKural.kural[0] }}</p>
+          <p class="kural-line">{{ randomKural.kural[1] }}</p>
+        </div>
+
+        <!-- Collapsible Meanings -->
+        <div class="meanings-wrapper">
+          <div class="tabs-row">
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'mu_va'" (click)="setMeaningTab(randomKural, 'mu_va')">மு.வ</button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'salamon'" (click)="setMeaningTab(randomKural, 'salamon')">சாலமன்</button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'kalaignar'" (click)="setMeaningTab(randomKural, 'kalaignar')">கலைஞர்</button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'en'" (click)="setMeaningTab(randomKural, 'en')">English</button>
+          </div>
+
+          <div class="meaning-display">
+            <p *ngIf="randomKural.activeMeaningTab === 'mu_va'">{{ randomKural.meaning.ta_mu_va }}</p>
+            <p *ngIf="randomKural.activeMeaningTab === 'salamon'">{{ randomKural.meaning.ta_salamon }}</p>
+            <p *ngIf="randomKural.activeMeaningTab === 'kalaignar'">{{ randomKural.meaning.ta_kalaignar }}</p>
+            <p *ngIf="randomKural.activeMeaningTab === 'en'">{{ randomKural.meaning.en }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-panel glass-card">
+      <!-- Search Bar -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          class="search-input" 
+          [(ngModel)]="searchQuery" 
+          (ngModelChange)="applyFilters()"
+          placeholder="{{ getCurrentLanguage() === 'en' ? 'Search by Kural number, word, or meaning...' : 'குறள் எண், சொல், அல்லது உரை கொண்டு தேடுக...' }}"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Dropdown Selectors -->
+      <div class="selectors-row">
+        <!-- Section Filter -->
+        <div class="filter-group">
+          <label>
+            <span *ngIf="getCurrentLanguage() === 'en'">Section (பால்)</span>
+            <span *ngIf="getCurrentLanguage() === 'ta'">பால் (அறம்/பொருள்/இன்பம்)</span>
+          </label>
+          <select class="filter-select" [(ngModel)]="selectedSection" (change)="onSectionChange()">
+            <option value="All">
+              {{ getCurrentLanguage() === 'en' ? 'All Sections' : 'அனைத்து பால்கள்' }}
+            </option>
+            <option value="அறத்துப்பால்">அறத்துப்பால் (Virtue)</option>
+            <option value="பொருட்பால்">பொருட்பால் (Wealth)</option>
+            <option value="காமத்துப்பால்">காமத்துப்பால் (Love)</option>
+          </select>
+        </div>
+
+        <!-- Chapter Filter -->
+        <div class="filter-group">
+          <label>
+            <span *ngIf="getCurrentLanguage() === 'en'">Chapter (அதிகாரம்)</span>
+            <span *ngIf="getCurrentLanguage() === 'ta'">அதிகாரம்</span>
+          </label>
+          <select class="filter-select" [(ngModel)]="selectedChapter" (change)="applyFilters()">
+            <option value="All">
+              {{ getCurrentLanguage() === 'en' ? 'All Chapters' : 'அனைத்து அதிகாரங்கள்' }}
+            </option>
+            <option *ngFor="let chap of chaptersList" [value]="chap">{{ chap }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading & Error States -->
+    <div class="status-container text-center" *ngIf="isDataLoading || loadingError">
+      <div class="spinner" *ngIf="isDataLoading"></div>
+      <p class="loading-text" *ngIf="isDataLoading">Loading Thirukkural database...</p>
+      
+      <div class="error-card glass-card" *ngIf="loadingError">
+        <p class="error-text">{{ loadingError }}</p>
+        <button class="btn btn-primary" (click)="loadThirukkuralData()">Try Again</button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state text-center glass-card" *ngIf="!isDataLoading && filteredKurals.length === 0">
+      <p class="lead-text" *ngIf="getCurrentLanguage() === 'en'">No couplets match your search query.</p>
+      <p class="lead-text" *ngIf="getCurrentLanguage() === 'ta'">உங்கள் தேடலுக்குரிய திருக்குறள்கள் எதுவும் கிடைக்கவில்லை.</p>
+      <button class="tbar-btn key-btn" (click)="searchQuery = ''; selectedSection = 'All'; onSectionChange()">Reset Filters</button>
+    </div>
+
+    <!-- Kurals Paginated List -->
+    <div class="kurals-list" *ngIf="!isDataLoading && filteredKurals.length > 0">
+      <div class="kural-card glass-card" *ngFor="let kural of getPaginatedKurals()">
+        <div class="kural-card-header">
+          <div class="kural-meta">
+            <span class="kural-num">#{{ kural.number }}</span>
+            <span class="kural-divider">•</span>
+            <span class="kural-chap">{{ kural.chapter }}</span>
+            <span class="kural-divider">•</span>
+            <span class="kural-sec">
+              {{ getCurrentLanguage() === 'en' ? sectionsEn[kural.section] : kural.section }}
+            </span>
+          </div>
+          <button class="tbar-btn key-btn collapse-toggle" (click)="toggleKuralMeaning(kural)">
+            {{ kural.showMeaning ? (getCurrentLanguage() === 'en' ? 'Hide' : 'மறை') : (getCurrentLanguage() === 'en' ? 'Meaning' : 'விளக்கம்') }}
+          </button>
+        </div>
+
+        <div class="couplet-text">
+          <p class="kural-line">{{ kural.kural[0] }}</p>
+          <p class="kural-line">{{ kural.kural[1] }}</p>
+        </div>
+
+        <!-- Meanings block -->
+        <div class="meanings-wrapper" *ngIf="kural.showMeaning">
+          <div class="tabs-row">
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'mu_va'" (click)="setMeaningTab(kural, 'mu_va')">மு.வ உரை</button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'salamon'" (click)="setMeaningTab(kural, 'salamon')">சாலமன் உரை</button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'kalaignar'" (click)="setMeaningTab(kural, 'kalaignar')">கலைஞர் உரை</button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'en'" (click)="setMeaningTab(kural, 'en')">English</button>
+          </div>
+
+          <div class="meaning-display">
+            <p *ngIf="kural.activeMeaningTab === 'mu_va'">{{ kural.meaning.ta_mu_va }}</p>
+            <p *ngIf="kural.activeMeaningTab === 'salamon'">{{ kural.meaning.ta_salamon }}</p>
+            <p *ngIf="kural.activeMeaningTab === 'kalaignar'">{{ kural.meaning.ta_kalaignar }}</p>
+            <p *ngIf="kural.activeMeaningTab === 'en'">{{ kural.meaning.en }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-panel glass-card" *ngIf="!isDataLoading && totalPages > 1">
+      <div class="pagination-buttons">
+        <button class="tbar-btn key-btn" [disabled]="currentPage === 1" (click)="goToPage(1)">
+          ◀◀ First
+        </button>
+        <button class="tbar-btn key-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+          ◀ Prev
+        </button>
+        
+        <span class="pagination-info">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
+
+        <button class="tbar-btn key-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Next ▶
+        </button>
+        <button class="tbar-btn key-btn" [disabled]="currentPage === totalPages" (click)="goToPage(totalPages)">
+          Last ▶▶
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>

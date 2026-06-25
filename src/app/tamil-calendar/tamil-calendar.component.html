@@ -1,0 +1,221 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero Header -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content text-center">
+      <h1>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'en'">Tamil Calendar</span>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'ta'">தமிழ் நாட்காட்டி</span>
+      </h1>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'en'">Daily Tamil Panchangam, auspicious timings, and traditional festivals.</p>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'ta'">தினசரி தமிழ் பஞ்சாங்கம், நல்ல நேரம், இராகு காலம் மற்றும் விரத நாட்கள்.</p>
+    </div>
+  </div>
+
+  <div class="container grid-container">
+    <!-- COLUMN 1: Calendar Grid -->
+    <div class="calendar-card glass-card">
+      <!-- Calendar Navigation Header -->
+      <div class="calendar-nav-header">
+        <button class="nav-arrow-btn" (click)="prevMonth()" aria-label="Previous month">◀</button>
+        <h2 class="month-title">{{ monthNameEn }}</h2>
+        <button class="nav-arrow-btn" (click)="nextMonth()" aria-label="Next month">▶</button>
+      </div>
+
+      <!-- Weekday Headers -->
+      <div class="calendar-grid weekdays-header">
+        <div class="weekday-cell" *ngFor="let day of WEEKDAYS_EN; let idx = index">
+          <span *ngIf="getCurrentLanguage() === 'en'">{{ day.slice(0, 3) }}</span>
+          <span *ngIf="getCurrentLanguage() === 'ta'">{{ WEEKDAYS_TA[idx] }}</span>
+        </div>
+      </div>
+
+      <!-- Days Grid -->
+      <div class="calendar-grid days-body">
+        <div 
+          *ngFor="let cell of weeks | slice:0 | keyvalue" 
+          class="calendar-row"
+        >
+          <div 
+            *ngFor="let dayCell of $any(cell.value)" 
+            class="day-cell"
+            [class.empty]="!dayCell.gDay"
+            [class.today]="dayCell.isToday"
+            [class.selected]="dayCell.isSelected"
+            (click)="selectCell(dayCell)"
+          >
+            <ng-container *ngIf="dayCell.gDay">
+              <!-- Gregorian Day (Top Left) -->
+              <span class="greg-day">{{ dayCell.gDay }}</span>
+              <!-- Tamil Day (Bottom Right) -->
+              <span class="tamil-day" *ngIf="dayCell.tamilDay">
+                {{ dayCell.tamilDay }}
+              </span>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMN 2: Panchangam & Festivals -->
+    <div class="details-pane">
+      
+      <!-- Daily Panchangam Details -->
+      <div class="panchangam-card glass-card">
+        <div class="panchangam-header">
+          <span class="badge">
+            <span *ngIf="getCurrentLanguage() === 'en'">Selected Day</span>
+            <span *ngIf="getCurrentLanguage() === 'ta'">தேர்ந்தெடுக்கப்பட்ட நாள்</span>
+          </span>
+          <h3>
+            {{ selectedPanchangam.gregorianDate | date:'longDate' }} 
+            ({{ getCurrentLanguage() === 'en' ? selectedPanchangam.weekdayEn : selectedPanchangam.weekdayTa }})
+          </h3>
+        </div>
+
+        <div class="panchangam-details-grid">
+          <!-- Tamil Date info -->
+          <div class="panchang-item large-span">
+            <div class="item-label">
+              <span *ngIf="getCurrentLanguage() === 'en'">Tamil Date</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">தமிழ் தேதி</span>
+            </div>
+            <div class="item-value highlight-value">
+              <span *ngIf="getCurrentLanguage() === 'en'">
+                {{ selectedPanchangam.tamilYearEn }} Year, {{ selectedPanchangam.tamilMonthEn }} {{ selectedPanchangam.tamilDay }}
+              </span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">
+                {{ selectedPanchangam.tamilYearTa }} வருடம், {{ selectedPanchangam.tamilMonthTa }} {{ selectedPanchangam.tamilDay }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Thiruvalluvar Year -->
+          <div class="panchang-item">
+            <div class="item-label">
+              <span *ngIf="getCurrentLanguage() === 'en'">Thiruvalluvar Year</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">திருவள்ளுவர் ஆண்டு</span>
+            </div>
+            <div class="item-value">{{ selectedPanchangam.thiruvalluvarYear }}</div>
+          </div>
+
+          <!-- Active Thithi -->
+          <div class="panchang-item">
+            <div class="item-label">
+              <span *ngIf="getCurrentLanguage() === 'en'">Thithi</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">திதி</span>
+            </div>
+            <div class="item-value">
+              {{ getCurrentLanguage() === 'en' ? selectedPanchangam.thithiEn : selectedPanchangam.thithiTa }}
+            </div>
+          </div>
+
+          <!-- Active Nakshatra -->
+          <div class="panchang-item large-span">
+            <div class="item-label">
+              <span *ngIf="getCurrentLanguage() === 'en'">Nakshatra</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">நட்சத்திரம்</span>
+            </div>
+            <div class="item-value">
+              {{ getCurrentLanguage() === 'en' ? selectedPanchangam.nakshatraEn : selectedPanchangam.nakshatraTa }}
+            </div>
+          </div>
+
+          <!-- Timings Divider Header -->
+          <div class="timing-header large-span">
+            <span *ngIf="getCurrentLanguage() === 'en'">Auspicious Times (நல்ல நேரங்கள்)</span>
+            <span *ngIf="getCurrentLanguage() === 'ta'">சுப நேரங்கள்</span>
+          </div>
+
+          <!-- Nalla Neram -->
+          <div class="panchang-item">
+            <div class="item-label auspicious">
+              <span *ngIf="getCurrentLanguage() === 'en'">Nalla Neram</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">நல்ல நேரம்</span>
+            </div>
+            <div class="item-value">{{ selectedPanchangam.nallaNeram }}</div>
+          </div>
+
+          <!-- Gowri Nalla Neram -->
+          <div class="panchang-item">
+            <div class="item-label auspicious">
+              <span *ngIf="getCurrentLanguage() === 'en'">Gowri Nalla Neram</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">கௌரி நல்ல நேரம்</span>
+            </div>
+            <div class="item-value">{{ selectedPanchangam.gowriNallaNeram }}</div>
+          </div>
+
+          <!-- Timings Divider Header -->
+          <div class="timing-header large-span inauspicious">
+            <span *ngIf="getCurrentLanguage() === 'en'">Inauspicious Times (கரி நேரங்கள்)</span>
+            <span *ngIf="getCurrentLanguage() === 'ta'">தவிர்க்க வேண்டிய நேரங்கள்</span>
+          </div>
+
+          <!-- Rahu Kalam -->
+          <div class="panchang-item">
+            <div class="item-label warning">
+              <span *ngIf="getCurrentLanguage() === 'en'">Rahu Kalam</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">இராகு காலம்</span>
+            </div>
+            <div class="item-value">{{ selectedPanchangam.rahuKalam }}</div>
+          </div>
+
+          <!-- Yamagandam -->
+          <div class="panchang-item">
+            <div class="item-label warning">
+              <span *ngIf="getCurrentLanguage() === 'en'">Yamagandam</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">எமகண்டம்</span>
+            </div>
+            <div class="item-value">{{ selectedPanchangam.yamagandam }}</div>
+          </div>
+
+          <!-- Kuligai -->
+          <div class="panchang-item">
+            <div class="item-label info">
+              <span *ngIf="getCurrentLanguage() === 'en'">Kuligai</span>
+              <span *ngIf="getCurrentLanguage() === 'ta'">குளிகை</span>
+            </div>
+            <div class="item-value">{{ selectedPanchangam.kuligai }}</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Month's Festivals Card -->
+      <div class="festivals-card glass-card">
+        <div class="festivals-header">
+          <span class="badge highlight">✨</span>
+          <h3 *ngIf="getCurrentLanguage() === 'en'">Important Days in {{ selectedPanchangam.tamilMonthEn }}</h3>
+          <h3 *ngIf="getCurrentLanguage() === 'ta'">{{ selectedPanchangam.tamilMonthTa }} மாத விரத/விசேஷ நாட்கள்</h3>
+        </div>
+
+        <div class="festivals-body">
+          <div class="no-festivals" *ngIf="activeMonthFestivals.length === 0">
+            <p *ngIf="getCurrentLanguage() === 'en'">No major festivals found in this month.</p>
+            <p *ngIf="getCurrentLanguage() === 'ta'">இம்மாதத்தில் முக்கிய விசேஷங்கள் ஏதுமில்லை.</p>
+          </div>
+          
+          <ul class="festival-list" *ngIf="activeMonthFestivals.length > 0">
+            <li class="festival-item" *ngFor="let fest of activeMonthFestivals">
+              <div class="fest-date-badge">
+                <span class="fest-month">
+                  {{ getCurrentLanguage() === 'en' ? selectedPanchangam.tamilMonthEn.slice(0,4) : selectedPanchangam.tamilMonthTa }}
+                </span>
+                <span class="fest-day">{{ fest.day }}</span>
+              </div>
+              <div class="fest-info">
+                <h4>{{ getCurrentLanguage() === 'en' ? fest.nameEn : fest.nameTa }}</h4>
+                <p class="fest-greg-ref">
+                  <!-- Optional details showing which Gregorian date this matches -->
+                  <span *ngIf="getCurrentLanguage() === 'en'">Traditional solar calendar alignment</span>
+                  <span *ngIf="getCurrentLanguage() === 'ta'">பாரம்பரிய தமிழ் சூரிய நாட்காட்டி முறை</span>
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
