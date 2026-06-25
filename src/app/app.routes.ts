@@ -60,5 +60,9 @@ export const routes: Routes = [
 		path: 'thirukkural',
 		loadComponent: () => import('./thirukkural/thirukkural.component').then(m => m.ThirukkuralComponent)
 	},
+	{
+		path: 'videos',
+		loadComponent: () => import('./videos/videos.component').then(m => m.VideosComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

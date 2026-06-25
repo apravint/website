@@ -1,0 +1,118 @@
+<section class="animate-fade-in page-wrapper">
+  <!-- Hero Banner -->
+  <div class="page-hero">
+    <div class="bg-glow"></div>
+    <div class="container hero-content text-center">
+      <h1>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'en'">Video Gallery</span>
+        <span class="text-gradient" *ngIf="getCurrentLanguage() === 'ta'">ஒளிக்காட்சிகள்</span>
+      </h1>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'en'">Watch video tutorials, guides, and creative Tamil poetry recitals.</p>
+      <p class="lead" *ngIf="getCurrentLanguage() === 'ta'">மென்பொருள் பயிற்சிகள், விளக்கக் குறிப்புகள் மற்றும் தமிழ் கவிதை வாசிப்புகள்.</p>
+    </div>
+  </div>
+
+  <div class="container main-gallery">
+    <!-- Controls Panel -->
+    <div class="controls-panel glass-card">
+      <!-- Search Input -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          class="search-input" 
+          [(ngModel)]="searchQuery" 
+          (ngModelChange)="filterVideos()"
+          placeholder="{{ getCurrentLanguage() === 'en' ? 'Search videos by title or description...' : 'ஒளிக்காட்சிகளைத் தேடுக...' }}"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills">
+        <button 
+          *ngFor="let cat of categories" 
+          class="pill-btn" 
+          [class.active]="activeCategory === cat"
+          (click)="selectCategory(cat)"
+        >
+          <span *ngIf="cat === 'All'">{{ getCurrentLanguage() === 'en' ? 'All Videos' : 'அனைத்தும்' }}</span>
+          <span *ngIf="cat === 'Coding'">{{ getCurrentLanguage() === 'en' ? 'Coding' : 'கோடிங்' }}</span>
+          <span *ngIf="cat === 'Poetry'">{{ getCurrentLanguage() === 'en' ? 'Poetry' : 'கவிதை' }}</span>
+          <span *ngIf="cat === 'Guides'">{{ getCurrentLanguage() === 'en' ? 'Guides' : 'வழிகாட்டிகள்' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state text-center glass-card" *ngIf="filteredVideos.length === 0">
+      <p class="lead-text" *ngIf="getCurrentLanguage() === 'en'">No videos match your search query.</p>
+      <p class="lead-text" *ngIf="getCurrentLanguage() === 'ta'">உங்கள் தேடலுக்குரிய ஒளிக்காட்சிகள் எதுவும் கிடைக்கவில்லை.</p>
+      <button class="tbar-btn key-btn" (click)="searchQuery = ''; activeCategory = 'All'; filterVideos()">Reset Filters</button>
+    </div>
+
+    <!-- Videos CSS Grid -->
+    <div class="videos-grid" *ngIf="filteredVideos.length > 0">
+      <div 
+        class="video-card glass-card" 
+        *ngFor="let video of filteredVideos"
+        (click)="playVideo(video)"
+      >
+        <!-- Card Thumbnail Space -->
+        <div class="thumbnail-container">
+          <img [src]="getThumbnailUrl(video.id)" [alt]="video.title" class="video-thumb" loading="lazy" />
+          
+          <!-- Play Hover Overlay -->
+          <div class="play-overlay">
+            <div class="play-icon-box">
+              <span class="play-icon">▶</span>
+            </div>
+          </div>
+
+          <!-- Video Duration Badge -->
+          <span class="duration-badge">{{ video.duration }}</span>
+        </div>
+
+        <!-- Video Card Text -->
+        <div class="card-details">
+          <span class="video-category-tag" [ngClass]="video.category.toLowerCase()">
+            {{ video.category }}
+          </span>
+          <h3 class="video-title">{{ video.title }}</h3>
+          <p class="video-desc">{{ video.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cinema Lightbox Modal Player Overlay -->
+  <div class="cinema-modal-backdrop" *ngIf="selectedVideo && safeVideoUrl">
+    <div class="cinema-modal-container glass-card animate-scale-up">
+      <!-- Modal Close Bar -->
+      <div class="modal-close-bar">
+        <span class="modal-video-title">{{ selectedVideo.title }}</span>
+        <button class="modal-close-btn" (click)="closePlayer()" aria-label="Close player">✖</button>
+      </div>
+
+      <!-- Responsive aspect-ratio player wrapper -->
+      <div class="modal-player-wrapper">
+        <iframe 
+          [src]="safeVideoUrl" 
+          title="YouTube video player" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          referrerpolicy="strict-origin-when-cross-origin" 
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <!-- Video description under player -->
+      <div class="modal-description-box">
+        <span class="video-category-tag" [ngClass]="selectedVideo.category.toLowerCase()">
+          {{ selectedVideo.category }}
+        </span>
+        <p class="video-desc">{{ selectedVideo.description }}</p>
+      </div>
+    </div>
+    <div class="modal-click-trap" (click)="closePlayer()"></div>
+  </div>
+</section>
