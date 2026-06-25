@@ -15,7 +15,29 @@
         "WORLDCUP": "World Cup 2026",
         "CALENDAR": "Calendar",
         "THIRUKKURAL": "Thirukkural",
-        "VIDEOS": "Videos"
+        "VIDEOS": "Videos",
+        "WALLPAPERS": "Wallpapers"
+    },
+    "WALLPAPERS": {
+        "TITLE": "Mobile Wallpapers",
+        "SUBTITLE": "Find and preview high-quality mobile portrait backgrounds on an interactive smartphone simulator.",
+        "SEARCH_PLACEHOLDER": "Search portrait photos (e.g. beach, neon, forest)...",
+        "API_STATUS_CONNECTED": "Pexels API Connected",
+        "API_STATUS_SETUP": "Setup Search API Key",
+        "LOCK_SCREEN": "Lock Screen",
+        "HOME_SCREEN": "Home Screen",
+        "DOWNLOAD_HD": "Download Ultra HD",
+        "BY": "by",
+        "NO_RESULTS": "No wallpapers found. Try a different search query.",
+        "KEY_MODAL_TITLE": "Pexels API Key Setup",
+        "KEY_MODAL_DESC": "We integrate with Pexels to offer millions of free portrait photos. Get a free API key at pexels.com and paste it below to enable live search.",
+        "KEY_INPUT_PLACEHOLDER": "Paste your Pexels API Key here...",
+        "SAVE_KEY": "Save Key",
+        "CLEAR_KEY": "Clear Key",
+        "CANCEL": "Cancel",
+        "SEARCHING": "Searching Pexels...",
+        "PREVIEW_LABEL": "Simulated Device Preview",
+        "DEFAULT_WALLPAPERS": "Curated Wallpapers"
     },
     "NEWS": {
         "TITLE": "Trending News",

@@ -64,5 +64,9 @@ export const routes: Routes = [
 		path: 'videos',
 		loadComponent: () => import('./videos/videos.component').then(m => m.VideosComponent)
 	},
+	{
+		path: 'wallpapers',
+		loadComponent: () => import('./wallpapers/wallpapers.component').then(m => m.WallpapersComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

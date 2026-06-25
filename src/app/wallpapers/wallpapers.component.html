@@ -1,0 +1,282 @@
+<div class="wallpapers-container">
+  <!-- Hero Section -->
+  <header class="wallpapers-hero">
+    <div class="aurora-glow red"></div>
+    <div class="aurora-glow blue"></div>
+    <h1 class="page-title">{{ 'WALLPAPERS.TITLE' | translate }}</h1>
+    <p class="page-subtitle">{{ 'WALLPAPERS.SUBTITLE' | translate }}</p>
+  </header>
+
+  <!-- Controls & Search -->
+  <div class="controls-section">
+    <div class="search-bar-wrapper">
+      <div class="search-input-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (keyup.enter)="searchWallpapers()" 
+          [placeholder]="'WALLPAPERS.SEARCH_PLACEHOLDER' | translate"
+          class="search-input"
+          aria-label="Search wallpapers"
+        />
+        <button *ngIf="searchQuery" (click)="searchQuery = ''; searchWallpapers()" class="clear-search-btn" aria-label="Clear search">×</button>
+      </div>
+      <button (click)="searchWallpapers()" class="btn-primary search-btn">
+        {{ 'NAV.WALLPAPERS' | translate }}
+      </button>
+    </div>
+
+    <!-- API Key Status Pill & Categories -->
+    <div class="controls-meta">
+      <button 
+        (click)="showKeyModal = true" 
+        class="api-status-btn"
+        [class.connected]="!!pexelsApiKey"
+        [attr.aria-label]="(pexelsApiKey ? 'WALLPAPERS.API_STATUS_CONNECTED' : 'WALLPAPERS.API_STATUS_SETUP') | translate"
+      >
+        <span class="status-indicator"></span>
+        {{ (pexelsApiKey ? 'WALLPAPERS.API_STATUS_CONNECTED' : 'WALLPAPERS.API_STATUS_SETUP') | translate }} ⚙️
+      </button>
+
+      <div class="categories-wrapper">
+        <button 
+          *ngFor="let cat of ['All', 'Nature', 'Space', 'Cyberpunk', 'Minimal']" 
+          (click)="selectCategory(cat)"
+          [class.active]="activeCategory === cat && !searchQuery"
+          class="category-pill"
+        >
+          {{ cat }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading & Errors -->
+  <div *ngIf="isSearching" class="loading-state">
+    <div class="spinner"></div>
+    <p>{{ 'WALLPAPERS.SEARCHING' | translate }}</p>
+  </div>
+
+  <div *ngIf="searchError" class="error-state">
+    <span class="error-icon">⚠️</span>
+    <p>{{ searchError }}</p>
+  </div>
+
+  <!-- Main Showcase Area (Split Grid + Simulator) -->
+  <div class="showcase-layout" *ngIf="!isSearching">
+    
+    <!-- Gallery Grid -->
+    <div class="gallery-section">
+      <h2 class="section-title">
+        {{ searchQuery ? ('NAV.WALLPAPERS' | translate) : ('WALLPAPERS.DEFAULT_WALLPAPERS' | translate) }}
+        <span class="results-count" *ngIf="wallpapersList.length > 0">({{ wallpapersList.length }})</span>
+      </h2>
+
+      <div class="gallery-grid" *ngIf="wallpapersList.length > 0; else noResults">
+        <div 
+          *ngFor="let wallpaper of wallpapersList" 
+          class="wallpaper-card"
+          [class.selected]="selectedWallpaper?.id === wallpaper.id"
+          (click)="setPreviewWallpaper(wallpaper)"
+        >
+          <div class="card-image-wrapper">
+            <img [src]="wallpaper.thumbnail" [alt]="wallpaper.title" class="wallpaper-thumbnail" loading="lazy" />
+            <div class="card-overlay">
+              <div class="card-actions">
+                <button 
+                  (click)="setPreviewWallpaper(wallpaper); $event.stopPropagation()" 
+                  class="action-btn preview-btn" 
+                  title="Preview on Simulator"
+                >
+                  👁️
+                </button>
+                <button 
+                  (click)="downloadWallpaper(wallpaper); $event.stopPropagation()" 
+                  class="action-btn download-btn" 
+                  title="Download Image"
+                >
+                  📥
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="wallpaper-title">{{ wallpaper.title }}</h3>
+            <p class="wallpaper-photographer">{{ 'WALLPAPERS.BY' | translate }} {{ wallpaper.photographer }}</p>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResults>
+        <div class="no-results-state">
+          <p>{{ 'WALLPAPERS.NO_RESULTS' | translate }}</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Simulator Section -->
+    <div class="simulator-section">
+      <h2 class="section-title">{{ 'WALLPAPERS.PREVIEW_LABEL' | translate }}</h2>
+
+      <!-- Live Simulator Frame -->
+      <div class="simulator-wrapper" *ngIf="selectedWallpaper">
+        <!-- Phone Device Mockup -->
+        <div class="phone-mockup">
+          <div class="phone-speaker"></div>
+          <div class="phone-camera"></div>
+          
+          <!-- Screen Screen Canvas -->
+          <div 
+            class="phone-screen" 
+            [style.background-image]="'url(' + selectedWallpaper.url + ')'"
+          >
+            <!-- Simulated Status Bar -->
+            <div class="sim-status-bar">
+              <span class="sim-status-time">{{ simulatedTime }}</span>
+              <div class="sim-status-icons">
+                <span class="sim-icon">📶</span>
+                <span class="sim-icon">📶</span>
+                <span class="sim-icon">🔋</span>
+              </div>
+            </div>
+
+            <!-- LOCK SCREEN VIEW -->
+            <div *ngIf="previewMode === 'lock'" class="sim-lock-screen-content fade-in">
+              <div class="sim-clock-wrapper">
+                <div class="sim-lock-date">{{ simulatedDate }}</div>
+                <div class="sim-lock-time">{{ simulatedTime }}</div>
+              </div>
+
+              <!-- Sleek Glass Notification Card -->
+              <div class="sim-notification">
+                <div class="noti-header">
+                  <span class="noti-app-icon">🎨</span>
+                  <span class="noti-app-name">Pravin Tamilan</span>
+                  <span class="noti-time">now</span>
+                </div>
+                <div class="noti-body">
+                  <p class="noti-title">{{ selectedWallpaper.title }}</p>
+                  <p class="noti-desc">{{ 'WALLPAPERS.BY' | translate }} {{ selectedWallpaper.photographer }}</p>
+                </div>
+              </div>
+
+              <!-- Lock screen utilities -->
+              <div class="sim-lock-actions">
+                <button class="sim-utility-btn" aria-label="Simulated Flashlight">🔦</button>
+                <button class="sim-utility-btn" aria-label="Simulated Camera">📷</button>
+              </div>
+            </div>
+
+            <!-- HOME SCREEN VIEW -->
+            <div *ngIf="previewMode === 'home'" class="sim-home-screen-content fade-in">
+              <!-- App grid simulation -->
+              <div class="sim-app-grid">
+                <div class="sim-app-item">
+                  <div class="sim-app-icon poetry">✍️</div>
+                  <span class="sim-app-label">Kavithai</span>
+                </div>
+                <div class="sim-app-item">
+                  <div class="sim-app-icon news">📰</div>
+                  <span class="sim-app-label">News</span>
+                </div>
+                <div class="sim-app-item">
+                  <div class="sim-app-icon calendar">📅</div>
+                  <span class="sim-app-label">Calendar</span>
+                </div>
+                <div class="sim-app-item">
+                  <div class="sim-app-icon kural">📖</div>
+                  <span class="sim-app-label">Kural</span>
+                </div>
+                <div class="sim-app-item">
+                  <div class="sim-app-icon tv">📺</div>
+                  <span class="sim-app-label">IPTV</span>
+                </div>
+                <div class="sim-app-item">
+                  <div class="sim-app-icon settings-app">⚙️</div>
+                  <span class="sim-app-label">Settings</span>
+                </div>
+              </div>
+
+              <!-- Glassmorphic Dock -->
+              <div class="sim-dock">
+                <div class="sim-dock-icon phone-app">📞</div>
+                <div class="sim-dock-icon chat">💬</div>
+                <div class="sim-dock-icon safari">🌐</div>
+                <div class="sim-dock-icon music">🎵</div>
+              </div>
+            </div>
+
+            <!-- Swipe Bar Indicator -->
+            <div class="sim-home-indicator"></div>
+          </div>
+        </div>
+
+        <!-- Mode Selectors and Download Card -->
+        <div class="simulator-controls">
+          <div class="mode-toggles">
+            <button 
+              (click)="previewMode = 'lock'" 
+              [class.active]="previewMode === 'lock'" 
+              class="toggle-btn"
+            >
+              🔒 {{ 'WALLPAPERS.LOCK_SCREEN' | translate }}
+            </button>
+            <button 
+              (click)="previewMode = 'home'" 
+              [class.active]="previewMode === 'home'" 
+              class="toggle-btn"
+            >
+              🏠 {{ 'WALLPAPERS.HOME_SCREEN' | translate }}
+            </button>
+          </div>
+
+          <div class="selected-details-card">
+            <h3 class="details-title">{{ selectedWallpaper.title }}</h3>
+            <p class="details-photographer">{{ 'WALLPAPERS.BY' | translate }} {{ selectedWallpaper.photographer }}</p>
+            <button (click)="downloadWallpaper(selectedWallpaper)" class="btn-primary download-hd-btn">
+              📥 {{ 'WALLPAPERS.DOWNLOAD_HD' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Pexels API Key Modal Configuration -->
+  <div class="modal-backdrop" *ngIf="showKeyModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ 'WALLPAPERS.KEY_MODAL_TITLE' | translate }}</h3>
+        <button (click)="showKeyModal = false" class="close-modal-btn" aria-label="Close settings">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-description">{{ 'WALLPAPERS.KEY_MODAL_DESC' | translate }}</p>
+        
+        <div class="form-group">
+          <input 
+            type="password" 
+            [(ngModel)]="pexelsApiKey" 
+            [placeholder]="'WALLPAPERS.KEY_INPUT_PLACEHOLDER' | translate" 
+            class="key-input"
+            aria-label="Pexels API Key"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button *ngIf="pexelsApiKey" (click)="clearPexelsKey()" class="btn-danger">
+          {{ 'WALLPAPERS.CLEAR_KEY' | translate }}
+        </button>
+        <div class="modal-action-right">
+          <button (click)="showKeyModal = false" class="btn-secondary">
+            {{ 'WALLPAPERS.CANCEL' | translate }}
+          </button>
+          <button (click)="savePexelsKey()" class="btn-primary">
+            {{ 'WALLPAPERS.SAVE_KEY' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
