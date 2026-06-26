@@ -234,9 +234,14 @@
           <div class="selected-details-card">
             <h3 class="details-title">{{ selectedWallpaper.title }}</h3>
             <p class="details-photographer">{{ 'WALLPAPERS.BY' | translate }} {{ selectedWallpaper.photographer }}</p>
-            <button (click)="downloadWallpaper(selectedWallpaper)" class="btn-primary download-hd-btn">
-              📥 {{ 'WALLPAPERS.DOWNLOAD_HD' | translate }}
-            </button>
+            <div class="simulator-action-buttons">
+              <button (click)="downloadWallpaper(selectedWallpaper)" class="btn-primary download-hd-btn">
+                📥 {{ 'WALLPAPERS.DOWNLOAD_HD' | translate }}
+              </button>
+              <button *ngIf="isNativeShareSupported" (click)="shareWallpaper(selectedWallpaper)" class="btn-secondary share-wallpaper-btn">
+                📤 Share
+              </button>
+            </div>
           </div>
         </div>
       </div>

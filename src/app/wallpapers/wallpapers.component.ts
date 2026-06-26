@@ -27,6 +27,7 @@ export class WallpapersComponent implements OnInit {
   private http = inject(HttpClient);
   private seo = inject(SeoService);
   public translationService = inject(TranslationService);
+  isNativeShareSupported = typeof navigator !== 'undefined' && !!navigator.share;
 
   // Curated High-Quality Portrait Wallpapers (Direct keyless Unsplash CDN urls, mobile optimized)
   curatedWallpapers: Wallpaper[] = [
@@ -231,5 +232,16 @@ export class WallpapersComponent implements OnInit {
   // Download high-resolution photo in new tab
   downloadWallpaper(wallpaper: Wallpaper): void {
     window.open(wallpaper.url, '_blank');
+  }
+
+  // Native share wallpaper link and description
+  shareWallpaper(wallpaper: Wallpaper): void {
+    if (this.isNativeShareSupported) {
+      navigator.share({
+        title: wallpaper.title,
+        text: `Check out this high quality mobile background: "${wallpaper.title}" by ${wallpaper.photographer}!`,
+        url: wallpaper.url
+      }).catch(err => console.log('Sharing failed:', err));
+    }
   }
 }
