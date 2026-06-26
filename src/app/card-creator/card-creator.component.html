@@ -432,6 +432,9 @@
                     <span *ngIf="isLoading()">Exporting...</span>
                     <span *ngIf="!isLoading()">💾 Download</span>
                 </button>
+                <button class="btn-primary share-btn" (click)="shareImage()" [disabled]="isLoading()" *ngIf="isShareSupported()">
+                    <span>📤 Share</span>
+                </button>
             </footer>
         </div>
     </div>

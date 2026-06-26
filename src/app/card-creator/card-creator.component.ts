@@ -913,6 +913,44 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
+    isShareSupported(): boolean {
+        return typeof navigator !== 'undefined' && !!navigator.share && !!navigator.canShare;
+    }
+
+    async shareImage(): Promise<void> {
+        const canvas = this.canvasService.getCanvas();
+        if (!canvas) return;
+
+        this.isLoading.set(true);
+
+        try {
+            const filename = `card-${Date.now()}`;
+            const options: ExportOptions = {
+                format: this.exportFormat(),
+                quality: this.exportQuality()
+            };
+            
+            const blob = await this.exportService.exportToBlob(canvas, options);
+            const ext = options.format === 'jpeg' ? 'jpg' : options.format;
+            const file = new File([blob], `${filename}.${ext}`, { type: blob.type });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'My Custom Poem Card',
+                    text: 'Look at the custom poetry card I designed on Pravin Tamilan\'s Card Creator!'
+                });
+            } else {
+                await this.exportService.downloadImage(canvas, filename, options);
+            }
+            this.closeExportModal();
+        } catch (error) {
+            console.error('Sharing failed:', error);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
     // Templates
     applyTemplate(templateId: string): void {
         this.canvasService.clear();
