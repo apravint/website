@@ -112,6 +112,10 @@
       background: var(--surface);
       box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
     }
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
   }
 
   .clear-search-btn {
@@ -310,6 +314,7 @@
 
   @media (max-width: 480px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
@@ -909,6 +914,10 @@
       border-color: var(--accent);
       background: var(--surface);
       outline: none;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 16px;
     }
   }
 }

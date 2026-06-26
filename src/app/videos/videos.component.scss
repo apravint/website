@@ -36,6 +36,10 @@
       background: rgba(255, 255, 255, 0.04);
       box-shadow: 0 0 12px rgba(var(--accent-rgb, 137, 221, 255), 0.15);
     }
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
   }
 
   .search-icon {
@@ -93,6 +97,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 }
 
 .video-card {
@@ -537,6 +546,10 @@
       border-color: var(--accent);
       background: rgba(255, 255, 255, 0.04);
       box-shadow: 0 0 10px rgba(var(--accent-rgb, 137, 221, 255), 0.15);
+    }
+
+    @media (max-width: 768px) {
+      font-size: 16px;
     }
   }
 }

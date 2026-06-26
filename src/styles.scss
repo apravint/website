@@ -447,3 +447,61 @@ textarea {
     background: var(--muted);
   }
 }
+
+/* --- MOBILE OPTIMIZATIONS & RESPONSIVENESS AUDIT IMPLEMENTATION --- */
+
+:root {
+  --space-mobile-padding: 16px;
+}
+
+/* Prevents iOS auto-zoom on focus by enforcing at least 16px font-size */
+@media (max-width: 768px) {
+  .search-input,
+  .key-input,
+  input[type="text"],
+  input[type="search"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Reduce layout margins/padding on smaller viewports */
+  .container {
+    padding-left: var(--space-mobile-padding) !important;
+    padding-right: var(--space-mobile-padding) !important;
+  }
+  
+  h1 {
+    font-size: 1.9rem !important;
+  }
+  
+  .page-hero {
+    padding: var(--space-2) 0 !important;
+    margin-bottom: var(--space-3) !important;
+  }
+
+  /* Standardize touch target minimum boundaries (at least 44px x 44px) */
+  .action-btn,
+  .category-pill,
+  .pill-btn,
+  .nav-link,
+  .dropdown-link,
+  .setting-option {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Spacers to prevent accidental adjacent taps */
+  .category-pills,
+  .card-actions,
+  .settings-options,
+  .flex {
+    gap: 12px !important;
+  }
+}
