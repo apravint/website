@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +14,7 @@ interface TerminalLine {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './terminal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./terminal.component.scss']
 })
 export class TerminalComponent implements OnInit, OnDestroy, AfterViewChecked {

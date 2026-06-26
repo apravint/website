@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,6 +18,7 @@ import { environment } from '../../environments/environment';
     standalone: true,
     imports: [AsyncPipe, CommonModule, FormsModule, TranslatePipe, AdUnitComponent],
     templateUrl: './kavithai.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./kavithai.component.scss']
 })
 export class KavithaiComponent implements OnInit {

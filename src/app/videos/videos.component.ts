@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
@@ -20,6 +20,7 @@ interface VideoItem {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule, TranslatePipe],
   templateUrl: './videos.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./videos.component.scss']
 })
 export class VideosComponent implements OnInit {

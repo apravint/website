@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, Input, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, AfterViewInit, Input, PLATFORM_ID, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 
@@ -18,6 +18,7 @@ import { environment } from '../../../environments/environment';
       </div>
     }
     `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .ad-container {
       display: block;

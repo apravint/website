@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Injector } from '@angular/core';
+import { Component, OnInit, inject, Injector, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SeoService } from '../shared/seo.service';
@@ -29,6 +29,7 @@ interface Skill {
   standalone: true,
   imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './home.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {

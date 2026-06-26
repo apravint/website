@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { SeoService } from '../shared/seo.service';
@@ -8,6 +8,7 @@ import { SeoService } from '../shared/seo.service';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './legal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./legal.component.scss']
 })
 export class LegalComponent implements OnInit {

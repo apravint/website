@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslationService } from '../shared/translation.service';
 import { TranslatePipe } from '../shared/translate.pipe';
@@ -39,6 +39,7 @@ applyColor(getPreferredColor());
   standalone: true,
   imports: [RouterModule, TranslatePipe],
   templateUrl: './navbar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
@@ -9,6 +9,7 @@ import { TranslatePipe } from '../shared/translate.pipe';
   standalone: true,
   imports: [CommonModule, TranslatePipe],
   templateUrl: './tutorials.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tutorials.component.scss']
 })
 export class TutorialsComponent implements OnInit {

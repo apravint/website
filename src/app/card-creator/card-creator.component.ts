@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListener, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListener, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import * as fabric from 'fabric';
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './card-creator.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './card-creator.component.scss'
 })
 export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {

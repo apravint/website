@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,6 +21,7 @@ interface CommandItem {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './linux.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./linux.component.scss']
 })
 export class LinuxComponent implements OnInit {

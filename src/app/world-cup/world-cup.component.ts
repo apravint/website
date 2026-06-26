@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
@@ -40,6 +40,7 @@ interface Match {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './world-cup.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./world-cup.component.scss']
 })
 export class WorldCupComponent implements OnInit {

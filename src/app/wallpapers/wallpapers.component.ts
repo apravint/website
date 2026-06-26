@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
@@ -20,6 +20,7 @@ interface Wallpaper {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule, TranslatePipe],
   templateUrl: './wallpapers.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./wallpapers.component.scss']
 })
 export class WallpapersComponent implements OnInit {

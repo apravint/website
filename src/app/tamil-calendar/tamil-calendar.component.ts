@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SeoService } from '../shared/seo.service';
@@ -57,6 +57,7 @@ interface Festival {
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './tamil-calendar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tamil-calendar.component.scss']
 })
 export class TamilCalendarComponent implements OnInit {

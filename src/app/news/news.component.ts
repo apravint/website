@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsService, NewsArticle } from '../shared/services/news.service';
@@ -206,6 +206,7 @@ import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
       </div>
     </section>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .controls-bar {
       display: flex;

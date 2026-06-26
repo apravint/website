@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { SeoService } from '../shared/seo.service';
 
 @Component({
@@ -6,6 +6,7 @@ import { SeoService } from '../shared/seo.service';
   standalone: true,
   imports: [],
   templateUrl: './about.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./about.component.scss']
 })
 export class AboutComponent {

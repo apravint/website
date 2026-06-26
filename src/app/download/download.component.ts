@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { TranslatePipe } from '../shared/translate.pipe';
 import { SeoService } from '../shared/seo.service';
 
@@ -7,6 +7,7 @@ import { SeoService } from '../shared/seo.service';
     standalone: true,
     imports: [TranslatePipe],
     templateUrl: './download.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./download.component.scss']
 })
 export class DownloadComponent {

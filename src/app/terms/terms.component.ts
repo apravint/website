@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SeoService } from '../shared/seo.service';
@@ -9,6 +9,7 @@ import { TranslatePipe } from '../shared/translate.pipe';
   standalone: true,
   imports: [AdUnitComponent, TranslatePipe],
   templateUrl: './terms.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./terms.component.scss']
 })
 export class TermsComponent {

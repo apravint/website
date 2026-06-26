@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
@@ -16,6 +16,7 @@ interface IPTVChannel {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './iptv.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./iptv.component.scss']
 })
 export class IptvComponent implements OnInit, OnDestroy {
