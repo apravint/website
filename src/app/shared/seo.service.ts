@@ -1,12 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SeoService {
 
-    constructor(private titleService: Title, private metaService: Meta) { }
+    constructor(
+        private titleService: Title, 
+        private metaService: Meta,
+        @Inject(DOCUMENT) private document: any
+    ) { }
 
     updateTitle(title: string) {
         this.titleService.setTitle(title);
@@ -26,6 +31,7 @@ export class SeoService {
         }
         if (config.url) {
             this.updateOpenGraphTags({ url: config.url });
+            this.updateCanonicalUrl(config.url);
         }
     }
 
@@ -44,6 +50,18 @@ export class SeoService {
         }
         if (config.url) {
             this.metaService.updateTag({ property: 'og:url', content: config.url });
+        }
+    }
+
+    updateCanonicalUrl(url: string) {
+        if (this.document && this.document.head) {
+            let element = this.document.head.querySelector("link[rel='canonical']") as HTMLLinkElement || null;
+            if (!element) {
+                element = this.document.createElement('link');
+                element.setAttribute('rel', 'canonical');
+                this.document.head.appendChild(element);
+            }
+            element.setAttribute('href', url);
         }
     }
 }
