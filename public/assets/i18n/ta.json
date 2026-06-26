@@ -17,7 +17,10 @@
         "THIRUKKURAL": "திருக்குறள்",
         "VIDEOS": "காணொளிகள்",
         "WALLPAPERS": "பின்புலங்கள்",
-        "LINUX": "லினக்ஸ் கையேடு"
+        "LINUX": "லினக்ஸ் கையேடு",
+        "LITERATURE": "இலக்கியம்",
+        "MEDIA": "ஊடகம்",
+        "DEVELOPMENT": "கருவிகள்"
     },
     "WALLPAPERS": {
         "TITLE": "கைபேசி பின்புலங்கள்",
