@@ -505,3 +505,37 @@ textarea {
     gap: 12px !important;
   }
 }
+
+/* --- NATIVE ANDROID/MOBILE INTEGRATIONS & UX POLISH --- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default translucent blue tap highlight on Android Chrome */
+button,
+a,
+.action-btn,
+.category-pill,
+.pill-btn,
+.nav-link,
+.dropdown-link,
+.setting-option,
+.color-option {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent accidental text selections on interactive UI controls */
+.action-btn,
+.category-pill,
+.pill-btn,
+.nav-link,
+.dropdown-link,
+.setting-option,
+.color-option,
+.burger,
+.navbar,
+.theme-switch {
+  user-select: none;
+  -webkit-user-select: none;
+}

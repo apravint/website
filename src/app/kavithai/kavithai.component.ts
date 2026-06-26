@@ -43,6 +43,7 @@ export class KavithaiComponent implements OnInit {
     loading = true;
     copiedId: string | null = null;
     highlightedPoemId: string | null = null;
+    isNativeShareSupported = typeof navigator !== 'undefined' && !!navigator.share;
     private allPoems: any[] = [];
 
     // AI Poet state
@@ -121,6 +122,11 @@ export class KavithaiComponent implements OnInit {
     shareToTwitter(poem: any): void {
         const text = this.formatPoemForShare(poem);
         this.shareService.shareToTwitter(text, 'https://pravintamilan.com/kavithai');
+    }
+
+    nativeShare(poem: any): void {
+        const text = this.formatPoemForShare(poem);
+        this.shareService.nativeShare(poem.title || 'Tamil Kavithai', text, 'https://pravintamilan.com/kavithai');
     }
 
     designCard(poem: any): void {

@@ -76,6 +76,12 @@
                             <span class="icon">{{ isLiked(k) ? '❤️' : '🤍' }}</span>
                         </button>
 
+                        @if (isNativeShareSupported) {
+                        <button class="action-btn share-btn native-share-btn" (click)="nativeShare(k)"
+                            aria-label="Share poem" title="Share via apps">
+                            <span class="icon">📤</span>
+                        </button>
+                        } @else {
                         <button class="action-btn share-btn" (click)="shareToTwitter(k)" aria-label="Share to Twitter"
                             title="Share on X/Twitter">
                             <span class="icon">𝕏</span>
@@ -85,6 +91,7 @@
                             aria-label="Share to WhatsApp" title="Share on WhatsApp">
                             <span class="icon">📱</span>
                         </button>
+                        }
 
                         <button class="action-btn copy-btn" [class.copied]="copiedId === getPoemId(k)"
                             (click)="copyPoem(k)" aria-label="Copy poem" title="Copy to clipboard">
