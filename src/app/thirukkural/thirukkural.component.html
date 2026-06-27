@@ -44,10 +44,18 @@
         <!-- Collapsible Meanings -->
         <div class="meanings-wrapper">
           <div class="tabs-row">
-            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'mu_va'" (click)="setMeaningTab(randomKural, 'mu_va')">மு.வ</button>
-            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'salamon'" (click)="setMeaningTab(randomKural, 'salamon')">சாலமன்</button>
-            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'kalaignar'" (click)="setMeaningTab(randomKural, 'kalaignar')">கலைஞர்</button>
-            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'en'" (click)="setMeaningTab(randomKural, 'en')">English</button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'mu_va'" (click)="setMeaningTab(randomKural, 'mu_va')">
+              {{ getCurrentLanguage() === 'en' ? 'M. Varadarajan' : 'மு.வ' }}
+            </button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'salamon'" (click)="setMeaningTab(randomKural, 'salamon')">
+              {{ getCurrentLanguage() === 'en' ? 'S. Pappaiah' : 'சாலமன்' }}
+            </button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'kalaignar'" (click)="setMeaningTab(randomKural, 'kalaignar')">
+              {{ getCurrentLanguage() === 'en' ? 'M. Karunanidhi' : 'கலைஞர்' }}
+            </button>
+            <button class="tab-btn" [class.active]="randomKural.activeMeaningTab === 'en'" (click)="setMeaningTab(randomKural, 'en')">
+              {{ getCurrentLanguage() === 'en' ? 'English' : 'ஆங்கிலம்' }}
+            </button>
           </div>
 
           <div class="meaning-display">
@@ -152,10 +160,18 @@
         <!-- Meanings block -->
         <div class="meanings-wrapper" *ngIf="kural.showMeaning">
           <div class="tabs-row">
-            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'mu_va'" (click)="setMeaningTab(kural, 'mu_va')">மு.வ உரை</button>
-            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'salamon'" (click)="setMeaningTab(kural, 'salamon')">சாலமன் உரை</button>
-            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'kalaignar'" (click)="setMeaningTab(kural, 'kalaignar')">கலைஞர் உரை</button>
-            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'en'" (click)="setMeaningTab(kural, 'en')">English</button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'mu_va'" (click)="setMeaningTab(kural, 'mu_va')">
+              {{ getCurrentLanguage() === 'en' ? 'M. Varadarajan' : 'மு.வ உரை' }}
+            </button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'salamon'" (click)="setMeaningTab(kural, 'salamon')">
+              {{ getCurrentLanguage() === 'en' ? 'S. Pappaiah' : 'சாலமன் உரை' }}
+            </button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'kalaignar'" (click)="setMeaningTab(kural, 'kalaignar')">
+              {{ getCurrentLanguage() === 'en' ? 'M. Karunanidhi' : 'கலைஞர் உரை' }}
+            </button>
+            <button class="tab-btn" [class.active]="kural.activeMeaningTab === 'en'" (click)="setMeaningTab(kural, 'en')">
+              {{ getCurrentLanguage() === 'en' ? 'English' : 'ஆங்கில உரை' }}
+            </button>
           </div>
 
           <div class="meaning-display">

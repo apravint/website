@@ -73,6 +73,17 @@ export class ThirukkuralComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadThirukkuralData();
+    
+    // Synchronize default meaning tabs when user switches language
+    this.translationService.currentLang$.subscribe(lang => {
+      const defaultTab = lang === 'ta' ? 'mu_va' : 'en';
+      if (this.randomKural) {
+        this.randomKural.activeMeaningTab = defaultTab;
+      }
+      this.allKurals.forEach(k => {
+        k.activeMeaningTab = defaultTab;
+      });
+    });
   }
 
   getCurrentLanguage(): string {
