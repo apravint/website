@@ -35,8 +35,8 @@
         </li>
 
         <!-- Literature Dropdown -->
-        <li class="nav-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-dropdown" [class.open]="activeDropdown === 'literature'">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" [attr.aria-expanded]="activeDropdown === 'literature'" (click)="toggleDropdown('literature')">
             📚 {{ 'NAV.LITERATURE' | translate }} <span class="chevron">▼</span>
           </button>
           <ul class="dropdown-menu">
@@ -64,8 +64,8 @@
         </li>
 
         <!-- Media Dropdown -->
-        <li class="nav-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-dropdown" [class.open]="activeDropdown === 'media'">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" [attr.aria-expanded]="activeDropdown === 'media'" (click)="toggleDropdown('media')">
             📺 {{ 'NAV.MEDIA' | translate }} <span class="chevron">▼</span>
           </button>
           <ul class="dropdown-menu">
@@ -98,8 +98,8 @@
         </li>
 
         <!-- Tools & Dev Dropdown -->
-        <li class="nav-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-dropdown" [class.open]="activeDropdown === 'tools'">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" [attr.aria-expanded]="activeDropdown === 'tools'" (click)="toggleDropdown('tools')">
             ⚙️ {{ 'NAV.DEVELOPMENT' | translate }} <span class="chevron">▼</span>
           </button>
           <ul class="dropdown-menu">

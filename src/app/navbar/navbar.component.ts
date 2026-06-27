@@ -48,6 +48,7 @@ export class NavbarComponent implements OnInit {
   menuOpen = false;
   showSettings = false;
   currentLang = 'en';
+  activeDropdown: 'literature' | 'media' | 'tools' | null = null;
 
   colors = [
     { name: 'indigo', value: '#4f46e5' },
@@ -94,10 +95,18 @@ export class NavbarComponent implements OnInit {
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+    if (!this.menuOpen) {
+      this.activeDropdown = null;
+    }
+  }
+
+  toggleDropdown(name: 'literature' | 'media' | 'tools') {
+    this.activeDropdown = this.activeDropdown === name ? null : name;
   }
 
   closeMenu() {
     this.menuOpen = false;
     this.showSettings = false;
+    this.activeDropdown = null;
   }
 }

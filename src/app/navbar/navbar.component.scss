@@ -266,7 +266,7 @@
   position: relative;
   display: inline-block;
 
-  &:hover {
+  &:hover, &.open {
     .dropdown-menu {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
@@ -292,7 +292,8 @@
   }
 }
 
-.nav-dropdown:hover .dropdown-toggle .chevron {
+.nav-dropdown:hover .dropdown-toggle .chevron,
+.nav-dropdown.open .dropdown-toggle .chevron {
   transform: rotate(180deg);
 }
 
@@ -430,25 +431,42 @@
       width: 100%;
       justify-content: center;
       padding: 0.75rem;
-      pointer-events: none; /* Make static header on mobile */
+      pointer-events: auto; /* Enable touch pointer actions on mobile */
       color: var(--text);
       font-weight: 700;
       opacity: 0.9;
       background: rgba(var(--primary-rgb), 0.04);
       border-radius: var(--radius);
       margin-top: 4px;
+      cursor: pointer;
 
       .chevron {
-        display: none; /* Hide chevron on mobile */
+        display: inline-block; /* Show chevron on mobile */
+        transition: transform 0.2s ease;
+      }
+    }
+
+    &.open {
+      .dropdown-toggle {
+        background: rgba(var(--primary-rgb), 0.08);
+        .chevron {
+          transform: rotate(180deg);
+        }
+      }
+      .dropdown-menu {
+        display: flex;
+        opacity: 1;
+        pointer-events: auto;
       }
     }
   }
 
   .dropdown-menu {
+    display: none; /* Collapsible dropdown by default on mobile */
     position: static;
     transform: none;
-    opacity: 1;
-    pointer-events: auto;
+    opacity: 0;
+    pointer-events: none;
     box-shadow: none;
     border: none;
     background: transparent;
