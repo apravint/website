@@ -226,7 +226,16 @@ export class ThirukkuralComponent implements OnInit {
   }
 
   private scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof document !== 'undefined') {
+      const element = document.querySelector('.filters-panel');
+      if (element) {
+        const yOffset = -90; // Account for floating navbar height
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
   }
 
   // Toggle detail visibility
