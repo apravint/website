@@ -20,6 +20,14 @@ export class LegalComponent implements OnInit {
     ) { }
 
     ngOnInit() {
+        // Check route data first
+        const routeDataTab = this.route.snapshot.data['tab'];
+        if (routeDataTab === 'terms' || routeDataTab === 'privacy') {
+            this.activeTab = routeDataTab;
+            this.updateSeo();
+            return;
+        }
+
         // Check query param or route data for initial tab
         this.route.queryParams.subscribe(params => {
             if (params['tab'] === 'terms') {

@@ -366,3 +366,30 @@
     margin: 0;
   }
 }
+
+/* Mobile Layout Overrides to Prevent Number Overlaps */
+@media (max-width: 480px) {
+  .calendar-row {
+    gap: 4px !important;
+  }
+  
+  .weekday-cell {
+    font-size: 0.72rem !important;
+  }
+  
+  .day-cell {
+    padding: 4px !important;
+    
+    .greg-day {
+      top: 3px !important;
+      left: 4px !important;
+      font-size: 0.8rem !important;
+    }
+    
+    .tamil-day {
+      bottom: 3px !important;
+      right: 4px !important;
+      font-size: 0.58rem !important;
+    }
+  }
+}

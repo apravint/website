@@ -8,8 +8,8 @@ export const routes: Routes = [
 	{ path: 'about', component: AboutComponent },
 	{ path: 'legal', component: LegalComponent },
 	// Deep-link support for old URLs
-	{ path: 'privacy', redirectTo: '/legal?tab=privacy', pathMatch: 'full' },
-	{ path: 'terms', redirectTo: '/legal?tab=terms', pathMatch: 'full' },
+	{ path: 'privacy', component: LegalComponent, data: { tab: 'privacy' } },
+	{ path: 'terms', component: LegalComponent, data: { tab: 'terms' } },
 	{
 		path: 'kavithai',
 		loadComponent: () => import('./kavithai/kavithai.component').then(m => m.KavithaiComponent)

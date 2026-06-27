@@ -46,7 +46,7 @@ body {
   --space-6: 4rem;
   --space-7: 5rem;
   --space-8: 6rem;
-  --header-height: 80px;
+  --header-height: 72px;
 
   /* Typography */
   --font-sans: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -194,22 +194,22 @@ body {
   outline-offset: 2px;
 }
 
-/* Floating Glass Navbar (Latest Web Design Trend) */
+/* Top-Docked Cyber-Neon Navbar */
 .navbar {
   position: fixed;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92%;
-  max-width: var(--container);
-  height: 64px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: none;
+  height: 72px;
   background: var(--surface-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(var(--primary-rgb), 0.12);
-  border-radius: 99px;
+  border: none;
+  border-bottom: 1px solid rgba(var(--primary-rgb), 0.15);
+  border-radius: 0;
   z-index: 1000;
-  box-shadow: var(--shadow-md), 0 0 1px 0 rgba(var(--primary-rgb), 0.25);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--primary-rgb), 0.1);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -250,9 +250,9 @@ body {
   }
 }
 
-/* Main content spacing helper to offset floating nav */
+/* Main content spacing helper to offset docked nav */
 main, app-root > div, .page-hero {
-  padding-top: calc(var(--header-height) + 10px);
+  padding-top: var(--header-height);
 }
 
 /* Container */

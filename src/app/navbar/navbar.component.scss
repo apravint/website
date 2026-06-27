@@ -1,27 +1,38 @@
 .navbar {
   position: fixed;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92%;
-  max-width: var(--container);
-  height: 64px;
+  top: 0;
+  left: 0;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  height: 72px;
   background: var(--surface-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(var(--primary-rgb), 0.12);
-  border-radius: 99px;
+  border: none;
+  border-bottom: 1.5px solid rgba(var(--primary-rgb), 0.15);
+  border-radius: 0;
   z-index: 1000;
-  box-shadow: var(--shadow-md), 0 0 1px 0 rgba(var(--primary-rgb), 0.25);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(var(--primary-rgb), 0.12);
   display: flex;
   align-items: center;
   padding: 0 24px;
 
+  /* Glowing Cyber bottom line */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
   @media (max-width: 768px) {
-    top: 10px;
-    width: 95%;
+    height: 60px;
     padding: 0 16px;
-    height: 58px;
   }
 }
 
