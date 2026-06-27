@@ -29,7 +29,7 @@ interface Kural {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './thirukkural.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrls: ['./thirukkural.component.scss']
 })
 export class ThirukkuralComponent implements OnInit {
@@ -251,10 +251,25 @@ export class ThirukkuralComponent implements OnInit {
   // Toggle detail visibility
   toggleKuralMeaning(kural: Kural): void {
     kural.showMeaning = !kural.showMeaning;
+    if (this.randomKural && this.randomKural.number === kural.number) {
+      this.randomKural = { ...this.randomKural, showMeaning: kural.showMeaning };
+    }
   }
 
   // Change tabs inside card
   setMeaningTab(kural: Kural, tab: 'mu_va' | 'salamon' | 'kalaignar' | 'en'): void {
     kural.activeMeaningTab = tab;
+
+    // Update reference for Kural of the Day
+    if (this.randomKural && this.randomKural.number === kural.number) {
+      this.randomKural = { ...this.randomKural, activeMeaningTab: tab };
+    }
+
+    // Update reference in the list to trigger change detection
+    const index = this.filteredKurals.findIndex(k => k.number === kural.number);
+    if (index !== -1) {
+      this.filteredKurals[index] = { ...kural, activeMeaningTab: tab };
+      this.filteredKurals = [...this.filteredKurals];
+    }
   }
 }
