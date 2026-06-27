@@ -15,29 +15,29 @@ body {
   padding: 0;
 }
 
-/* Color system and tokens - UPGRADED TO OBSIDIAN / AURORA GLOW TRENDS */
+/* Color system and tokens - NEO-MIDNIGHT CYBERPUNK THEME */
 :root {
-  /* Palette - Light Mode (Ultra-clean, crisp, sky-tinted) */
-  --bg: #f3f4f6; /* Cool Gray 100 */
+  /* Palette - Light Cyber Mode */
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-glass: rgba(255, 255, 255, 0.75);
+  --surface-glass: rgba(255, 255, 255, 0.8);
   --card: #ffffff;
-  --muted: #6b7280; /* Gray 500 */
-  --accent: #6366f1; /* Indigo 500 */
-  --accent-hover: #4f46e5; /* Indigo 600 */
-  --text: #111827; /* Gray 900 */
-  --border: #e5e7eb; /* Gray 200 */
-  --border-rgb: 229, 231, 235;
-  --focus: 3px solid rgba(99, 102, 241, 0.35);
+  --muted: #64748b;
+  --accent: #0891b2; /* Cyber Teal */
+  --accent-hover: #0e7490;
+  --text: #0f172a;
+  --border: #e2e8f0;
+  --border-rgb: 226, 232, 240;
+  --focus: 3px solid rgba(8, 145, 178, 0.35);
   --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 20px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 25px 45px -10px rgba(99, 102, 241, 0.08), 0 10px 20px -5px rgba(99, 102, 241, 0.04);
-  --shadow-neon: 0 0 15px rgba(99, 102, 241, 0.2);
+  --shadow-lg: 0 25px 45px -10px rgba(8, 145, 178, 0.08), 0 10px 20px -5px rgba(8, 145, 178, 0.04);
+  --shadow-neon: 0 0 15px rgba(8, 145, 178, 0.15);
 
   /* Layout */
   --container: 1240px;
-  --radius: 18px;
-  --radius-lg: 28px;
+  --radius: 20px;
+  --radius-lg: 30px;
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.5rem;
@@ -52,10 +52,10 @@ body {
   --font-sans: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Additional colors */
-  --primary: #6366f1;
-  --primary-rgb: 99, 102, 241;
-  --secondary: #a855f7;
-  --secondary-rgb: 168, 85, 247;
+  --primary: #0891b2;
+  --primary-rgb: 8, 145, 178;
+  --secondary: #7c3aed; /* Violet */
+  --secondary-rgb: 124, 58, 237;
   --surface-rgb: 255, 255, 255;
   --rose: #f43f5e;
 }
@@ -63,107 +63,111 @@ body {
 /* Obsidian Dark Mode (Deep space obsidian black, neon accents) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --bg: #05070f; /* Deep Space Obsidian */
-    --surface: #0b0f19;
-    --surface-glass: rgba(11, 15, 25, 0.7);
-    --card: #0b0f19;
-    --muted: #9ca3af; /* Gray 400 */
-    --accent: #818cf8; /* Indigo 400 */
-    --accent-hover: #6366f1; /* Indigo 500 */
-    --text: #f9fafb; /* Gray 50 */
-    --border: #1f2937; /* Gray 800 */
-    --border-rgb: 31, 41, 55;
-    --primary: #818cf8;
-    --primary-rgb: 129, 140, 248;
-    --secondary: #c084fc;
-    --secondary-rgb: 192, 132, 252;
-    --surface-rgb: 11, 15, 25;
+    --bg: #030712; /* Deep Obsidian Black */
+    --surface: #090d16; /* Cyber Dark Slate */
+    --surface-glass: rgba(9, 13, 22, 0.72);
+    --card: #090d16;
+    --muted: #94a3b8;
+    --accent: #06b6d4; /* Electric Cyan */
+    --accent-hover: #22d3ee;
+    --text: #f8fafc;
+    --border: #1e293b;
+    --border-rgb: 30, 41, 59;
+    --primary: #06b6d4;
+    --primary-rgb: 6, 182, 212;
+    --secondary: #a78bfa; /* Violet Glow */
+    --secondary-rgb: 167, 139, 250;
+    --surface-rgb: 9, 13, 22;
     --rose: #fb7185;
-    --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 2px 8px -2px rgba(6, 182, 212, 0.1);
     --shadow-md: 0 10px 25px -10px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 10px 25px -10px rgba(129, 140, 248, 0.05);
-    --shadow-neon: 0 0 25px rgba(129, 140, 248, 0.15);
+    --shadow-lg: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 10px 25px -10px rgba(6, 182, 212, 0.05);
+    --shadow-neon: 0 0 25px rgba(6, 182, 212, 0.18);
   }
 }
 
 /* Explicit Dark Theme Switch Override */
 :root[data-theme="dark"] {
-  --bg: #05070f;
-  --surface: #0b0f19;
-  --surface-glass: rgba(11, 15, 25, 0.7);
-  --card: #0b0f19;
-  --muted: #9ca3af;
-  --accent: #818cf8;
-  --accent-hover: #6366f1;
-  --text: #f9fafb;
-  --border: #1f2937;
-  --border-rgb: 31, 41, 55;
-  --primary: #818cf8;
-  --primary-rgb: 129, 140, 248;
-  --secondary: #c084fc;
-  --secondary-rgb: 192, 132, 252;
-  --surface-rgb: 11, 15, 25;
+  --bg: #030712;
+  --surface: #090d16;
+  --surface-glass: rgba(9, 13, 22, 0.72);
+  --card: #090d16;
+  --muted: #94a3b8;
+  --accent: #06b6d4;
+  --accent-hover: #22d3ee;
+  --text: #f8fafc;
+  --border: #1e293b;
+  --border-rgb: 30, 41, 59;
+  --primary: #06b6d4;
+  --primary-rgb: 6, 182, 212;
+  --secondary: #a78bfa;
+  --secondary-rgb: 167, 139, 250;
+  --surface-rgb: 9, 13, 22;
   --rose: #fb7185;
-  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px -2px rgba(6, 182, 212, 0.1);
   --shadow-md: 0 10px 25px -10px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 10px 25px -10px rgba(129, 140, 248, 0.05);
-  --shadow-neon: 0 0 25px rgba(129, 140, 248, 0.15);
+  --shadow-lg: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 10px 25px -10px rgba(6, 182, 212, 0.05);
+  --shadow-neon: 0 0 25px rgba(6, 182, 212, 0.18);
 }
 
 /* Explicit Light Theme Switch Override */
 :root[data-theme="light"] {
-  --bg: #f3f4f6;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-glass: rgba(255, 255, 255, 0.75);
+  --surface-glass: rgba(255, 255, 255, 0.8);
   --card: #ffffff;
-  --muted: #6b7280;
-  --accent: #6366f1;
-  --accent-hover: #4f46e5;
-  --text: #111827;
-  --border: #e5e7eb;
-  --border-rgb: 229, 231, 235;
-  --primary: #6366f1;
-  --primary-rgb: 99, 102, 241;
-  --secondary: #a855f7;
-  --secondary-rgb: 168, 85, 247;
+  --muted: #64748b;
+  --accent: #0891b2;
+  --accent-hover: #0e7490;
+  --text: #0f172a;
+  --border: #e2e8f0;
+  --border-rgb: 226, 232, 240;
+  --primary: #0891b2;
+  --primary-rgb: 8, 145, 178;
+  --secondary: #7c3aed;
+  --secondary-rgb: 124, 58, 237;
   --surface-rgb: 255, 255, 255;
   --rose: #f43f5e;
   --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 20px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 25px 45px -10px rgba(99, 102, 241, 0.08), 0 10px 20px -5px rgba(99, 102, 241, 0.04);
-  --shadow-neon: 0 0 15px rgba(99, 102, 241, 0.2);
+  --shadow-lg: 0 25px 45px -10px rgba(8, 145, 178, 0.08), 0 10px 20px -5px rgba(8, 145, 178, 0.04);
+  --shadow-neon: 0 0 15px rgba(8, 145, 178, 0.15);
 }
 
-/* Color Themes Swatches */
+/* Color Themes Swatches - Upgraded to Cyberpunk Gradients */
 :root[data-color="emerald"] {
-  --accent: #10b981;
-  --accent-hover: #059669;
+  --accent: #10b981; /* Electric Emerald */
+  --accent-hover: #34d399;
   --primary: #10b981;
   --primary-rgb: 16, 185, 129;
+  --secondary: #3b82f6;
   --radius: 20px;
 }
 
 :root[data-color="rose"] {
-  --accent: #f43f5e;
-  --accent-hover: #e11d48;
-  --primary: #f43f5e;
-  --primary-rgb: 244, 63, 94;
+  --accent: #ec4899; /* Hot Neon Pink */
+  --accent-hover: #f472b6;
+  --primary: #ec4899;
+  --primary-rgb: 236, 72, 153;
+  --secondary: #8b5cf6;
   --radius: 12px;
 }
 
 :root[data-color="amber"] {
-  --accent: #f59e0b;
-  --accent-hover: #d97706;
-  --primary: #f59e0b;
-  --primary-rgb: 245, 158, 11;
+  --accent: #fbbf24; /* Neon Gold Amber */
+  --accent-hover: #fcd34d;
+  --primary: #fbbf24;
+  --primary-rgb: 251, 191, 36;
+  --secondary: #f43f5e;
   --radius: 14px;
 }
 
 :root[data-color="sky"] {
-  --accent: #0ea5e9;
-  --accent-hover: #0284c7;
+  --accent: #0ea5e9; /* Cyber Sky Blue */
+  --accent-hover: #38bdf8;
   --primary: #0ea5e9;
-  --primary-rgb: 14, 165, 233;
+  --primary-rgb: 14, 165, 227;
+  --secondary: #d946ef;
   --radius: 22px;
 }
 
