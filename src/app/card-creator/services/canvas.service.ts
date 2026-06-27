@@ -443,6 +443,72 @@ export class CanvasService {
         });
     }
 
+    isImageSelected(): boolean {
+        const activeObject = this.canvas?.getActiveObject();
+        return activeObject instanceof fabric.FabricImage;
+    }
+
+    applyFilter(filterType: string, value?: number): void {
+        const canvas = this.getCanvas();
+        if (!canvas) return;
+        const activeObject = canvas.getActiveObject();
+        if (activeObject && activeObject instanceof fabric.FabricImage) {
+            const img = activeObject as fabric.FabricImage;
+            
+            // Remove existing filter of same type
+            if (img.filters) {
+                img.filters = img.filters.filter(f => f.type.toLowerCase() !== filterType.toLowerCase());
+            } else {
+                img.filters = [];
+            }
+
+            if (value !== undefined || filterType === 'grayscale' || filterType === 'sepia' || filterType === 'invert') {
+                let filter: any;
+                const type = filterType.toLowerCase();
+                if (type === 'grayscale') {
+                    filter = new fabric.filters.Grayscale();
+                } else if (type === 'sepia') {
+                    filter = new fabric.filters.Sepia();
+                } else if (type === 'invert') {
+                    filter = new fabric.filters.Invert();
+                } else if (type === 'brightness') {
+                    filter = new fabric.filters.Brightness({ brightness: value ?? 0 });
+                } else if (type === 'contrast') {
+                    filter = new fabric.filters.Contrast({ contrast: value ?? 0 });
+                } else if (type === 'blur') {
+                    filter = new fabric.filters.Blur({ blur: value ?? 0 });
+                }
+                
+                if (filter) {
+                    img.filters.push(filter);
+                }
+            }
+            
+            img.applyFilters();
+            canvas.renderAll();
+        }
+    }
+
+    setDrawingMode(enabled: boolean): void {
+        if (this.canvas) {
+            this.canvas.isDrawingMode = enabled;
+            if (enabled && !this.canvas.freeDrawingBrush) {
+                this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
+            }
+        }
+    }
+
+    setDrawingBrush(options: { color?: string; width?: number }): void {
+        if (this.canvas && this.canvas.freeDrawingBrush) {
+            if (options.color) this.canvas.freeDrawingBrush.color = options.color;
+            if (options.width) this.canvas.freeDrawingBrush.width = options.width;
+        }
+    }
+
+    isDrawingMode(): boolean {
+        return this.canvas?.isDrawingMode || false;
+    }
+
     dispose(): void {
         this.canvas?.dispose();
         this.canvas = null;

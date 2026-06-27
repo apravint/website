@@ -66,6 +66,16 @@
                     <span class="tab-icon">📋</span>
                     <span class="tab-label">Templates</span>
                 </button>
+                <button class="tab-btn" [class.active]="activePanel() === 'shapes'"
+                    (click)="setActivePanel('shapes')" title="Shapes">
+                    <span class="tab-icon">⬡</span>
+                    <span class="tab-label">Shapes</span>
+                </button>
+                <button class="tab-btn" [class.active]="activePanel() === 'draw'"
+                    (click)="setActivePanel('draw')" title="Draw">
+                    <span class="tab-icon">🖌️</span>
+                    <span class="tab-label">Draw</span>
+                </button>
             </nav>
 
             <div class="panel-content" *ngIf="activePanel()">
@@ -272,6 +282,55 @@
                         <input type="file" accept="image/*" (change)="onImageUpload($event)" hidden>
                     </label>
                     <p class="hint">Supports PNG, JPG, GIF, WebP</p>
+
+                    <!-- Image Filters (shown when image is selected) -->
+                    <div class="image-filters-controls" *ngIf="canvasService.isImageSelected()">
+                        <h4 class="mt-4" style="margin-top: 20px;">Image Filters</h4>
+                        
+                        <!-- Presets (Grayscale / Sepia / Invert) -->
+                        <div class="form-group">
+                            <label>Filter Presets</label>
+                            <div class="filter-toggles" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="filter-toggle-btn" [class.active]="grayscaleActive()" (click)="toggleGrayscale()" style="flex: 1; padding: 6px; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; color: #fff; cursor: pointer;">
+                                    Grayscale
+                                </button>
+                                <button class="filter-toggle-btn" [class.active]="sepiaActive()" (click)="toggleSepia()" style="flex: 1; padding: 6px; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; color: #fff; cursor: pointer;">
+                                    Sepia
+                                </button>
+                                <button class="filter-toggle-btn" [class.active]="invertActive()" (click)="toggleInvert()" style="flex: 1; padding: 6px; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; color: #fff; cursor: pointer;">
+                                    Invert
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Adjustments (Brightness, Contrast, Blur) -->
+                        <div class="form-group" style="margin-top: 12px;">
+                            <label>Brightness</label>
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="range" min="-0.8" max="0.8" step="0.05" [ngModel]="brightnessValue()"
+                                    (ngModelChange)="applyImageFilter('brightness', $event)" style="flex: 1;">
+                                <span class="slider-value" style="font-size: 0.8rem; min-width: 35px;">{{ (brightnessValue() * 100).toFixed(0) }}%</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 12px;">
+                            <label>Contrast</label>
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="range" min="-0.8" max="0.8" step="0.05" [ngModel]="contrastValue()"
+                                    (ngModelChange)="applyImageFilter('contrast', $event)" style="flex: 1;">
+                                <span class="slider-value" style="font-size: 0.8rem; min-width: 35px;">{{ (contrastValue() * 100).toFixed(0) }}%</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 12px;">
+                            <label>Blur</label>
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="range" min="0" max="0.8" step="0.05" [ngModel]="blurValue()"
+                                    (ngModelChange)="applyImageFilter('blur', $event)" style="flex: 1;">
+                                <span class="slider-value" style="font-size: 0.8rem; min-width: 35px;">{{ (blurValue() * 100).toFixed(0) }}%</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Background Panel -->
@@ -301,6 +360,49 @@
                             <span class="template-icon">{{ template.icon }}</span>
                             <span class="template-name">{{ template.name }}</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Shapes Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'shapes'">
+                    <h4>Add Shape</h4>
+                    <div class="shapes-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                        <button *ngFor="let shape of shapeLibrary" class="add-btn" (click)="addShape(shape.id)" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: #fff; transition: background 0.2s;">
+                            <span class="shape-preview" style="font-size: 1.5rem;">{{ shape.icon }}</span>
+                            <span class="shape-label" style="font-size: 0.8rem;">{{ shape.name }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Draw Panel -->
+                <div class="panel-section" *ngIf="activePanel() === 'draw'">
+                    <h4>Free Hand Drawing</h4>
+                    <div class="drawing-status" style="margin-bottom: 15px;">
+                        <span class="badge" [class.active]="isDrawing()" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                            <span class="pulse-dot" *ngIf="isDrawing()" style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite;"></span>
+                            {{ isDrawing() ? 'Drawing Mode Active' : 'Drawing Suspended' }}
+                        </span>
+                    </div>
+
+                    <!-- Brush Size -->
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label>Brush Size</label>
+                        <div class="slider-control" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="range" min="1" max="50" step="1" [ngModel]="drawingWidth()"
+                                (ngModelChange)="setDrawingWidth($event)" style="flex: 1;">
+                            <span class="slider-value" style="font-size: 0.8rem; min-width: 35px;">{{ drawingWidth() }}px</span>
+                        </div>
+                    </div>
+
+                    <!-- Brush Color -->
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label>Brush Color</label>
+                        <div class="color-grid compact" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px;">
+                            <button *ngFor="let color of colors" class="color-btn small"
+                                [style.backgroundColor]="color" [class.active]="drawingColor() === color"
+                                (click)="setDrawingColor(color)" [title]="color" style="width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.2s;">
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

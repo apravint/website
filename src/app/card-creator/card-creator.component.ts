@@ -21,11 +21,24 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
 
     // State
-    readonly activePanel = signal<'text' | 'image' | 'background' | 'templates' | null>('text');
+    readonly activePanel = signal<'text' | 'image' | 'background' | 'templates' | 'shapes' | 'draw' | null>('text');
     readonly showExportModal = signal(false);
     readonly showTemplatesModal = signal(false);
     readonly selectedSizeIndex = signal(0);
     readonly isLoading = signal(false);
+
+    // Free Drawing State
+    readonly isDrawing = signal(false);
+    readonly drawingColor = signal('#4f46e5');
+    readonly drawingWidth = signal(5);
+
+    // Image Filters State
+    readonly brightnessValue = signal(0);
+    readonly contrastValue = signal(0);
+    readonly blurValue = signal(0);
+    readonly grayscaleActive = signal(false);
+    readonly sepiaActive = signal(false);
+    readonly invertActive = signal(false);
 
     // Canvas sizes
     readonly canvasSizes = CANVAS_SIZES;
@@ -514,8 +527,20 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Panel actions
-    setActivePanel(panel: 'text' | 'image' | 'background' | 'templates'): void {
-        this.activePanel.set(this.activePanel() === panel ? null : panel);
+    setActivePanel(panel: 'text' | 'image' | 'background' | 'templates' | 'shapes' | 'draw'): void {
+        const nextPanel = this.activePanel() === panel ? null : panel;
+        this.activePanel.set(nextPanel);
+        
+        // Turn drawing mode on/off depending on panel selected
+        const shouldDraw = nextPanel === 'draw';
+        this.isDrawing.set(shouldDraw);
+        this.canvasService.setDrawingMode(shouldDraw);
+        if (shouldDraw) {
+            this.canvasService.setDrawingBrush({
+                color: this.drawingColor(),
+                width: this.drawingWidth()
+            });
+        }
     }
 
     // Canvas size
@@ -1201,5 +1226,52 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
             this.canvasService.clear();
             this.saveHistory();
         }
+    }
+
+    // Shapes actions
+    addShape(type: any): void {
+        this.canvasService.addShape(type);
+        this.saveHistory();
+    }
+
+    // Free Drawing actions
+    setDrawingColor(color: string): void {
+        this.drawingColor.set(color);
+        this.canvasService.setDrawingBrush({ color });
+    }
+
+    setDrawingWidth(width: number): void {
+        this.drawingWidth.set(width);
+        this.canvasService.setDrawingBrush({ width });
+    }
+
+    // Image filter actions
+    applyImageFilter(filterType: string, value?: number): void {
+        if (filterType === 'brightness' && value !== undefined) this.brightnessValue.set(value);
+        if (filterType === 'contrast' && value !== undefined) this.contrastValue.set(value);
+        if (filterType === 'blur' && value !== undefined) this.blurValue.set(value);
+        this.canvasService.applyFilter(filterType, value);
+        this.saveHistory();
+    }
+
+    toggleGrayscale(): void {
+        const next = !this.grayscaleActive();
+        this.grayscaleActive.set(next);
+        this.canvasService.applyFilter('grayscale', next ? 1 : undefined);
+        this.saveHistory();
+    }
+
+    toggleSepia(): void {
+        const next = !this.sepiaActive();
+        this.sepiaActive.set(next);
+        this.canvasService.applyFilter('sepia', next ? 1 : undefined);
+        this.saveHistory();
+    }
+
+    toggleInvert(): void {
+        const next = !this.invertActive();
+        this.invertActive.set(next);
+        this.canvasService.applyFilter('invert', next ? 1 : undefined);
+        this.saveHistory();
     }
 }
