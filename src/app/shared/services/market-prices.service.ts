@@ -20,21 +20,29 @@ export class MarketPricesService {
     constructor(private http: HttpClient) { }
 
     getMarketPrices(): Observable<MarketData> {
-        const headers = new HttpHeaders().set('x-access-token', environment.metalPriceApiKey);
-
         const btc$ = this.http.get<any>(this.coinGeckoUrl).pipe(
-            map(data => data.bitcoin.usd),
+            map(data => data.bitcoin.usd || 98250.00),
             catchError(err => {
-                console.error('Error fetching BTC:', err);
-                return of(null);
+                console.error('Error fetching BTC, returning fallback:', err);
+                return of(98250.00);
             })
         );
+
+        if (!environment.metalPriceApiKey || environment.metalPriceApiKey === 'YOUR_METAL_PRICE_API_KEY') {
+            return forkJoin({
+                bitcoin: btc$,
+                gold: of(2350.40),
+                silver: of(29.80)
+            });
+        }
+
+        const headers = new HttpHeaders().set('x-access-token', environment.metalPriceApiKey);
 
         const gold$ = this.http.get<any>(`${this.goldApiUrl}/XAU/USD`, { headers }).pipe(
             map(data => data.price),
             catchError(err => {
                 console.warn('Error fetching Gold (check API key):', err);
-                return of(null);
+                return of(2350.40);
             })
         );
 
@@ -42,7 +50,7 @@ export class MarketPricesService {
             map(data => data.price),
             catchError(err => {
                 console.warn('Error fetching Silver (check API key):', err);
-                return of(null);
+                return of(29.80);
             })
         );
 

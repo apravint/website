@@ -16,13 +16,11 @@ export const routes: Routes = [
 	},
 	{
 		path: 'ai-assistant',
-		redirectTo: '/kavithai',
-		pathMatch: 'full'
+		loadComponent: () => import('./ai-assistant/ai-assistant.component').then(m => m.AiAssistantComponent)
 	},
 	{
 		path: 'market',
-		redirectTo: '/news',
-		pathMatch: 'full'
+		loadComponent: () => import('./market-prices/market-prices.component').then(m => m.MarketPricesComponent)
 	},
 	{
 		path: 'news',

@@ -201,6 +201,22 @@ export class AiAssistantComponent {
     this.isLoading = true;
     this.cdr.detectChanges();
 
+    if (!environment.geminiApiKey || environment.geminiApiKey === 'YOUR_GEMINI_API_KEY') {
+      setTimeout(() => {
+        let mockResponse = 'மன்னிக்கவும், Gemini API சாவி (API Key) இன்னும் கட்டமைக்கப்படவில்லை. ';
+        mockResponse += 'கட்டமைத்த பின் இந்த கவிதை உதவியாளர் உங்களுக்கு சிறப்பாக உதவ முடியும்!\n\n';
+        mockResponse += 'இங்கே ஒரு மாதிரி கவிதை:\n';
+        mockResponse += 'அறிவை வளர்க்கும் கணினியே,\n';
+        mockResponse += 'அன்பைப் பெருக்கும் தமிழ்மொழியே!\n';
+        mockResponse += 'இணைந்து இயங்கும் உலகினில்,\n';
+        mockResponse += 'இன்பம் தருவதே எமது கவியே!';
+        this.messages.push({ role: 'ai', text: mockResponse });
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }, 1000);
+      return;
+    }
+
     try {
       const prompt = `You are a legendary Tamil poet. 
       The user wants: "${userText}". 
