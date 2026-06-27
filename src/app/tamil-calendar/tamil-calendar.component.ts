@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
-import { TranslatePipe } from '../shared/translate.pipe';
 
 interface TamilMonthInfo {
   nameEn: string;
@@ -55,7 +54,7 @@ interface Festival {
 @Component({
   selector: 'app-tamil-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule],
   templateUrl: './tamil-calendar.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tamil-calendar.component.scss']

@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
-import { TranslatePipe } from '../shared/translate.pipe';
 
 interface KuralMeaning {
   ta_mu_va: string;
@@ -28,7 +27,7 @@ interface Kural {
 @Component({
   selector: 'app-thirukkural',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './thirukkural.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./thirukkural.component.scss']
