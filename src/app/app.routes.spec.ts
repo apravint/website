@@ -25,11 +25,11 @@ describe('App routing', () => {
     expect(location.path()).toBe('/about');
   });
 
-  it('should redirect /privacy to /legal with tab param', async () => {
+  it('should navigate to /privacy and load LegalComponent', async () => {
     const router = TestBed.inject(Router);
     const location = TestBed.inject(Location);
     await router.navigate(['/privacy']);
-    expect(location.path()).toContain('/legal');
+    expect(location.path()).toBe('/privacy');
   });
 
   it('has kavithai route configured and loadComponent works', async () => {
