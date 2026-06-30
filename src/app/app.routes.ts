@@ -8,7 +8,14 @@ export const routes: Routes = [
 	{ path: 'about', component: AboutComponent },
 	{ path: 'legal', component: LegalComponent },
 	// Deep-link support for old URLs
-	{ path: 'privacy', component: LegalComponent, data: { tab: 'privacy' } },
+	{
+		path: 'privacy',
+		loadComponent: () => import('./privacy/privacy.component').then(m => m.PrivacyComponent)
+	},
+	{
+		path: 'security',
+		loadComponent: () => import('./security/security.component').then(m => m.SecurityComponent)
+	},
 	{ path: 'terms', component: LegalComponent, data: { tab: 'terms' } },
 	{
 		path: 'kavithai',
