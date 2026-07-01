@@ -11,11 +11,14 @@ fi
 
 # 2. Update the docs directory
 echo "Updating deployment directory (docs/)..."
-# Remove old build files in docs
-rm -rf docs/browser docs/prerendered-routes.json docs/3rdpartylicenses.txt
+# Remove old build files in docs (preserve CNAME if it exists)
+find docs/ -mindepth 1 -not -name "CNAME" -delete
 
-# Copy new build outputs to docs
-cp -r dist/website/* docs/
+# Copy new browser build outputs directly to root of docs
+cp -r dist/website/browser/* docs/
+# Copy auxiliary build files
+cp dist/website/3rdpartylicenses.txt docs/ 2>/dev/null || true
+cp dist/website/prerendered-routes.json docs/ 2>/dev/null || true
 
 echo "=========================================================="
 echo "          Build Completed & Copied to docs/               "
