@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { SeoService } from '../shared/seo.service';
 import { TranslatePipe } from '../shared/translate.pipe';
 import { GitHubService, GitHubStats } from '../shared/services/github.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 import { KavithaiService, Kavithai } from '../kavithai/kavithai.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -35,6 +36,7 @@ interface Skill {
 export class HomeComponent implements OnInit {
   private githubService = inject(GitHubService);
   private injector = inject(Injector);
+  private analytics = inject(AnalyticsService);
 
   today = new Date().toDateString();
   showGreeting = true;
@@ -152,6 +154,7 @@ export class HomeComponent implements OnInit {
     if (this.allPoems && this.allPoems.length > 0) {
       const randomIndex = Math.floor(Math.random() * this.allPoems.length);
       this.featuredPoem = this.allPoems[randomIndex];
+      this.analytics.logCustomEvent('home_featured_poem_cycled', { title: this.featuredPoem?.title || 'Untitled' });
     }
   }
 
@@ -162,5 +165,6 @@ export class HomeComponent implements OnInit {
 
   changeSkillCategory(category: 'all' | 'frontend' | 'backend' | 'devops'): void {
     this.selectedSkillCategory = category;
+    this.analytics.logCustomEvent('home_skills_tab_switched', { category });
   }
 }

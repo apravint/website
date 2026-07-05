@@ -4,16 +4,20 @@ import { HomeComponent } from './home.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TranslationService } from '../shared/translation.service';
 import { KavithaiService } from '../kavithai/kavithai.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 import { of } from 'rxjs';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
+  let analyticsSpy: jasmine.SpyObj<AnalyticsService>;
 
   beforeEach(async () => {
+    analyticsSpy = jasmine.createSpyObj('AnalyticsService', ['logCustomEvent']);
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule, HomeComponent],
       providers: [
+        { provide: AnalyticsService, useValue: analyticsSpy },
         {
           provide: TranslationService, useValue: {
             translate: (k: string) => {

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { environment } from '../../environments/environment';
 import { SeoService } from '../shared/seo.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 @Component({
   selector: 'app-ai-assistant',
@@ -184,7 +185,11 @@ export class AiAssistantComponent {
   private genAI = new GoogleGenerativeAI(environment.geminiApiKey);
   private model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  constructor(private cdr: ChangeDetectorRef, private seo: SeoService) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private seo: SeoService,
+    private analytics: AnalyticsService
+  ) {
     this.seo.updateMetaTags({
       title: 'AI Kavithai Assistant - Tamil Poetry Generator',
       description: 'Ask our AI poet to write or explain a Tamil kavithai for you. Generate beautiful Tamil poetry with help from AI.',
@@ -196,6 +201,8 @@ export class AiAssistantComponent {
     if (!this.userInput.trim() || this.isLoading) return;
 
     const userText = this.userInput;
+    this.analytics.logCustomEvent('ai_poem_requested', { prompt: userText });
+    
     this.messages.push({ role: 'user', text: userText });
     this.userInput = '';
     this.isLoading = true;
