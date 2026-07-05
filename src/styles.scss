@@ -543,3 +543,13 @@ a,
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* App Preview Mode (Hides Header/Footer inside Simulator) */
+body.app-preview-mode {
+  app-navbar, .navbar, app-footer, .site-footer, app-back-to-top {
+    display: none !important;
+  }
+  main, app-root > div, .page-hero {
+    padding-top: 0 !important;
+  }
+}

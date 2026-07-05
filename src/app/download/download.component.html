@@ -1,14 +1,13 @@
 <section class="animate-fade-in">
     <div class="page-hero">
         <div class="bg-glow"></div>
-        <div class="container hero-content">
-            <div class="app-showcase">
-                <div class="app-icon-wrapper">
-                    <span class="app-icon">📱</span>
-                </div>
-            </div>
-
+        <div class="container hero-grid">
+            <!-- Left Column: App Description & CTA -->
             <div class="hero-text">
+                <div class="app-icon-badge animate-fade-in">
+                    <span class="badge-icon">📱</span>
+                    <span class="badge-text">Interactive Live Demo</span>
+                </div>
                 <h1><span class="text-gradient">{{ 'DOWNLOAD.TITLE' | translate }}</span></h1>
                 <p class="lead">{{ 'DOWNLOAD.DESC' | translate }}</p>
 
@@ -34,6 +33,32 @@
                             X (Twitter)
                         </a>
                     </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Android Device Frame Simulator -->
+            <div class="phone-simulator-container animate-fade-in delay-200">
+                <div class="smartphone-frame">
+                    <!-- Dynamic Notch / Camera -->
+                    <div class="camera-notch"></div>
+                    <!-- Bezel highlight sheen -->
+                    <div class="screen-sheen"></div>
+                    
+                    <!-- Status Bar -->
+                    <div class="sim-status-bar">
+                        <span class="sim-time">{{ simTime }}</span>
+                        <div class="sim-icons">
+                            <span class="icon">📶</span>
+                            <span class="icon">📶</span>
+                            <span class="icon">🔋 100%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- App Frame Iframe -->
+                    <iframe src="/?preview=true" class="simulator-iframe" title="App Interactive Live Preview"></iframe>
+                    
+                    <!-- Bottom Home Indicator Bar -->
+                    <div class="home-indicator"></div>
                 </div>
             </div>
         </div>
