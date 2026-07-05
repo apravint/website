@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { SeoService } from '../shared/seo.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 interface TeamStats {
   name: string;
@@ -46,6 +47,7 @@ interface Match {
 export class WorldCupComponent implements OnInit {
   private http = inject(HttpClient);
   private seo = inject(SeoService);
+  private analytics = inject(AnalyticsService);
 
   activeTab: 'standings' | 'matches' | 'news' = 'standings';
   searchQuery = '';
@@ -190,6 +192,12 @@ export class WorldCupComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchWorldCupNews();
+  }
+
+  selectTab(tab: 'standings' | 'matches' | 'news'): void {
+    this.activeTab = tab;
+    this.searchQuery = '';
+    this.analytics.logCustomEvent('world_cup_tab_switched', { tab });
   }
 
   // Google News search via rss2json

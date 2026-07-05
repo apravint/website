@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 import { TranslatePipe } from '../shared/translate.pipe';
 
 interface Wallpaper {
@@ -27,6 +28,7 @@ export class WallpapersComponent implements OnInit {
   private http = inject(HttpClient);
   private seo = inject(SeoService);
   public translationService = inject(TranslationService);
+  private analytics = inject(AnalyticsService);
   isNativeShareSupported = typeof navigator !== 'undefined' && !!navigator.share;
 
   // Curated High-Quality Portrait Wallpapers (Direct keyless Unsplash CDN urls, mobile optimized)
@@ -154,6 +156,7 @@ export class WallpapersComponent implements OnInit {
   selectCategory(category: string): void {
     this.activeCategory = category;
     this.searchQuery = '';
+    this.analytics.logCustomEvent('wallpaper_category_changed', { category });
     
     if (category === 'All') {
       this.wallpapersList = [...this.curatedWallpapers];
@@ -232,6 +235,11 @@ export class WallpapersComponent implements OnInit {
   // Download high-resolution photo in new tab
   downloadWallpaper(wallpaper: Wallpaper): void {
     window.open(wallpaper.url, '_blank');
+    this.analytics.logCustomEvent('wallpaper_downloaded', {
+      title: wallpaper.title,
+      category: wallpaper.category,
+      photographer: wallpaper.photographer
+    });
   }
 
   // Native share wallpaper link and description
@@ -241,6 +249,11 @@ export class WallpapersComponent implements OnInit {
         title: wallpaper.title,
         text: `Check out this high quality mobile background: "${wallpaper.title}" by ${wallpaper.photographer}!`,
         url: wallpaper.url
+      }).then(() => {
+        this.analytics.logCustomEvent('wallpaper_shared', {
+          title: wallpaper.title,
+          category: wallpaper.category
+        });
       }).catch(err => console.log('Sharing failed:', err));
     }
   }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 interface TamilMonthInfo {
   nameEn: string;
@@ -62,6 +63,7 @@ interface Festival {
 export class TamilCalendarComponent implements OnInit {
   private seo = inject(SeoService);
   public translationService = inject(TranslationService);
+  private analytics = inject(AnalyticsService);
 
   // Current Calendar Focus
   currentYear: number = 2026; // Default to simulation year
@@ -344,6 +346,11 @@ export class TamilCalendarComponent implements OnInit {
     } else {
       this.currentMonth--;
     }
+    this.analytics.logCustomEvent('calendar_month_changed', {
+      year: this.currentYear,
+      month: this.currentMonth,
+      direction: 'prev'
+    });
     this.buildCalendar();
   }
 
@@ -354,12 +361,20 @@ export class TamilCalendarComponent implements OnInit {
     } else {
       this.currentMonth++;
     }
+    this.analytics.logCustomEvent('calendar_month_changed', {
+      year: this.currentYear,
+      month: this.currentMonth,
+      direction: 'next'
+    });
     this.buildCalendar();
   }
 
   selectCell(cell: CalendarCell): void {
     if (cell.date) {
       this.selectedDate = cell.date;
+      this.analytics.logCustomEvent('calendar_date_selected', {
+        date: cell.date.toISOString()
+      });
       
       // Update selected states inside weeks structure
       this.weeks.forEach(w => w.forEach(c => {

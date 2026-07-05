@@ -13,9 +13,9 @@
     <!-- Search and Filter Bar -->
     <div class="control-bar glass-card">
       <div class="tabs-navigation">
-        <button class="tab-btn" [class.active]="activeTab === 'standings'" (click)="activeTab = 'standings'; searchQuery = ''">📊 Standings</button>
-        <button class="tab-btn" [class.active]="activeTab === 'matches'" (click)="activeTab = 'matches'; searchQuery = ''">📅 Matches</button>
-        <button class="tab-btn" [class.active]="activeTab === 'news'" (click)="activeTab = 'news'; searchQuery = ''">📰 Latest News</button>
+        <button class="tab-btn" [class.active]="activeTab === 'standings'" (click)="selectTab('standings')">📊 Standings</button>
+        <button class="tab-btn" [class.active]="activeTab === 'matches'" (click)="selectTab('matches')">📅 Matches</button>
+        <button class="tab-btn" [class.active]="activeTab === 'news'" (click)="selectTab('news')">📰 Latest News</button>
       </div>
 
       <div class="search-box" *ngIf="activeTab !== 'news'">

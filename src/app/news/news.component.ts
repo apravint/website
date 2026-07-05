@@ -8,6 +8,7 @@ import { TranslatePipe } from '../shared/translate.pipe';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 @Component({
   selector: 'app-news',
@@ -645,7 +646,8 @@ export class NewsComponent implements OnInit {
     private marketService: MarketPricesService,
     private stockService: StockService,
     private seo: SeoService,
-    private translation: TranslationService
+    private translation: TranslationService,
+    private analytics: AnalyticsService
   ) { }
 
   ngOnInit() {
@@ -664,6 +666,7 @@ export class NewsComponent implements OnInit {
 
   selectCategory(category: string) {
     this.selectedCategory = category;
+    this.analytics.logCustomEvent('news_category_changed', { category });
     this.loadNews();
   }
 

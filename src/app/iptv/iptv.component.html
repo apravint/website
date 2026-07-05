@@ -139,7 +139,7 @@
             class="search-input"
           />
           
-          <select [(ngModel)]="selectedCategory" class="category-select">
+          <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="category-select">
             <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
           </select>
         </div>

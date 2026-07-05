@@ -231,6 +231,10 @@ export class IptvComponent implements OnInit, OnDestroy {
     });
   }
 
+  onCategoryChange(): void {
+    this.analytics.logCustomEvent('iptv_category_changed', { category: this.selectedCategory });
+  }
+
   // Play a channel
   playChannel(channel: IPTVChannel): void {
     this.currentChannel = channel;
