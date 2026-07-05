@@ -16,6 +16,8 @@ find docs/ -mindepth 1 -not -name "CNAME" -delete
 
 # Copy new browser build outputs directly to root of docs
 cp -r dist/website/browser/* docs/
+# Copy CNAME custom domain file
+cp CNAME docs/CNAME 2>/dev/null || true
 # Copy auxiliary build files
 cp dist/website/3rdpartylicenses.txt docs/ 2>/dev/null || true
 cp dist/website/prerendered-routes.json docs/ 2>/dev/null || true
