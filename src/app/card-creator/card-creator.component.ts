@@ -6,6 +6,7 @@ import { CanvasService } from './services/canvas.service';
 import { HistoryService } from './services/history.service';
 import { ExportService, ExportOptions } from './services/export.service';
 import { CANVAS_SIZES } from './models/canvas-element.model';
+import { AnalyticsService } from '../shared/services/analytics.service';
 import * as fabric from 'fabric';
 
 @Component({
@@ -415,7 +416,8 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
         public canvasService: CanvasService,
         public historyService: HistoryService,
         private exportService: ExportService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private analytics: AnalyticsService
     ) { }
 
     ngOnInit(): void {
@@ -930,6 +932,10 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
                 };
                 await this.exportService.downloadImage(canvas, filename, options);
             }
+            this.analytics.logCustomEvent('card_exported', {
+                format: this.exportFormat(),
+                quality: this.exportQuality()
+            });
             this.closeExportModal();
         } catch (error) {
             console.error('Export failed:', error);
@@ -968,6 +974,10 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 await this.exportService.downloadImage(canvas, filename, options);
             }
+            this.analytics.logCustomEvent('card_shared', {
+                format: this.exportFormat(),
+                quality: this.exportQuality()
+            });
             this.closeExportModal();
         } catch (error) {
             console.error('Sharing failed:', error);
@@ -978,6 +988,7 @@ export class CardCreatorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Templates
     applyTemplate(templateId: string): void {
+        this.analytics.logCustomEvent('card_template_applied', { template_id: templateId });
         this.canvasService.clear();
 
         switch (templateId) {

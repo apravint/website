@@ -10,6 +10,7 @@ import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SeoService } from '../shared/seo.service';
 import { FavoritesService } from '../shared/services/favorites.service';
 import { ShareService } from '../shared/services/share.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { environment } from '../../environments/environment';
 
@@ -26,6 +27,7 @@ export class KavithaiComponent implements OnInit {
     private seo = inject(SeoService);
     private favoritesService = inject(FavoritesService);
     private shareService = inject(ShareService);
+    private analytics = inject(AnalyticsService);
     private cdr = inject(ChangeDetectorRef);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
@@ -122,25 +124,30 @@ export class KavithaiComponent implements OnInit {
     shareToTwitter(poem: any): void {
         const text = this.formatPoemForShare(poem);
         this.shareService.shareToTwitter(text, 'https://pravintamilan.com/kavithai');
+        this.analytics.logCustomEvent('poem_shared', { platform: 'twitter', title: poem.title || 'Untitled' });
     }
 
     nativeShare(poem: any): void {
         const text = this.formatPoemForShare(poem);
         this.shareService.nativeShare(poem.title || 'Tamil Kavithai', text, 'https://pravintamilan.com/kavithai');
+        this.analytics.logCustomEvent('poem_shared', { platform: 'native', title: poem.title || 'Untitled' });
     }
 
     designCard(poem: any): void {
         const text = this.formatPoemForShare(poem);
         this.router.navigate(['/create'], { queryParams: { text } });
+        this.analytics.logCustomEvent('poem_shared', { platform: 'design_card', title: poem.title || 'Untitled' });
     }
 
     designCardFromText(text: string): void {
         this.router.navigate(['/create'], { queryParams: { text } });
+        this.analytics.logCustomEvent('poem_shared', { platform: 'design_card_from_text' });
     }
 
     shareToWhatsApp(poem: any): void {
         const text = this.formatPoemForShare(poem) + '\n\n📖 https://pravintamilan.com/kavithai';
         this.shareService.shareToWhatsApp(text);
+        this.analytics.logCustomEvent('poem_shared', { platform: 'whatsapp', title: poem.title || 'Untitled' });
     }
 
     async copyPoem(poem: any): Promise<void> {
@@ -148,6 +155,7 @@ export class KavithaiComponent implements OnInit {
         const success = await this.shareService.copyToClipboard(text);
         if (success) {
             this.copiedId = this.getPoemId(poem);
+            this.analytics.logCustomEvent('poem_shared', { platform: 'copy', title: poem.title || 'Untitled' });
             setTimeout(() => {
                 this.copiedId = null;
             }, 2000);

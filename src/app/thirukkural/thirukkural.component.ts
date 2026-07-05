@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 interface KuralMeaning {
   ta_mu_va: string;
@@ -36,6 +37,7 @@ export class ThirukkuralComponent implements OnInit {
   private http = inject(HttpClient);
   private seo = inject(SeoService);
   public translationService = inject(TranslationService);
+  private analytics = inject(AnalyticsService);
 
   // Raw and Filtered Kurals
   allKurals: Kural[] = [];
@@ -251,23 +253,33 @@ export class ThirukkuralComponent implements OnInit {
   // Toggle detail visibility
   toggleKuralMeaning(kural: Kural): void {
     kural.showMeaning = !kural.showMeaning;
-    if (this.randomKural && this.randomKural.number === kural.number) {
+    if (kural.number === this.randomKural?.number) {
       this.randomKural = { ...this.randomKural, showMeaning: kural.showMeaning };
+    }
+    if (kural.showMeaning) {
+      this.analytics.logCustomEvent('kural_meaning_viewed', {
+        kural_number: kural.number,
+        chapter: kural.chapter,
+        section: kural.section
+      });
     }
   }
 
   // Change tabs inside card
   setMeaningTab(kural: Kural, tab: 'mu_va' | 'salamon' | 'kalaignar' | 'en'): void {
     kural.activeMeaningTab = tab;
+    
+    this.analytics.logCustomEvent('kural_meaning_tab_switched', {
+      kural_number: kural.number,
+      tab: tab
+    });
 
-    // Update reference for Kural of the Day
-    if (this.randomKural && this.randomKural.number === kural.number) {
+    if (kural.number === this.randomKural?.number) {
       this.randomKural = { ...this.randomKural, activeMeaningTab: tab };
     }
-
-    // Update reference in the list to trigger change detection
+    
     const index = this.filteredKurals.findIndex(k => k.number === kural.number);
-    if (index !== -1) {
+    if (index > -1) {
       this.filteredKurals[index] = { ...kural, activeMeaningTab: tab };
       this.filteredKurals = [...this.filteredKurals];
     }

@@ -4,17 +4,21 @@ import { of, throwError } from 'rxjs';
 import { KavithaiService } from './kavithai.service';
 import { SeoService } from '../shared/seo.service';
 import { ActivatedRoute } from '@angular/router';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 describe('KavithaiComponent', () => {
   let seoSpy: jasmine.SpyObj<SeoService>;
+  let analyticsSpy: jasmine.SpyObj<AnalyticsService>;
 
   beforeEach(async () => {
     seoSpy = jasmine.createSpyObj('SeoService', ['updateMetaTags']);
+    analyticsSpy = jasmine.createSpyObj('AnalyticsService', ['logCustomEvent']);
     await TestBed.configureTestingModule({
       imports: [KavithaiComponent],
       providers: [
         { provide: KavithaiService, useValue: { getKavithaigal: () => of([]) } },
         { provide: SeoService, useValue: seoSpy },
+        { provide: AnalyticsService, useValue: analyticsSpy },
         {
           provide: ActivatedRoute,
           useValue: { queryParams: of({}) }

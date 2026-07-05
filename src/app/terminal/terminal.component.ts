@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SeoService } from '../shared/seo.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 interface TerminalLine {
   text: string;
@@ -24,6 +25,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private seo = inject(SeoService);
   private route = inject(ActivatedRoute);
+  private analytics = inject(AnalyticsService);
 
   // Command input field
   command = '';
@@ -213,6 +215,10 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   // Command parser
   private executeCommand(cmd: string, args: string[], rawCmd: string): void {
+    this.analytics.logCustomEvent('cli_command_executed', {
+      command: cmd,
+      args: args.join(' ')
+    });
     switch (cmd) {
       case 'help':
       case '?':

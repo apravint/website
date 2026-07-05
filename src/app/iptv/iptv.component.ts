@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { SeoService } from '../shared/seo.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 interface IPTVChannel {
   name: string;
@@ -25,6 +26,7 @@ export class IptvComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private seo = inject(SeoService);
   private cdr = inject(ChangeDetectorRef);
+  private analytics = inject(AnalyticsService);
 
   // M3U Playlist States
   playlistUrl = '';
@@ -233,6 +235,10 @@ export class IptvComponent implements OnInit, OnDestroy {
   playChannel(channel: IPTVChannel): void {
     this.currentChannel = channel;
     this.isPlaying = true;
+    this.analytics.logCustomEvent('iptv_channel_played', {
+      channel_name: channel.name,
+      category: channel.category
+    });
     this.cdr.detectChanges();
 
     const videoElement = this.videoPlayer.nativeElement;
