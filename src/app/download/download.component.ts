@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TranslatePipe } from '../shared/translate.pipe';
 import { SeoService } from '../shared/seo.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 @Component({
     selector: 'app-download',
@@ -14,7 +15,10 @@ export class DownloadComponent implements OnInit, OnDestroy {
     simTime = '12:00';
     private timeInterval: any;
 
-    constructor(private seo: SeoService) {
+    constructor(
+        private seo: SeoService,
+        private analytics: AnalyticsService
+    ) {
         this.seo.updateMetaTags({
             title: 'Download - Tamil Kavithai App',
             description: 'Get the Tamil Kavithai mobile app on Google Play Store and enjoy daily poems.',
@@ -46,6 +50,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     openPlayStore() {
+        this.analytics.logCustomEvent('download_app_clicked', { platform: 'play_store' });
         window.open(this.playStoreUrl, '_blank');
     }
 }

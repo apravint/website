@@ -1,15 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { DownloadComponent } from './download.component';
 import { SeoService } from '../shared/seo.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 describe('DownloadComponent', () => {
   let seoSpy: jasmine.SpyObj<SeoService>;
+  let analyticsSpy: jasmine.SpyObj<AnalyticsService>;
 
   beforeEach(async () => {
     seoSpy = jasmine.createSpyObj('SeoService', ['updateMetaTags']);
+    analyticsSpy = jasmine.createSpyObj('AnalyticsService', ['logCustomEvent']);
     await TestBed.configureTestingModule({
       imports: [DownloadComponent],
-      providers: [ { provide: SeoService, useValue: seoSpy } ]
+      providers: [
+        { provide: SeoService, useValue: seoSpy },
+        { provide: AnalyticsService, useValue: analyticsSpy }
+      ]
     }).compileComponents();
   });
 
