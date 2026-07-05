@@ -1,11 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import { AnalyticsService } from './shared/services/analytics.service';
 
 describe('AppComponent', () => {
+  let analyticsSpy: jasmine.SpyObj<AnalyticsService>;
+
   beforeEach(async () => {
+    analyticsSpy = jasmine.createSpyObj('AnalyticsService', ['logCustomEvent']);
     await TestBed.configureTestingModule({
       imports: [AppComponent, RouterTestingModule],
+      providers: [
+        { provide: AnalyticsService, useValue: analyticsSpy }
+      ]
     }).compileComponents();
   });
 
