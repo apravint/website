@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslationService } from '../shared/translation.service';
 import { TranslatePipe } from '../shared/translate.pipe';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 export function getPreferredTheme(): 'light' | 'dark' {
   const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
@@ -43,6 +44,7 @@ applyColor(getPreferredColor());
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
+  private analytics = inject(AnalyticsService);
   theme: 'light' | 'dark' = 'light';
   colorTheme: string = 'indigo';
   menuOpen = false;
@@ -73,18 +75,21 @@ export class NavbarComponent implements OnInit {
 
   toggleLanguage() {
     const next = this.currentLang === 'en' ? 'ta' : 'en';
+    this.analytics.logCustomEvent('language_changed', { language: next });
     this.translationService.setLanguage(next);
   }
 
   toggleTheme() {
     const next: 'light' | 'dark' = this.theme === 'dark' ? 'light' : 'dark';
     this.theme = next;
+    this.analytics.logCustomEvent('theme_changed', { theme: next });
     applyTheme(next);
     try { localStorage.setItem('theme', next); } catch { /* ignore */ }
   }
 
   setColorTheme(color: string) {
     this.colorTheme = color;
+    this.analytics.logCustomEvent('color_theme_changed', { color });
     applyColor(color);
     try { localStorage.setItem('color-theme', color); } catch { /* ignore */ }
   }

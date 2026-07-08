@@ -6,6 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
 import { TranslatePipe } from '../shared/translate.pipe';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 interface VideoItem {
   id: string; // YouTube Video ID
@@ -28,6 +29,7 @@ export class VideosComponent implements OnInit {
   private sanitizer = inject(DomSanitizer);
   private seo = inject(SeoService);
   public translationService = inject(TranslationService);
+  private analytics = inject(AnalyticsService);
 
   // Categories list
   categories = ['All', 'Coding', 'Poetry', 'Guides'];
@@ -116,12 +118,18 @@ export class VideosComponent implements OnInit {
 
   selectCategory(category: string): void {
     this.activeCategory = category;
+    this.analytics.logCustomEvent('video_category_changed', { category });
     this.filterVideos();
   }
 
   // Cinema Lightbox modal open
   playVideo(video: VideoItem): void {
     this.selectedVideo = video;
+    this.analytics.logCustomEvent('video_played', {
+      title: video.title,
+      category: video.category,
+      video_id: video.id
+    });
     // Set auto-play to 1 so video starts immediately upon clicking the card thumbnail
     const embedUrl = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`;
     this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
@@ -136,6 +144,7 @@ export class VideosComponent implements OnInit {
   // YouTube API Search
   searchVideos(): void {
     const query = this.searchQuery.trim();
+    this.analytics.logCustomEvent('video_searched', { query });
     if (!query) {
       this.filterVideos();
       return;

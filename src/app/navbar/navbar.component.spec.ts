@@ -4,11 +4,13 @@ import { BehaviorSubject } from 'rxjs';
 
 import { NavbarComponent, getPreferredTheme, getPreferredColor } from './navbar.component';
 import { TranslationService } from '../shared/translation.service';
+import { AnalyticsService } from '../shared/services/analytics.service';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
   let translationSpy: jasmine.SpyObj<TranslationService> & { currentLang$: BehaviorSubject<string> };
+  let analyticsSpy: jasmine.SpyObj<AnalyticsService>;
 
   beforeEach(async () => {
     translationSpy = jasmine.createSpyObj('TranslationService', ['setLanguage', 'translate']) as any;
@@ -16,9 +18,14 @@ describe('NavbarComponent', () => {
     translationSpy.translations$ = new BehaviorSubject<any>({});
     translationSpy.translate.and.callFake((key: string) => key);
 
+    analyticsSpy = jasmine.createSpyObj('AnalyticsService', ['logCustomEvent']);
+
     await TestBed.configureTestingModule({
       imports: [NavbarComponent, RouterTestingModule],
-      providers: [{ provide: TranslationService, useValue: translationSpy }]
+      providers: [
+        { provide: TranslationService, useValue: translationSpy },
+        { provide: AnalyticsService, useValue: analyticsSpy }
+      ]
     })
       .compileComponents();
 

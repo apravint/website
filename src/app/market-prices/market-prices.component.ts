@@ -8,6 +8,7 @@ import { SeoService } from '../shared/seo.service';
 import { TranslationService } from '../shared/translation.service';
 import { AdUnitComponent } from '../shared/ad-unit/ad-unit.component';
 import { SparklineComponent } from '../shared/components/sparkline/sparkline.component';
+import { AnalyticsService } from '../shared/services/analytics.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
@@ -484,7 +485,8 @@ export class MarketPricesComponent implements OnInit {
     private marketService: MarketPricesService,
     private stockService: StockService,
     private seo: SeoService,
-    private translation: TranslationService
+    private translation: TranslationService,
+    private analytics: AnalyticsService
   ) { }
 
   ngOnInit() {
@@ -529,6 +531,11 @@ export class MarketPricesComponent implements OnInit {
   selectStock(result: SearchResult) {
     this.searchResults = [];
     this.searchQuery = result.symbol;
+    this.analytics.logCustomEvent('stock_selected', {
+      symbol: result.symbol,
+      name: result.name,
+      exchange: result.exchange
+    });
     this.stockService.getQuote(result.symbol, result.exchange).subscribe(quote => {
       this.selectedStock = quote || undefined;
     });
@@ -572,6 +579,7 @@ export class MarketPricesComponent implements OnInit {
   }
 
   refreshAll() {
+    this.analytics.logCustomEvent('market_prices_refreshed');
     this.fetchPrices();
     this.fetchIndices();
     if (this.selectedStock) {
