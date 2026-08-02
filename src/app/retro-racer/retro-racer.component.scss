@@ -1,0 +1,265 @@
+.racer-page {
+  min-height: 90vh;
+  background: linear-gradient(135deg, #02040a 0%, #0d0e1c 100%);
+  color: #fff;
+  padding: var(--space-3) 0 var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.racer-header {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  padding: 0 16px;
+
+  h2 {
+    font-size: 1.5rem;
+    color: #ff007f;
+    text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+    margin: 0;
+  }
+}
+
+.back-link {
+  color: #00f0ff;
+  text-decoration: none;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.racer-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 16px;
+}
+
+/* Glassmorphism Stats HUD */
+.hud-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .value {
+    font-size: 1.45rem;
+    font-weight: 800;
+    font-family: monospace;
+    color: #fff;
+  }
+
+  .speed-val {
+    color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    
+    small {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+  }
+}
+
+.lives-container {
+  display: flex;
+  gap: 4px;
+  font-size: 1rem;
+}
+
+/* Canvas & Screen wrapper */
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 2px solid rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.08);
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Start Overlay */
+.start-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.overlay-content {
+  text-align: center;
+
+  .logo-text {
+    font-size: 3rem;
+    color: #00f0ff;
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+    margin-bottom: 20px;
+    letter-spacing: 4px;
+    font-weight: 900;
+  }
+
+  .start-btn {
+    padding: 12px 35px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, #ff007f 0%, #7c3aed 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+/* Mobile HUD touch buttons controls */
+.mobile-controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+  margin-top: 8px;
+
+  @media (min-width: 769px) {
+    display: none; // Hides touch controls on desktop screen
+  }
+}
+
+.steering-group, .action-group {
+  display: flex;
+  gap: 10px;
+}
+
+.ctrl-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background 0.1s, transform 0.1s;
+
+  &:active {
+    transform: scale(0.92);
+    background: rgba(0, 240, 255, 0.2);
+    border-color: #00f0ff;
+  }
+}
+
+.action-go {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  font-size: 1.1rem;
+
+  &:active {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: #34d399;
+  }
+}
+
+.action-stop {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 0.9rem;
+
+  &:active {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: #f87171;
+  }
+}
+
+/* Instructions Banner */
+.instructions-panel {
+  background: rgba(255, 255, 255, 0.01);
+  padding: 15px 20px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  p {
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.4;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      color: #fff;
+    }
+  }
+}

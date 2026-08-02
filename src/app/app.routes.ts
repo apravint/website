@@ -79,5 +79,9 @@ export const routes: Routes = [
 		path: 'linux',
 		loadComponent: () => import('./linux/linux.component').then(m => m.LinuxComponent)
 	},
+	{
+		path: 'racer',
+		loadComponent: () => import('./retro-racer/retro-racer.component').then(m => m.RetroRacerComponent)
+	},
 	{ path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

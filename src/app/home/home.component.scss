@@ -908,6 +908,94 @@
   to { transform: rotate(360deg); }
 }
 
+/* Retro Racer Game Promo Bento */
+.racer-promo-card {
+  background: linear-gradient(135deg, #0f051d 0%, #200424 100%);
+  color: white;
+  border-color: #ff007f;
+  position: relative;
+  overflow: hidden;
+
+  .glow-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 20%, #ff007f 0%, transparent 60%);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .racer-promo-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  h3 {
+    color: white;
+    font-size: 1.25rem;
+    margin: 12px 0 6px;
+    text-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+  }
+
+  .invite-desc {
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .arcade-cabinet {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 0, 127, 0.1);
+    border: 1px solid rgba(255, 0, 127, 0.3);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .arcade-emoji {
+      font-size: 1.35rem;
+      z-index: 2;
+    }
+
+    .neon-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+      border-radius: 12px;
+      animation: pulseGlow 2s infinite alternate;
+    }
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: auto;
+    border-color: rgba(0, 240, 255, 0.4);
+    color: #00f0ff !important;
+    background: rgba(0, 240, 255, 0.03);
+
+    &:hover {
+      background: #00f0ff;
+      color: #02040a !important;
+      border-color: #00f0ff;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }
+  }
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  100% { transform: scale(1.05); opacity: 1; }
+}
+
 /* Responsive details */
 @media (max-width: 1024px) {
   .bento-grid {
