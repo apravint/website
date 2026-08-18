@@ -15,8 +15,9 @@ import CalendarTab from '@/components/CalendarTab';
 import RacerTab from '@/components/RacerTab';
 import AIAssistantTab from '@/components/AIAssistantTab';
 import KavithaiTab from '@/components/KavithaiTab';
+import ThirukkuralTab from '@/components/ThirukkuralTab';
 
-type TabType = 'home' | 'news' | 'market' | 'iptv' | 'calendar' | 'racer' | 'ai' | 'kavithai';
+type TabType = 'home' | 'news' | 'market' | 'iptv' | 'calendar' | 'racer' | 'ai' | 'kavithai' | 'thirukkural';
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -91,6 +92,7 @@ export default function Page() {
     { id: 'racer', label: 'Arcade', icon: Gamepad2 },
     { id: 'ai', label: 'AI Console', icon: MessageSquare },
     { id: 'kavithai', label: 'Kavithai', icon: BookOpen },
+    { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen },
   ];
 
   return (
@@ -213,6 +215,7 @@ export default function Page() {
             {activeTab === 'racer' && <RacerTab />}
             {activeTab === 'ai' && <AIAssistantTab />}
             {activeTab === 'kavithai' && <KavithaiTab />}
+            {activeTab === 'thirukkural' && <ThirukkuralTab />}
           </motion.div>
         </AnimatePresence>
       </main>

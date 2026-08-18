@@ -170,7 +170,7 @@ export default function HomeTab({ onTabChange }: HomeTabProps) {
           <Code className="w-5 h-5 text-cyber-cyan" /> Quick Access Services
         </h3>
         
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
           <button 
             onClick={() => onTabChange('news')}
             className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-cyber-cyan/30 text-center transition-all group"
@@ -192,7 +192,7 @@ export default function HomeTab({ onTabChange }: HomeTabProps) {
             className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-cyber-cyan/30 text-center transition-all group"
           >
             <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📺</div>
-            <span className="text-xs font-bold text-zinc-300 block">IPTV Television</span>
+            <span className="text-xs font-bold text-zinc-300 block">IPTV</span>
           </button>
 
           <button 
@@ -201,6 +201,22 @@ export default function HomeTab({ onTabChange }: HomeTabProps) {
           >
             <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📅</div>
             <span className="text-xs font-bold text-zinc-300 block">Tamil Calendar</span>
+          </button>
+
+          <button 
+            onClick={() => onTabChange('thirukkural')}
+            className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-cyber-cyan/30 text-center transition-all group"
+          >
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📖</div>
+            <span className="text-xs font-bold text-zinc-300 block">Thirukkural</span>
+          </button>
+
+          <button 
+            onClick={() => onTabChange('kavithai')}
+            className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-cyber-cyan/30 text-center transition-all group"
+          >
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">✍️</div>
+            <span className="text-xs font-bold text-zinc-300 block">Kavithai</span>
           </button>
         </div>
       </motion.div>
