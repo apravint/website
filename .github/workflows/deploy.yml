@@ -1,4 +1,4 @@
-name: Deploy Angular to GitHub Pages
+name: Deploy Next.js to GitHub Pages
 
 on:
   push:
@@ -10,38 +10,13 @@ permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Security audit
-        continue-on-error: true
-        run: |
-          echo "::warning::Running npm audit - failures in dev dependencies won't block deployment"
-          npm audit --audit-level=high || echo "::warning::Audit found vulnerabilities. Check if they affect production dependencies."
-
-      - name: Run tests
-        run: npm test -- --watch=false --browsers=ChromeHeadless
-
   build:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -50,59 +25,19 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: 22
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Create environment file
-        env:
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-          FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
-          FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
-          ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          METAL_PRICE_API_KEY: ${{ secrets.METAL_PRICE_API_KEY }}
-          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-        run: |
-          mkdir -p src/environments
-          # Robustly trim newlines and spaces from secrets
-          CLEAN_API_KEY=$(echo "${FIREBASE_API_KEY}" | xargs)
-          CLEAN_SENDER_ID=$(echo "${FIREBASE_SENDER_ID}" | xargs)
-          CLEAN_APP_ID=$(echo "${FIREBASE_APP_ID}" | xargs)
-          CLEAN_MEASUREMENT_ID=$(echo "${FIREBASE_MEASUREMENT_ID}" | xargs)
-          CLEAN_ADSENSE_ID=$(echo "${ADSENSE_CLIENT_ID}" | xargs)
-          CLEAN_GEMINI_KEY=$(echo "${GEMINI_API_KEY}" | xargs)
-          CLEAN_METAL_KEY=$(echo "${METAL_PRICE_API_KEY}" | xargs)
-          CLEAN_NEWS_KEY=$(echo "${NEWS_API_KEY}" | xargs)
-          CLEAN_TWELVE_DATA_KEY=$(echo "${TWELVE_DATA_API_KEY}" | xargs)
-          
-          printf "export const environment = {\n  production: true,\n  firebase: {\n    apiKey: \"%s\",\n    authDomain: \"tamil-kavithai-28d8b.firebaseapp.com\",\n    databaseURL: \"https://tamil-kavithai-28d8b.firebaseio.com\",\n    projectId: \"tamil-kavithai-28d8b\",\n    storageBucket: \"tamil-kavithai-28d8b.firebasestorage.app\",\n    messagingSenderId: \"%s\",\n    appId: \"%s\",\n    measurementId: \"%s\"\n  },\n  adClient: \"%s\",\n  geminiApiKey: \"%s\",\n  metalPriceApiKey: \"%s\",\n  newsApiKey: \"%s\",\n  twelveDataApiKey: \"%s\"\n};\n" \
-          "$CLEAN_API_KEY" "$CLEAN_SENDER_ID" "$CLEAN_APP_ID" "$CLEAN_MEASUREMENT_ID" "$CLEAN_ADSENSE_ID" "$CLEAN_GEMINI_KEY" "$CLEAN_METAL_KEY" "$CLEAN_NEWS_KEY" "$CLEAN_TWELVE_DATA_KEY" > src/environments/environment.prod.ts
-          
-          echo "Verifying file creation..."
-          ls -l src/environments/environment.prod.ts
-          echo "File exists if above line succeeded."
-
-      - name: Replace index.html placeholders
-        env:
-          ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
-        run: |
-          CLEAN_ADSENSE_ID=$(echo "${ADSENSE_CLIENT_ID}" | xargs)
-          sed -i "s/__ADSENSE_CLIENT_ID__/${CLEAN_ADSENSE_ID}/g" src/index.html
-          echo "Replaced AdSense placeholder in index.html"
-
-      - name: Build
-        run: npm run build -- --configuration=production --base-href=/
+      - name: Build Next.js app
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/website/browser
+          path: out
 
   deploy:
     environment:
