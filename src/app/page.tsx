@@ -27,9 +27,20 @@ export default function Page() {
   // Client-side theme bootstrapper
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('pt-theme') as 'light' | 'dark';
+      const savedTheme = (localStorage.getItem('pt-theme') as 'light' | 'dark') || 'dark';
       const savedAccent = localStorage.getItem('pt-accent');
-      if (savedTheme) setTheme(savedTheme);
+      
+      setTheme(savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      if (savedTheme === 'light') {
+        document.body.style.backgroundColor = '#f8fafc';
+        document.body.style.color = '#0f172a';
+      } else {
+        document.body.style.backgroundColor = '#02040a';
+        document.body.style.color = '#f8fafc';
+      }
+      
       if (savedAccent) setAccentColor(savedAccent);
     }
   }, []);
@@ -59,14 +70,13 @@ export default function Page() {
     setTheme(nextTheme);
     localStorage.setItem('pt-theme', nextTheme);
     
-    // Apply body bg classes accordingly
-    const root = document.documentElement;
+    // Set data-theme attribute on root HTML
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    
     if (nextTheme === 'light') {
-      root.style.setProperty('--color-bg-dark', '#f8fafc');
       document.body.style.backgroundColor = '#f8fafc';
       document.body.style.color = '#0f172a';
     } else {
-      root.style.setProperty('--color-bg-dark', '#02040a');
       document.body.style.backgroundColor = '#02040a';
       document.body.style.color = '#f8fafc';
     }
