@@ -11,15 +11,19 @@
     <div class="hud-dashboard glass-card">
       <div class="hud-item">
         <span class="label">SPEED</span>
-        <span class="value speed-val">{{ speed | number:'1.0-0' }} <small>KM/H</small></span>
+        <span class="value speed-val" [class.boost-active]="isNitroActive">
+          {{ speed | number:'1.0-0' }} <small>KM/H</small>
+        </span>
       </div>
       <div class="hud-item">
         <span class="label">SCORE</span>
         <span class="value">{{ score }}</span>
       </div>
       <div class="hud-item">
-        <span class="label">HIGH SCORE</span>
-        <span class="value text-gradient">{{ highScore }}</span>
+        <span class="label">NITRO</span>
+        <div class="nitro-bar-bg">
+          <div class="nitro-bar-fill" [style.width.%]="nitro" [class.active]="isNitroActive"></div>
+        </div>
       </div>
       <div class="hud-item">
         <span class="label">LIVES</span>
@@ -79,6 +83,16 @@
           STOP
         </button>
         <button 
+          class="ctrl-btn action-nitro"
+          [class.empty]="nitro <= 0"
+          (touchstart)="setMobileAction('nitro', true)"
+          (touchend)="setMobileAction('nitro', false)"
+          (mousedown)="setMobileAction('nitro', true)"
+          (mouseup)="setMobileAction('nitro', false)"
+        >
+          BOOST
+        </button>
+        <button 
           class="ctrl-btn action-go"
           (touchstart)="setMobileAction('go', true)"
           (touchend)="setMobileAction('go', false)"
@@ -92,8 +106,8 @@
 
     <!-- Instructions banner -->
     <div class="instructions-panel glass-card">
-      <p>💻 <strong>Desktop controls:</strong> Use keyboard <strong>Arrow Keys</strong> (Up to speed up, Left/Right to steer, Down to brake).</p>
-      <p>📱 <strong>Mobile controls:</strong> Hold <strong>GO!</strong> and steer using left/right arrows at bottom corners.</p>
+      <p>💻 <strong>Desktop controls:</strong> Keyboard <strong>Arrow Keys</strong> (Up to speed up, Left/Right to steer, Down to brake, <strong>Shift Key</strong> to activate Nitro boost).</p>
+      <p>📱 <strong>Mobile controls:</strong> Hold <strong>GO!</strong> and steer using left/right arrows. Hold <strong>BOOST</strong> to accelerate past limits.</p>
     </div>
   </div>
 </div>

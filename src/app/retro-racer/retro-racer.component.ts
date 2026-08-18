@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -36,6 +36,7 @@ interface Car {
   speed: number;
   color: string;
   width: number;
+  driftDirection: number;
 }
 
 interface Segment {
@@ -51,6 +52,24 @@ interface Segment {
     lane?: string;
   };
   sprites: GameSprite[];
+}
+
+interface Star {
+  x: number;
+  y: number;
+  size: number;
+  brightness: number;
+}
+
+interface Particle {
+  x: number;
+  y: number;
+  z: number;
+  vx: number;
+  vy: number;
+  vz: number;
+  color: string;
+  size: number;
 }
 
 @Component({
@@ -78,7 +97,8 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly RUMBLE_LENGTH = 3;
   readonly CAMERA_DEPTH = 0.8; // Perspective factor
   readonly DRAW_DISTANCE = 300;
-  readonly MAX_SPEED = 280; // km/h limit
+  readonly BASE_MAX_SPEED = 280; // km/h limit
+  readonly NITRO_MAX_SPEED = 350; // Boost speed limit
 
   // Road geometry parameters
   segments: Segment[] = [];
@@ -99,6 +119,18 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   keyRight = false;
   keyFaster = false;
   keySlower = false;
+  keyNitro = false;
+
+  // Nitro Mechanic
+  nitro = 100; // 0 to 100 charge
+  isNitroActive = false;
+
+  // Screen shake on crash
+  screenShake = 0;
+
+  // Twinkling Starfield and Speed Particle Lists
+  stars: Star[] = [];
+  particles: Particle[] = [];
 
   // Obstacles and Cars
   cars: Car[] = [];
@@ -115,6 +147,7 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   lives = 3;
   gameState: 'start' | 'playing' | 'crashed' | 'gameover' = 'start';
   crashTimer = 0;
+  lastMilestone = 0;
 
   // Graphics Colors
   colors = {
@@ -137,13 +170,15 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.seo.updateMetaTags({
       title: 'Neon Outrun Racer | Pravin Tamilan Gaming',
-      description: 'Play a retro pseudo-3D motorcycle highway arcade racing game built with pure canvas rendering directly on your phone.',
+      description: 'Play an enhanced pseudo-3D retro highway arcade racing game with scrolling parallax mountain ranges, starfield systems, and audio.',
       url: 'https://pravintamilan.com/racer'
     });
 
     if (typeof window !== 'undefined') {
       this.highScore = Number(localStorage.getItem('racer-highscore') || '0');
     }
+
+    this.initStars();
   }
 
   ngAfterViewInit(): void {
@@ -166,6 +201,109 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     if (this.audioCtx) {
       this.audioCtx.close();
+    }
+  }
+
+  // Generate Twinkling Star Coordinates
+  private initStars(): void {
+    this.stars = [];
+    for (let i = 0; i < 80; i++) {
+      this.stars.push({
+        x: Math.random() * 800,
+        y: Math.random() * 200,
+        size: 0.5 + Math.random() * 1.5,
+        brightness: Math.random()
+      });
+    }
+  }
+
+  // Spawn Speed Spark Particles
+  private spawnSparks(x: number, y: number, z: number, isNitro: boolean): void {
+    const count = isNitro ? 5 : 2;
+    for (let i = 0; i < count; i++) {
+      this.particles.push({
+        x: x + (Math.random() - 0.5) * 100,
+        y: y + (Math.random() - 0.5) * 50,
+        z: z,
+        vx: (Math.random() - 0.5) * 400,
+        vy: -100 - Math.random() * 200,
+        vz: -300 - Math.random() * 400,
+        color: isNitro ? '#00f0ff' : '#fd227c',
+        size: 2 + Math.random() * 3
+      });
+    }
+  }
+
+  // Bind Keyboard Listeners for Desktop Gameplay
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent): void {
+    this.initAudio();
+
+    if (this.gameState === 'start' || this.gameState === 'gameover') {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.startGame();
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'a':
+      case 'A':
+        this.keyLeft = true;
+        break;
+      case 'ArrowRight':
+      case 'd':
+      case 'D':
+        this.keyRight = true;
+        break;
+      case 'ArrowUp':
+      case 'w':
+      case 'W':
+        this.keyFaster = true;
+        break;
+      case 'ArrowDown':
+      case 's':
+      case 'S':
+        this.keySlower = true;
+        break;
+      case 'Shift':
+      case 'x':
+      case 'X':
+        this.keyNitro = true;
+        break;
+    }
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  handleKeyUp(event: KeyboardEvent): void {
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'a':
+      case 'A':
+        this.keyLeft = false;
+        break;
+      case 'ArrowRight':
+      case 'd':
+      case 'D':
+        this.keyRight = false;
+        break;
+      case 'ArrowUp':
+      case 'w':
+      case 'W':
+        this.keyFaster = false;
+        break;
+      case 'ArrowDown':
+      case 's':
+      case 'S':
+        this.keySlower = false;
+        break;
+      case 'Shift':
+      case 'x':
+      case 'X':
+        this.keyNitro = false;
+        break;
     }
   }
 
@@ -269,9 +407,10 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.cars.push({
         z: 2000 + i * (this.roadLength / this.totalCars) * 0.8,
         x: (Math.random() * 1.6) - 0.8,
-        speed: 100 + Math.random() * 90,
+        speed: 90 + Math.random() * 80,
         color: i % 3 === 0 ? '#fbbf24' : (i % 3 === 1 ? '#a78bfa' : '#ef4444'),
-        width: 0.5
+        width: 0.5,
+        driftDirection: Math.random() > 0.5 ? 1 : -1
       });
     }
   }
@@ -290,6 +429,11 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.speed = 0;
     this.position = 0;
     this.playerX = 0;
+    this.nitro = 100;
+    this.isNitroActive = false;
+    this.screenShake = 0;
+    this.lastMilestone = 0;
+    this.particles = [];
     this.resetCars();
 
     this.lastTime = performance.now();
@@ -324,36 +468,85 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   private update(dt: number): void {
     this.score += Math.round(this.speed * dt * 0.05);
 
+    // Score Milestone sound trigger
+    const milestone = Math.floor(this.score / 1000);
+    if (milestone > this.lastMilestone) {
+      this.lastMilestone = milestone;
+      this.playMilestoneSound();
+    }
+
+    // Twinkle Stars
+    this.stars.forEach(s => {
+      s.brightness += (Math.random() - 0.5) * 0.2;
+      s.brightness = Math.max(0.1, Math.min(1.0, s.brightness));
+    });
+
+    // Spawn exhaust speed sparks when driving fast
+    if (this.speed > 50 && this.gameState === 'playing') {
+      const zOffset = this.position + 200;
+      this.spawnSparks(this.playerX * this.ROAD_WIDTH, this.playerY + 200, zOffset, this.isNitroActive);
+    }
+
+    // Update Particles
+    this.particles.forEach(p => {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.z += p.vz * dt;
+    });
+
+    // Remove distant particles
+    this.particles = this.particles.filter(p => p.z > this.position);
+
+    // Decay screen shake
+    if (this.screenShake > 0) {
+      this.screenShake = Math.max(0, this.screenShake - dt * 25);
+    }
+
     // Dynamic camera height changes on hills
     const currentSegment = this.findSegment(this.position + 200);
     this.playerY = currentSegment.y;
 
+    const maxSpeedLimit = this.isNitroActive ? this.NITRO_MAX_SPEED : this.BASE_MAX_SPEED;
+
     // Accelerate / Brake logic
     if (this.gameState === 'playing') {
-      if (this.keyFaster) {
-        this.speed = this.accelerate(this.speed, 2.5, dt);
+      // Nitro Boost calculations
+      if (this.keyNitro && this.nitro > 0 && this.speed > 80) {
+        this.isNitroActive = true;
+        this.nitro = Math.max(0, this.nitro - dt * 45); // drains in ~2.2s
+        this.speed = this.accelerate(this.speed, 5.0, dt, maxSpeedLimit);
         this.playEngineSound(this.speed);
-      } else if (this.keySlower) {
-        this.speed = this.accelerate(this.speed, -8.0, dt);
       } else {
-        this.speed = this.accelerate(this.speed, -1.5, dt); // Deceleration friction
+        this.isNitroActive = false;
+        // Slowly recharge nitro when not active
+        this.nitro = Math.min(100, this.nitro + dt * 8); // recharges in ~12.5s
+
+        if (this.keyFaster) {
+          this.speed = this.accelerate(this.speed, 2.5, dt, maxSpeedLimit);
+          this.playEngineSound(this.speed);
+        } else if (this.keySlower) {
+          this.speed = this.accelerate(this.speed, -8.0, dt, maxSpeedLimit);
+        } else {
+          this.speed = this.accelerate(this.speed, -1.5, dt, maxSpeedLimit); // Deceleration friction
+        }
       }
 
-      // Left / Right steering logic
+      // Left / Right steering logic (Nitro reduces steer control slightly due to high speed)
+      const steerFactor = this.isNitroActive ? 1.7 : 2.2;
       if (this.keyLeft) {
-        this.playerX -= dt * 2.2 * (this.speed / this.MAX_SPEED);
+        this.playerX -= dt * steerFactor * (this.speed / maxSpeedLimit);
       } else if (this.keyRight) {
-        this.playerX += dt * 2.2 * (this.speed / this.MAX_SPEED);
+        this.playerX += dt * steerFactor * (this.speed / maxSpeedLimit);
       }
 
       // Road curving centripetal forces
-      const speedRatio = this.speed / this.MAX_SPEED;
+      const speedRatio = this.speed / maxSpeedLimit;
       this.playerX = this.playerX - (currentSegment.curve * 0.0035 * speedRatio);
 
       // Decelerate heavily if driving off road on grass sides
       if (Math.abs(this.playerX) > 1.0) {
         if (this.speed > 80) {
-          this.speed = this.accelerate(this.speed, -15.0, dt);
+          this.speed = this.accelerate(this.speed, -15.0, dt, maxSpeedLimit);
         }
       }
 
@@ -361,7 +554,8 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.playerX = Math.max(-2.0, Math.min(2.0, this.playerX));
     } else if (this.gameState === 'crashed') {
       // In crash recovery animation state
-      this.speed = this.accelerate(this.speed, -25.0, dt);
+      this.isNitroActive = false;
+      this.speed = this.accelerate(this.speed, -25.0, dt, maxSpeedLimit);
       this.crashTimer += dt;
       if (this.crashTimer > 1.5) {
         this.crashTimer = 0;
@@ -377,11 +571,16 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     // Parallax scrolling calculation
-    this.skyOffset += currentSegment.curve * 0.04 * (this.speed / this.MAX_SPEED);
+    this.skyOffset += currentSegment.curve * 0.04 * (this.speed / maxSpeedLimit);
 
-    // AI Cars updates
+    // AI Cars updates with lane drifting behavior
     this.cars.forEach(car => {
-      const carSegment = this.findSegment(car.z);
+      // AI car steering/lane drifting simulation
+      car.x += car.driftDirection * 0.15 * dt;
+      if (Math.abs(car.x) > 0.8) {
+        car.driftDirection *= -1; // bounce off sides
+      }
+
       car.z += car.speed * 8 * dt;
       if (car.z >= this.roadLength) {
         car.z -= this.roadLength;
@@ -397,15 +596,19 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Check collision with roadside obstacles
     currentSegment.sprites.forEach(sprite => {
-      const side = sprite.x > 0 ? 1 : -1;
       if (this.gameState === 'playing' && Math.abs(this.playerX - sprite.x) < 0.6) {
         this.triggerCrash('obstacle');
       }
     });
   }
 
-  private accelerate(v: number, accel: number, dt: number): number {
-    return Math.max(0, Math.min(this.MAX_SPEED, v + accel * 40 * dt));
+  private accelerate(v: number, accel: number, dt: number, maxLimit: number): number {
+    let target = v + accel * 40 * dt;
+    // Decelerate down if nitro turned off and speed exceeds base limit
+    if (target > maxLimit) {
+      target = Math.max(maxLimit, v - 100 * dt);
+    }
+    return Math.max(0, Math.min(maxLimit, target));
   }
 
   private findSegment(z: number): Segment {
@@ -416,6 +619,7 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   private triggerCrash(type: 'car' | 'obstacle'): void {
     this.speed = 20; // reset speed
     this.lives--;
+    this.screenShake = 18; // Trigger screen shake offset
     this.playCrashSound();
     this.analytics.logCustomEvent('racer_crashed', { obstacle_type: type, remaining_lives: this.lives });
 
@@ -439,10 +643,22 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   private render(): void {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    // 1. Draw Sky Backdrop & Retro Wave Grid Sun
+    this.ctx.save();
+
+    // Apply Screen Shake if active
+    if (this.screenShake > 0) {
+      const dx = (Math.random() - 0.5) * this.screenShake;
+      const dy = (Math.random() - 0.5) * this.screenShake;
+      this.ctx.translate(dx, dy);
+    }
+
+    // 1. Draw Sky Backdrop, Stars & Retro Wave Grid Sun
     this.drawSky();
 
-    // 2. Draw Road Segments (Back-to-Front painter's projection algorithm)
+    // 2. Draw Parallax Mountain Ranges
+    this.drawMountains();
+
+    // 3. Draw Road Segments (Back-to-Front painter's projection algorithm)
     const baseSegment = this.findSegment(this.position);
     let maxy = this.canvasHeight;
     let x = 0;
@@ -467,7 +683,10 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
       maxy = segment.p1.screen.y;
     }
 
-    // 3. Render Cars and Obstacles
+    // 4. Render Particle Sparks
+    this.drawParticles();
+
+    // 5. Render Cars and Obstacles
     for (let i = this.DRAW_DISTANCE - 1; i >= 0; i--) {
       const segmentIndex = (baseSegment.index + i) % this.segments.length;
       const segment = this.segments[segmentIndex];
@@ -485,14 +704,19 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     }
 
-    // 4. Render Player Bike/Car
+    // 6. Render Player Headlight projection cone (night effect)
+    this.drawHeadlight();
+
+    // 7. Render Player Bike
     this.drawPlayer();
 
-    // 5. If start screen or gameover, overlay menu
+    this.ctx.restore(); // Restore context to avoid shaking text HUD overlay
+
+    // 8. If start screen or gameover, overlay menu
     if (this.gameState === 'start') {
-      this.drawMenuOverlay('NEON RACER 2026', 'PRESS START TO RUN');
+      this.drawMenuOverlay('NEON RACER 2026', 'PRESS SPACE OR ENTER TO RUN');
     } else if (this.gameState === 'gameover') {
-      this.drawMenuOverlay('GAME OVER', 'PRESS START TO TRY AGAIN');
+      this.drawMenuOverlay('GAME OVER', 'PRESS SPACE OR ENTER TO RETRY');
     }
   }
 
@@ -511,12 +735,24 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private drawSky(): void {
-    // Gradient Sky Backdrop
+    // Dynamic sky colors shifting using HSL based on current score
+    const hue = (240 + (this.score / 150)) % 360;
+    const skyTop = `hsl(${hue}, 65%, 7%)`;
+    const skyBottom = `hsl(${(hue + 50) % 360}, 65%, 15%)`;
+
     const grad = this.ctx.createLinearGradient(0, 0, 0, this.canvasHeight / 2);
-    grad.addColorStop(0, this.colors.sky);
-    grad.addColorStop(1, '#1b0e33');
+    grad.addColorStop(0, skyTop);
+    grad.addColorStop(1, skyBottom);
     this.ctx.fillStyle = grad;
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    // Draw Twinkling Stars
+    this.ctx.save();
+    this.stars.forEach(s => {
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${s.brightness})`;
+      this.ctx.fillRect(s.x, s.y, s.size, s.size);
+    });
+    this.ctx.restore();
 
     // Parallax Synthwave Sunset Sun
     const sunRadius = 70;
@@ -533,11 +769,48 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ctx.fill();
 
     // Outrun horizontal scanlines on the sun
-    this.ctx.fillStyle = this.colors.sky;
+    this.ctx.fillStyle = skyBottom;
     for (let i = 0; i < 6; i++) {
       const lineY = sunY + 15 + i * 8;
       this.ctx.fillRect(sunX - sunRadius, lineY, sunRadius * 2, 2 + i * 0.8);
     }
+  }
+
+  // Draw two layers of scrolling parallax mountains
+  private drawMountains(): void {
+    const horizon = this.canvasHeight / 2;
+
+    // Layer 1: Distant Mountains (Dark Purple)
+    this.ctx.fillStyle = '#1e113a';
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, horizon);
+    
+    const count1 = 6;
+    const step1 = this.canvasWidth / count1;
+    for (let i = 0; i <= count1 + 1; i++) {
+      const x = (i * step1) - (this.skyOffset * 40) % step1;
+      const height = (i % 2 === 0) ? 35 : 15;
+      this.ctx.lineTo(x, horizon - height);
+    }
+    this.ctx.lineTo(this.canvasWidth, horizon);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Layer 2: Closer Mountains (Matte Indigo)
+    this.ctx.fillStyle = '#0f0822';
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, horizon);
+    
+    const count2 = 8;
+    const step2 = this.canvasWidth / count2;
+    for (let i = 0; i <= count2 + 1; i++) {
+      const x = (i * step2) - (this.skyOffset * 70) % step2;
+      const height = (i % 3 === 0) ? 22 : ((i % 3 === 1) ? 12 : 30);
+      this.ctx.lineTo(x, horizon - height);
+    }
+    this.ctx.lineTo(this.canvasWidth, horizon);
+    this.ctx.closePath();
+    this.ctx.fill();
   }
 
   private drawSegment(segment: Segment): void {
@@ -578,6 +851,26 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ctx.lineTo(x4, y4);
     this.ctx.closePath();
     this.ctx.fill();
+  }
+
+  // Render projected 3D particles on screen
+  private drawParticles(): void {
+    this.particles.forEach(p => {
+      const worldZ = p.z - this.position;
+      if (worldZ <= 0) return;
+
+      const scale = this.CAMERA_DEPTH / worldZ;
+      const screenX = (this.canvasWidth / 2) + scale * (p.x - this.playerX * this.ROAD_WIDTH) * (this.canvasWidth / 2);
+      const screenY = (this.canvasHeight / 2) - scale * (p.y - this.playerY - 1200) * (this.canvasHeight / 2);
+      const size = scale * p.size * (this.canvasWidth / 2);
+
+      if (screenX >= 0 && screenX <= this.canvasWidth && screenY >= 0 && screenY <= this.canvasHeight) {
+        this.ctx.fillStyle = p.color;
+        this.ctx.beginPath();
+        this.ctx.arc(screenX, screenY, size, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    });
   }
 
   // Draw programmatic roadside items (trees, rocks, billboards)
@@ -667,6 +960,35 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ctx.fillRect(destX + w * 0.3, destY - w * 0.35, w * 0.15, w * 0.1);
   }
 
+  // Draw player headlight light cone ahead of bike
+  private drawHeadlight(): void {
+    if (this.gameState !== 'playing') return;
+
+    const screenX = this.canvasWidth / 2;
+    const screenY = this.canvasHeight - 40;
+
+    const beamWidth = 220;
+    const beamHeight = 150;
+
+    this.ctx.save();
+    
+    // Light beam gradient cone
+    const grad = this.ctx.createLinearGradient(0, screenY - beamHeight, 0, screenY);
+    grad.addColorStop(0, 'rgba(0, 240, 255, 0.0)');
+    grad.addColorStop(0.7, 'rgba(0, 240, 255, 0.08)');
+    grad.addColorStop(1, 'rgba(0, 240, 255, 0.18)');
+
+    this.ctx.fillStyle = grad;
+    this.ctx.beginPath();
+    this.ctx.moveTo(screenX, screenY - 20);
+    this.ctx.lineTo(screenX - beamWidth / 2, screenY - beamHeight);
+    this.ctx.lineTo(screenX + beamWidth / 2, screenY - beamHeight);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    this.ctx.restore();
+  }
+
   // Draw Programmatic Player (Futuristic Neon Moto-Rider)
   private drawPlayer(): void {
     const screenX = this.canvasWidth / 2;
@@ -679,11 +1001,11 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     // Slight tilt offset when steering
     if (this.keyLeft) {
       this.ctx.translate(screenX, screenY);
-      this.ctx.rotate(-0.06);
+      this.ctx.rotate(-0.07);
       this.ctx.translate(-screenX, -screenY);
     } else if (this.keyRight) {
       this.ctx.translate(screenX, screenY);
-      this.ctx.rotate(0.06);
+      this.ctx.rotate(0.07);
       this.ctx.translate(-screenX, -screenY);
     }
 
@@ -699,18 +1021,26 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ctx.arc(screenX - 12, screenY - size / 2 - 8, size * 0.35, 0, Math.PI * 2);
       this.ctx.fill();
     } else {
+      // Draw nitro speed lines/motion blur wrapper around bike
+      if (this.isNitroActive) {
+        this.ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
+        this.ctx.beginPath();
+        this.ctx.arc(screenX, screenY - size * 0.5, size * 0.4, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
       // Rear tire shadow
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
       this.ctx.beginPath();
       this.ctx.ellipse(screenX, screenY, size * 0.3, size * 0.08, 0, 0, Math.PI * 2);
       this.ctx.fill();
 
-      // Futuristic cyan bike frame
-      this.ctx.fillStyle = this.colors.gridLines;
+      // Futuristic cyan/pink bike frame
+      this.ctx.fillStyle = this.isNitroActive ? '#ff007f' : this.colors.gridLines;
       this.ctx.fillRect(screenX - size * 0.15, screenY - size * 0.65, size * 0.3, size * 0.6);
 
       // Neon Wheel
-      this.ctx.strokeStyle = this.colors.darkRumble;
+      this.ctx.strokeStyle = this.isNitroActive ? this.colors.gridLines : this.colors.darkRumble;
       this.ctx.lineWidth = 5;
       this.ctx.beginPath();
       this.ctx.arc(screenX, screenY - size * 0.15, size * 0.15, 0, Math.PI * 2);
@@ -727,15 +1057,15 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ctx.fill();
 
       // Helmet visor glow
-      this.ctx.fillStyle = this.colors.gridLines;
+      this.ctx.fillStyle = this.isNitroActive ? '#facc15' : this.colors.gridLines;
       this.ctx.fillRect(screenX - size * 0.14, screenY - size * 0.85, size * 0.28, size * 0.08);
 
-      // Animated exhaust jet flame trail when accelerating
-      if (this.keyFaster && this.speed > 50) {
-        this.ctx.fillStyle = '#f97316';
+      // Exhaust jet flame trail (blue for nitro, orange for normal)
+      if ((this.keyFaster || this.isNitroActive) && this.speed > 50) {
+        this.ctx.fillStyle = this.isNitroActive ? '#00f0ff' : '#f97316';
         this.ctx.beginPath();
         this.ctx.moveTo(screenX - 10, screenY - 12);
-        this.ctx.lineTo(screenX, screenY + 15 + Math.random() * 15);
+        this.ctx.lineTo(screenX, screenY + 18 + Math.random() * 15);
         this.ctx.lineTo(screenX + 10, screenY - 12);
         this.ctx.closePath();
         this.ctx.fill();
@@ -748,7 +1078,7 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
   // Draw overlay titles (Start Menu / GameOver)
   private drawMenuOverlay(title: string, subtitle: string): void {
     // Backdrop dark transparent mask
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     // Neon typography
@@ -782,8 +1112,13 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     const gain = this.audioCtx.createGain();
 
     osc.type = 'sawtooth';
-    // Engine pitch hum scales with speed
-    osc.frequency.setValueAtTime(60 + (speedVal / this.MAX_SPEED) * 110, this.audioCtx.currentTime);
+    
+    // Engine pitch hum scales with speed, climbs even higher when nitro is active
+    const maxLimit = this.isNitroActive ? this.NITRO_MAX_SPEED : this.BASE_MAX_SPEED;
+    const baseFreq = this.isNitroActive ? 80 : 60;
+    const multiplier = this.isNitroActive ? 140 : 110;
+    
+    osc.frequency.setValueAtTime(baseFreq + (speedVal / maxLimit) * multiplier, this.audioCtx.currentTime);
 
     // Keep volume low and fade out quickly to simulate real engine loops
     gain.gain.setValueAtTime(0.06, this.audioCtx.currentTime);
@@ -829,9 +1164,33 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     noiseNode.start();
   }
 
+  // Synth arpeggio milestone reached sound
+  private playMilestoneSound(): void {
+    if (!this.audioCtx) return;
+    const now = this.audioCtx.currentTime;
+    
+    // Play quick ascending arpeggio chord (C4 -> E4 -> G4 -> C5)
+    const notes = [261.63, 329.63, 392.00, 523.25];
+    notes.forEach((freq, idx) => {
+      const osc = this.audioCtx!.createOscillator();
+      const gain = this.audioCtx!.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+      gain.gain.setValueAtTime(0.08, now + idx * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx!.destination);
+
+      osc.start(now + idx * 0.1);
+      osc.stop(now + idx * 0.1 + 0.25);
+    });
+  }
+
   // --- Mobile Controls Tap Zones & Handlers ---
 
-  setMobileAction(action: 'left' | 'right' | 'go' | 'stop', isPressed: boolean): void {
+  setMobileAction(action: 'left' | 'right' | 'go' | 'stop' | 'nitro', isPressed: boolean): void {
     this.initAudio(); // Resume sound permission on touch
     if (this.gameState === 'start' || this.gameState === 'gameover') {
       this.startGame();
@@ -842,5 +1201,6 @@ export class RetroRacerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (action === 'right') this.keyRight = isPressed;
     if (action === 'go') this.keyFaster = isPressed;
     if (action === 'stop') this.keySlower = isPressed;
+    if (action === 'nitro') this.keyNitro = isPressed;
   }
 }

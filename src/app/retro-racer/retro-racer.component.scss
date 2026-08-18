@@ -91,12 +91,51 @@
   .speed-val {
     color: #00f0ff;
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    transition: all 0.15s ease;
     
     small {
       font-size: 0.7rem;
       color: #94a3b8;
     }
+
+    &.boost-active {
+      color: #ff007f;
+      text-shadow: 0 0 15px rgba(255, 0, 127, 0.7);
+    }
   }
+}
+
+/* Nitro Charge Bar */
+.nitro-bar-bg {
+  width: 100px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 6px;
+
+  @media (max-width: 600px) {
+    width: 80px;
+  }
+}
+
+.nitro-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff 0%, #3b82f6 100%);
+  border-radius: 5px;
+  transition: width 0.1s linear;
+
+  &.active {
+    background: linear-gradient(90deg, #ff007f 0%, #f43f5e 100%);
+    box-shadow: 0 0 8px #ff007f;
+    animation: pulseActive 0.5s infinite alternate;
+  }
+}
+
+@keyframes pulseActive {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
 .lives-container {
@@ -238,6 +277,25 @@
   &:active {
     background: rgba(239, 68, 68, 0.3);
     border-color: #f87171;
+  }
+}
+
+.action-nitro {
+  background: rgba(255, 0, 127, 0.12);
+  border-color: rgba(255, 0, 127, 0.3);
+  color: #ff007f;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+
+  &.empty {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:active:not(.empty) {
+    background: rgba(255, 0, 127, 0.3);
+    border-color: #ff007f;
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
   }
 }
 
