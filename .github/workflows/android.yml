@@ -32,8 +32,10 @@ jobs:
       - name: Build Next.js static export
         run: npm run build
 
-      - name: Sync Capacitor Android
-        run: npx cap sync android
+      - name: Add Android Platform & Sync
+        run: |
+          npx cap add android || true
+          npx cap sync android
 
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
