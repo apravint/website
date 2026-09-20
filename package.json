@@ -12,6 +12,7 @@
     "@capacitor/android": "^8.5.2",
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",
+    "@mlc-ai/web-llm": "^0.2.85",
     "@types/canvas-confetti": "^1.9.0",
     "@types/three": "^0.186.0",
     "canvas-confetti": "^1.9.4",
