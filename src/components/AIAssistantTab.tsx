@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Terminal, Send, Cpu, Trash2, Settings, Wifi, RefreshCw, Copy, Check, Sparkles, Bot, Zap, Code } from 'lucide-react';
+import { 
+  Terminal, Send, Cpu, Trash2, Settings, Wifi, RefreshCw, Copy, Check, Sparkles, 
+  Bot, Zap, Mic, MicOff, Volume2, Download, Sliders, Play, Code 
+} from 'lucide-react';
 import { CreateMLCEngine, MLCEngine } from '@mlc-ai/web-llm';
 
 interface Message {
@@ -28,31 +31,44 @@ export default function AIAssistantTab() {
   const [engineMode, setEngineMode] = useState<EngineMode>('ollama');
   const [ollamaEndpoint, setOllamaEndpoint] = useState('http://localhost:11434/v1');
   const [ollamaModel, setOllamaModel] = useState('llama3.2');
+  const [availableOllamaModels, setAvailableOllamaModels] = useState<string[]>(['llama3.2', 'qwen2.5', 'deepseek-r1', 'phi3.5', 'codellama']);
   const [webllmModel, setWebllmModel] = useState('SmolLM2-360M-Instruct-q4f16_1-MLC');
-  const [systemPrompt, setSystemPrompt] = useState('You are Cyber AI, a helpful assistant integrated into Pravin Tamilan web portal and Termux environment.');
+  const [systemPrompt, setSystemPrompt] = useState('You are Cyber AI, a helpful assistant integrated into Pravin Tamilan web portal.');
+  const [temperature, setTemperature] = useState(0.7);
   const [showConfig, setShowConfig] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'checking' | 'online' | 'offline'>('idle');
   const [latency, setLatency] = useState<number | null>(null);
   const [webllmProgress, setWebllmProgress] = useState<string>('');
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const webllmEngineRef = useRef<MLCEngine | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping, webllmProgress]);
 
-  // Test Local Ollama Connection Ping
+  // Dynamic Ollama Model Fetcher & Connection Ping
   const checkOllamaConnection = async () => {
     setConnectionStatus('checking');
     const startTime = Date.now();
     try {
-      const res = await fetch(`${ollamaEndpoint.replace(/\/v1\/?$/, '')}/api/tags`, {
+      const baseUrl = ollamaEndpoint.replace(/\/v1\/?$/, '');
+      const res = await fetch(`${baseUrl}/api/tags`, {
         method: 'GET',
         signal: AbortSignal.timeout(3000)
       });
       if (res.ok) {
+        const data = await res.json();
+        if (data.models && Array.isArray(data.models) && data.models.length > 0) {
+          const names = data.models.map((m: any) => m.name);
+          setAvailableOllamaModels(names);
+          if (!names.includes(ollamaModel)) {
+            setOllamaModel(names[0]);
+          }
+        }
         setConnectionStatus('online');
         setLatency(Date.now() - startTime);
       } else {
@@ -71,11 +87,52 @@ export default function AIAssistantTab() {
     }
   }, [ollamaEndpoint, engineMode]);
 
-  // Initialize WebLLM in-browser model if selected
+  // Speech-to-Text Input via Web Speech API
+  const toggleSpeechRecognition = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInputVal(prev => prev ? `${prev} ${transcript}` : transcript);
+      };
+      recognition.onerror = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } else {
+      alert('Speech Recognition is not supported by your browser.');
+    }
+  };
+
+  // Text-to-Speech Output
+  const speakMessage = (text: string) => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const cleanText = text.replace(/[*_#`]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Initialize WebLLM in-browser model
   const initWebLLM = async () => {
     if (webllmEngineRef.current) return webllmEngineRef.current;
     setIsTyping(true);
-    setWebllmProgress('Initializing WebGPU LLM Engine...');
+    setWebllmProgress('Initializing WebGPU Engine...');
     try {
       const engine = await CreateMLCEngine(webllmModel, {
         initProgressCallback: (report) => {
@@ -87,7 +144,7 @@ export default function AIAssistantTab() {
       setIsTyping(false);
       return engine;
     } catch (e: any) {
-      setWebllmProgress(`WebLLM Error: ${e?.message || 'WebGPU not supported on browser'}`);
+      setWebllmProgress(`WebLLM Error: ${e?.message || 'WebGPU not supported'}`);
       setIsTyping(false);
       return null;
     }
@@ -134,7 +191,7 @@ export default function AIAssistantTab() {
               { role: 'user', content: query }
             ],
             stream: true,
-            temperature: 0.7
+            temperature: temperature
           })
         });
 
@@ -175,7 +232,6 @@ export default function AIAssistantTab() {
         setIsTyping(false);
         return;
       } catch (err: any) {
-        // Fallback to offline response if endpoint fails
         runOfflineFallback(botMsgId, query, err?.message);
       }
     } 
@@ -190,7 +246,8 @@ export default function AIAssistantTab() {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: query }
           ],
-          stream: true
+          stream: true,
+          temperature: temperature
         });
 
         let accumulatedText = '';
@@ -224,10 +281,8 @@ export default function AIAssistantTab() {
       const q = query.toLowerCase();
       if (q.includes('ollama') || q.includes('local llm') || q.includes('setup')) {
         reply += "To connect Ollama locally:\n1. Run `ollama serve` on your PC/server.\n2. Ensure CORS allows requests by setting `OLLAMA_ORIGINS=*`.\n3. Enter your Local IP (e.g. `http://localhost:11434/v1` or `http://192.168.1.100:11434/v1`).";
-      } else if (q.includes('racer') || q.includes('game')) {
-        reply += "🎮 **Cyber Racer 3D Tips**:\n- Use **Boost** when straight lines open up.\n- Near-misses with traffic trigger **Drift Multipliers**.\n- Collect **Coins** to upgrade your vehicle stats in the Garage!";
-      } else if (q.includes('termux') || q.includes('linux')) {
-        reply += "💻 **Termux Utility Shell**:\n- Update packages: `pkg update && pkg upgrade`\n- Node environment: `pkg install nodejs-lts git python`\n- Launch dev server: `npm run dev -- --webpack`";
+      } else if (q.includes('racer') || q.includes('pong') || q.includes('game')) {
+        reply += "🎮 **Cyber Arcade Strategy Tips**:\n- In **3D Cyber Racer**: Use Nitro on straight lines & trigger Drift Multipliers on close passes!\n- In **3D Neon Pong**: Rebound shots off side wall corners to outsmart AI!";
       } else if (q.includes('thirukkural') || q.includes('tamil')) {
         reply += "📜 **Thirukkural 1**:\n*அகர முதல எழுத்தெல்லாம் ஆதி\nபகவன் முதற்றே உலகு.*\n\n*Meaning*: As the letter 'A' is the first of all letters, so the Eternal God is primary to the world.";
       } else {
@@ -238,13 +293,24 @@ export default function AIAssistantTab() {
         m.id === msgId ? { ...m, text: reply, isStreaming: false } : m
       ));
       setIsTyping(false);
-    }, 600);
+    }, 500);
   };
 
   const copyToClipboard = (text: string, id: number) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const exportChatHistory = () => {
+    const mdContent = messages.map(m => `### ${m.sender === 'user' ? 'User' : 'Cyber Local LLM'} (${m.timestamp})\n\n${m.text}\n`).join('\n---\n\n');
+    const blob = new Blob([mdContent], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cyber-llm-chat-${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleClear = () => {
@@ -259,7 +325,7 @@ export default function AIAssistantTab() {
   };
 
   return (
-    <div className="w-full max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-950/80 overflow-hidden shadow-2xl flex flex-col h-[620px] glass-card font-sans">
+    <div className="w-full max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-950/80 overflow-hidden shadow-2xl flex flex-col h-[650px] glass-card font-sans">
       
       {/* Console Header Bar */}
       <div className="flex justify-between items-center px-4 py-3 border-b border-zinc-900 bg-zinc-900/60 backdrop-blur-md">
@@ -278,7 +344,7 @@ export default function AIAssistantTab() {
           </div>
 
           {/* Connection Status Badge */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-bold">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-bold font-mono">
             <span className={`w-2 h-2 rounded-full ${
               engineMode === 'ollama' 
                 ? (connectionStatus === 'online' ? 'bg-emerald-400 animate-ping' : connectionStatus === 'checking' ? 'bg-amber-400 animate-spin' : 'bg-red-500')
@@ -320,6 +386,14 @@ export default function AIAssistantTab() {
           </button>
 
           <button 
+            onClick={exportChatHistory}
+            className="p-1.5 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-cyber-cyan transition-colors"
+            title="Export Chat Markdown"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+
+          <button 
             onClick={handleClear}
             className="p-1.5 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-red-400 transition-colors"
             title="Clear Chat Logs"
@@ -329,9 +403,9 @@ export default function AIAssistantTab() {
         </div>
       </div>
 
-      {/* Settings Configuration Drawer */}
+      {/* Settings Drawer */}
       {showConfig && (
-        <div className="p-4 bg-zinc-900/90 border-b border-zinc-800 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div className="p-4 bg-zinc-900/95 border-b border-zinc-800 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
           <div className="space-y-1">
             <label className="text-zinc-400 font-bold uppercase tracking-wider block">Ollama Endpoint URL</label>
             <div className="flex gap-2">
@@ -339,11 +413,12 @@ export default function AIAssistantTab() {
                 type="text"
                 value={ollamaEndpoint}
                 onChange={(e) => setOllamaEndpoint(e.target.value)}
-                className="flex-1 px-3 py-1.5 rounded bg-black border border-zinc-700 text-white font-mono text-xs focus:outline-none focus:border-cyber-cyan"
+                className="flex-1 px-3 py-1.5 rounded bg-black border border-zinc-700 text-white text-xs focus:outline-none focus:border-cyber-cyan"
               />
               <button 
                 onClick={checkOllamaConnection}
                 className="px-2 py-1 bg-zinc-800 rounded text-zinc-300 hover:text-white"
+                title="Refresh Model List"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
@@ -351,32 +426,54 @@ export default function AIAssistantTab() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-zinc-400 font-bold uppercase tracking-wider block">Ollama Model Name</label>
+            <label className="text-zinc-400 font-bold uppercase tracking-wider block">Ollama Model</label>
             <select
               value={ollamaModel}
               onChange={(e) => setOllamaModel(e.target.value)}
-              className="w-full px-3 py-1.5 rounded bg-black border border-zinc-700 text-white font-mono text-xs focus:outline-none focus:border-cyber-cyan"
+              className="w-full px-3 py-1.5 rounded bg-black border border-zinc-700 text-white text-xs focus:outline-none focus:border-cyber-cyan"
             >
-              <option value="llama3.2">llama3.2</option>
-              <option value="qwen2.5">qwen2.5</option>
-              <option value="phi3.5">phi3.5</option>
-              <option value="smollm2">smollm2</option>
-              <option value="mistral">mistral</option>
-              <option value="codellama">codellama</option>
+              {availableOllamaModels.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
             </select>
           </div>
 
           <div className="space-y-1">
-            <label className="text-zinc-400 font-bold uppercase tracking-wider block">In-Browser WebLLM Model</label>
+            <label className="text-zinc-400 font-bold uppercase tracking-wider block">WebLLM In-Browser Model</label>
             <select
               value={webllmModel}
               onChange={(e) => setWebllmModel(e.target.value)}
-              className="w-full px-3 py-1.5 rounded bg-black border border-zinc-700 text-white font-mono text-xs focus:outline-none focus:border-cyber-pink"
+              className="w-full px-3 py-1.5 rounded bg-black border border-zinc-700 text-white text-xs focus:outline-none focus:border-cyber-pink"
             >
-              <option value="SmolLM2-360M-Instruct-q4f16_1-MLC">SmolLM2 360M (Fastest)</option>
+              <option value="SmolLM2-360M-Instruct-q4f16_1-MLC">SmolLM2 360M (Super Fast)</option>
               <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B (Smart)</option>
               <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen 2.5 0.5B (Compact)</option>
+              <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5 Mini (Advanced)</option>
             </select>
+          </div>
+
+          <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-zinc-800">
+            <div>
+              <label className="text-zinc-400 font-bold uppercase tracking-wider block mb-1">System Prompt</label>
+              <input
+                type="text"
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
+                className="w-full px-3 py-1.5 rounded bg-black border border-zinc-700 text-white text-xs focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-zinc-400 font-bold uppercase tracking-wider block mb-1">Temperature: {temperature}</label>
+              <input
+                type="range"
+                min="0.1"
+                max="1.0"
+                step="0.1"
+                value={temperature}
+                onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                className="w-full accent-cyber-cyan"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -398,13 +495,22 @@ export default function AIAssistantTab() {
                   <span className="flex items-center gap-1 text-cyber-pink">
                     <Sparkles className="w-3 h-3" /> Cyber Local LLM
                   </span>
-                  <button 
-                    onClick={() => copyToClipboard(msg.text, msg.id)}
-                    className="opacity-60 hover:opacity-100 transition-opacity p-1"
-                    title="Copy response"
-                  >
-                    {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => speakMessage(msg.text)}
+                      className="opacity-60 hover:opacity-100 transition-opacity p-1 text-zinc-400 hover:text-white"
+                      title="Read Aloud (TTS)"
+                    >
+                      <Volume2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button 
+                      onClick={() => copyToClipboard(msg.text, msg.id)}
+                      className="opacity-60 hover:opacity-100 transition-opacity p-1 text-zinc-400 hover:text-white"
+                      title="Copy response"
+                    >
+                      {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
               )}
               {msg.text}
@@ -432,13 +538,13 @@ export default function AIAssistantTab() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Quick Prompt Chips Suggestions */}
+      {/* Quick Prompt Chips */}
       <div className="px-4 py-2 bg-zinc-900/40 border-t border-zinc-900 flex gap-2 overflow-x-auto scrollbar-none select-none">
         {[
-          { label: '🚀 Termux Next.js', prompt: 'How do I run Next.js server smoothly in Termux?' },
-          { label: '🦙 Ollama Setup', prompt: 'How to setup Ollama local server for API streaming?' },
-          { label: '🏎️ Cyber Racer 3D', prompt: 'Give me tips to score high in Cyber Racer 3D' },
-          { label: '📜 Thirukkural 1', prompt: 'Explain Thirukkural 1 with Tamil and English meaning' }
+          { label: '⚡ Code Debugger', prompt: 'Write a TypeScript function to calculate Fibonacci series with memoization.' },
+          { label: '🎮 Game Strategies', prompt: 'Give me top strategies to master 3D Cyber Racer and Neon Pong!' },
+          { label: '📜 Thirukkural 1', prompt: 'Explain Thirukkural 1 with Tamil and English meanings.' },
+          { label: '🦙 Ollama Config', prompt: 'How do I expose Ollama endpoint over my home WiFi network?' }
         ].map((chip, idx) => (
           <button
             key={idx}
@@ -453,16 +559,27 @@ export default function AIAssistantTab() {
       {/* Input Form Console */}
       <form 
         onSubmit={(e) => handleSend(e)}
-        className="p-4 border-t border-zinc-900 bg-zinc-900/30 flex gap-3"
+        className="p-4 border-t border-zinc-900 bg-zinc-900/30 flex gap-2"
       >
+        <button
+          type="button"
+          onClick={toggleSpeechRecognition}
+          className={`p-3 rounded-xl border border-zinc-800 transition-all ${
+            isListening ? 'bg-red-500/20 border-red-500 text-red-400 animate-pulse' : 'bg-black text-zinc-400 hover:text-white'
+          }`}
+          title="Voice Speech Input"
+        >
+          {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+        </button>
+
         <input 
           type="text" 
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
           placeholder={
             engineMode === 'ollama' 
-              ? "Ask Local LLM (Ollama)..." 
-              : "Ask In-Browser Local AI (WebLLM)..."
+              ? `Ask Local LLM (${ollamaModel})...` 
+              : `Ask In-Browser WebGPU LLM...`
           }
           className="flex-1 px-4 py-3 rounded-xl bg-black border border-zinc-800 focus:border-cyber-cyan/50 focus:outline-none text-white text-xs md:text-sm font-mono placeholder:text-zinc-600 shadow-inner"
         />
@@ -478,4 +595,3 @@ export default function AIAssistantTab() {
     </div>
   );
 }
-

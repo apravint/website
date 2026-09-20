@@ -3,24 +3,28 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Sparkles, BarChart2, Tv, BookOpen, Calendar, Home
+  Gamepad2, Bot, Sparkles, BarChart2, Tv, BookOpen, Trophy, Zap
 } from 'lucide-react';
 
 import RacerTab from '@/components/RacerTab';
+import CyberPongTab from '@/components/CyberPongTab';
 import AIAssistantTab from '@/components/AIAssistantTab';
 import NewsTab from '@/components/NewsTab';
 import MarketTab from '@/components/MarketTab';
 import IPTVTab from '@/components/IPTVTab';
 import ThirukkuralTab from '@/components/ThirukkuralTab';
+import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'ai' | 'racer' | 'news' | 'market' | 'iptv' | 'thirukkural';
+type TabType = 'ai' | 'arcade' | 'news' | 'market' | 'iptv' | 'thirukkural';
+type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState<TabType>('ai');
+  const [arcadeGame, setArcadeGame] = useState<ArcadeGameType>('racer');
 
   const menuItems = [
     { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-cyber-cyan' },
-    { id: 'racer', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
+    { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
     { id: 'news', label: 'News', icon: Sparkles, color: 'text-amber-400' },
     { id: 'market', label: 'Markets', icon: BarChart2, color: 'text-emerald-400' },
     { id: 'iptv', label: 'IPTV', icon: Tv, color: 'text-purple-400' },
@@ -40,7 +44,7 @@ export default function Page() {
                 PRAVIN TAMILAN PORTAL
               </span>
               <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest font-mono">
-                LOCAL LLM & 3D ARCADE
+                LOCAL LLM & 3D ARCADE HUB
               </span>
             </div>
           </div>
@@ -78,10 +82,45 @@ export default function Page() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.18 }}
-            className="w-full flex justify-center"
+            className="w-full flex flex-col items-center justify-center"
           >
             {activeTab === 'ai' && <AIAssistantTab />}
-            {activeTab === 'racer' && <RacerTab />}
+
+            {activeTab === 'arcade' && (
+              <div className="w-full flex flex-col items-center gap-4">
+                {/* Arcade Game Selector Sub-Header */}
+                <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-zinc-800 shadow-lg">
+                  <button
+                    onClick={() => setArcadeGame('racer')}
+                    className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
+                      arcadeGame === 'racer'
+                        ? 'bg-cyber-pink text-white shadow-lg shadow-cyber-pink/30 scale-105'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    🏎️ 3D CYBER RACER
+                  </button>
+                  <button
+                    onClick={() => setArcadeGame('pong')}
+                    className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
+                      arcadeGame === 'pong'
+                        ? 'bg-cyber-cyan text-zinc-950 shadow-lg shadow-cyber-cyan/30 scale-105'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    🏓 3D NEON PONG
+                  </button>
+                </div>
+
+                {/* Selected Game View */}
+                {arcadeGame === 'racer' && <RacerTab />}
+                {arcadeGame === 'pong' && <CyberPongTab />}
+
+                {/* In-Game AI Companion Floating Widget */}
+                <ArcadeCompanionWidget gameName={arcadeGame === 'racer' ? '3D Cyber Racer' : '3D Neon Cyber Pong'} />
+              </div>
+            )}
+
             {activeTab === 'news' && <NewsTab />}
             {activeTab === 'market' && <MarketTab />}
             {activeTab === 'iptv' && <IPTVTab />}
@@ -92,5 +131,3 @@ export default function Page() {
     </div>
   );
 }
-
-
