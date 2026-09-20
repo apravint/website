@@ -314,7 +314,7 @@ export default function RacerTab() {
     }
   };
 
-  // Rebuild 3D Realistic Sports Car Model
+  // Rebuild High-Detail Realistic 3D Sports Supercar Model
   const rebuildPlayerCar = (scene: THREE.Scene, model: CarModelType, glowColor: string) => {
     if (playerCarGroupRef.current) scene.remove(playerCarGroupRef.current);
 
@@ -322,63 +322,138 @@ export default function RacerTab() {
     frontWheelsRef.current = [];
     rearWheelsRef.current = [];
 
-    // Metallic Body Material
+    // Metallic Car Paint Material
     const bodyMat = new THREE.MeshStandardMaterial({
       color: glowColor,
-      metalness: 0.85,
-      roughness: 0.15,
+      metalness: 0.9,
+      roughness: 0.12,
       emissive: glowColor,
       emissiveIntensity: 0.15
     });
 
-    let bodyWidth = 2.0, bodyHeight = 0.55, bodyLength = 4.2;
-    if (model === 'roadster') { bodyWidth = 1.9; bodyHeight = 0.48; bodyLength = 4.0; }
-    if (model === 'titan') { bodyWidth = 2.3; bodyHeight = 0.85; bodyLength = 4.6; }
+    const carbonMat = new THREE.MeshStandardMaterial({
+      color: '#090d16',
+      metalness: 0.95,
+      roughness: 0.25
+    });
 
-    // Lower Main Chassis Body
-    const bodyGeo = new THREE.BoxGeometry(bodyWidth, bodyHeight, bodyLength);
-    const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-    bodyMesh.position.y = bodyHeight / 2 + 0.25;
-    bodyMesh.castShadow = true;
-    carGroup.add(bodyMesh);
+    const chromeMat = new THREE.MeshStandardMaterial({
+      color: '#e2e8f0',
+      metalness: 0.98,
+      roughness: 0.05
+    });
 
-    // Sleek Cabin & Windshield Glass
+    const brakeMat = new THREE.MeshStandardMaterial({
+      color: '#ef4444',
+      metalness: 0.6,
+      roughness: 0.3
+    });
+
+    let bodyWidth = 2.05, bodyHeight = 0.52, bodyLength = 4.4;
+    if (model === 'roadster') { bodyWidth = 1.95; bodyHeight = 0.46; bodyLength = 4.1; }
+    if (model === 'titan') { bodyWidth = 2.35; bodyHeight = 0.82; bodyLength = 4.7; }
+
+    // 1. Lower Main Chassis Frame
+    const chassisGeo = new THREE.BoxGeometry(bodyWidth, bodyHeight * 0.6, bodyLength);
+    const chassisMesh = new THREE.Mesh(chassisGeo, bodyMat);
+    chassisMesh.position.y = bodyHeight * 0.3 + 0.22;
+    chassisMesh.castShadow = true;
+    carGroup.add(chassisMesh);
+
+    // 2. Slanted Front Nose Bonnet / Hood
+    const hoodGeo = new THREE.BoxGeometry(bodyWidth * 0.94, bodyHeight * 0.45, bodyLength * 0.35);
+    const hoodMesh = new THREE.Mesh(hoodGeo, bodyMat);
+    hoodMesh.position.set(0, bodyHeight * 0.48 + 0.2, -bodyLength * 0.25);
+    hoodMesh.rotation.x = 0.08; // Slanted aerodynamic hood angle
+    carGroup.add(hoodMesh);
+
+    // Front Aerodynamic Carbon Splitter Bumper
+    const splitterGeo = new THREE.BoxGeometry(bodyWidth * 1.02, 0.08, 0.5);
+    const splitterMesh = new THREE.Mesh(splitterGeo, carbonMat);
+    splitterMesh.position.set(0, 0.15, -bodyLength / 2 - 0.1);
+    carGroup.add(splitterMesh);
+
+    // 3. Aerodynamic Teardrop Cabin & Curved Tinted Glass
     const glassMat = new THREE.MeshStandardMaterial({ 
-      color: '#090d16', 
-      metalness: 0.95, 
-      roughness: 0.05, 
-      opacity: 0.9, 
+      color: '#020617', 
+      metalness: 0.98, 
+      roughness: 0.02, 
+      opacity: 0.88, 
       transparent: true 
     });
-    const canopyGeo = new THREE.BoxGeometry(bodyWidth * 0.82, bodyHeight * 0.75, bodyLength * 0.45);
-    const canopyMesh = new THREE.Mesh(canopyGeo, glassMat);
-    canopyMesh.position.set(0, bodyHeight + 0.22, -0.15);
-    carGroup.add(canopyMesh);
+    const cabinGeo = new THREE.BoxGeometry(bodyWidth * 0.8, bodyHeight * 0.75, bodyLength * 0.42);
+    const cabinMesh = new THREE.Mesh(cabinGeo, glassMat);
+    cabinMesh.position.set(0, bodyHeight + 0.22, 0.1);
+    carGroup.add(cabinMesh);
 
-    // Active Aerodynamic Spoiler Wing
-    const spoilerWingGeo = new THREE.BoxGeometry(bodyWidth * 1.05, 0.06, 0.4);
-    const spoilerWingMat = new THREE.MeshStandardMaterial({ color: '#090d16', metalness: 0.9 });
-    const spoilerMesh = new THREE.Mesh(spoilerWingGeo, spoilerWingMat);
-    spoilerMesh.position.set(0, bodyHeight + 0.45, bodyLength / 2 - 0.2);
+    // Carbon Roof Top
+    const roofGeo = new THREE.BoxGeometry(bodyWidth * 0.76, 0.06, bodyLength * 0.38);
+    const roofMesh = new THREE.Mesh(roofGeo, carbonMat);
+    roofMesh.position.set(0, bodyHeight + 0.6, 0.1);
+    carGroup.add(roofMesh);
+
+    // Side Mirrors (Left & Right)
+    const mirrorGeo = new THREE.BoxGeometry(0.22, 0.12, 0.18);
+    const mirrorLeft = new THREE.Mesh(mirrorGeo, carbonMat);
+    mirrorLeft.position.set(-bodyWidth / 2 - 0.12, bodyHeight + 0.25, -bodyLength * 0.1);
+    carGroup.add(mirrorLeft);
+
+    const mirrorRight = new THREE.Mesh(mirrorGeo, carbonMat);
+    mirrorRight.position.set(bodyWidth / 2 + 0.12, bodyHeight + 0.25, -bodyLength * 0.1);
+    carGroup.add(mirrorRight);
+
+    // 4. Rear Carbon Diffuser & Quad Exhaust Tips
+    const diffuserGeo = new THREE.BoxGeometry(bodyWidth * 0.96, 0.15, 0.4);
+    const diffuserMesh = new THREE.Mesh(diffuserGeo, carbonMat);
+    diffuserMesh.position.set(0, 0.2, bodyLength / 2 + 0.1);
+    carGroup.add(diffuserMesh);
+
+    // Quad Chrome Exhaust Pipe Outlets
+    const exhaustGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.3, 16);
+    [-0.5, -0.3, 0.3, 0.5].forEach((offset) => {
+      const exhaustMesh = new THREE.Mesh(exhaustGeo, chromeMat);
+      exhaustMesh.rotation.x = Math.PI / 2;
+      exhaustMesh.position.set(offset, 0.22, bodyLength / 2 + 0.2);
+      carGroup.add(exhaustMesh);
+    });
+
+    // 5. Active GT Spoiler Wing with Dual Upright Mounts
+    const stanchionGeo = new THREE.BoxGeometry(0.06, 0.35, 0.12);
+    const stanchionLeft = new THREE.Mesh(stanchionGeo, carbonMat);
+    stanchionLeft.position.set(-bodyWidth * 0.3, bodyHeight + 0.35, bodyLength / 2 - 0.3);
+    carGroup.add(stanchionLeft);
+
+    const stanchionRight = new THREE.Mesh(stanchionGeo, carbonMat);
+    stanchionRight.position.set(bodyWidth * 0.3, bodyHeight + 0.35, bodyLength / 2 - 0.3);
+    carGroup.add(stanchionRight);
+
+    const spoilerWingGeo = new THREE.BoxGeometry(bodyWidth * 1.08, 0.05, 0.42);
+    const spoilerMesh = new THREE.Mesh(spoilerWingGeo, carbonMat);
+    spoilerMesh.position.set(0, bodyHeight + 0.52, bodyLength / 2 - 0.3);
     carGroup.add(spoilerMesh);
 
-    // Realistic 3D Alloy Wheels Helper
-    const createWheel = (x: number, y: number, z: number, isFront: boolean) => {
+    // 6. Detailed 3D Alloy Wheels & Red Brake Calipers Helper
+    const createRealisticWheel = (x: number, y: number, z: number, isFront: boolean) => {
       const wheelGroup = new THREE.Group();
       
-      // Rubber Tire
-      const tireGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.25, 24);
-      const tireMat = new THREE.MeshStandardMaterial({ color: '#18181b', roughness: 0.85 });
+      // Outer Rubber Treaded Tire
+      const tireGeo = new THREE.CylinderGeometry(0.38, 0.38, 0.28, 32);
+      const tireMat = new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.9 });
       const tireMesh = new THREE.Mesh(tireGeo, tireMat);
       tireMesh.rotation.z = Math.PI / 2;
       wheelGroup.add(tireMesh);
 
-      // Alloy Rim
-      const rimGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.26, 12);
-      const rimMat = new THREE.MeshStandardMaterial({ color: '#cbd5e1', metalness: 0.9, roughness: 0.1 });
-      const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+      // Inner Metallic Star Alloy Rim
+      const rimGeo = new THREE.CylinderGeometry(0.26, 0.26, 0.29, 16);
+      const rimMesh = new THREE.Mesh(rimGeo, chromeMat);
       rimMesh.rotation.z = Math.PI / 2;
       wheelGroup.add(rimMesh);
+
+      // Red Brake Caliper
+      const caliperGeo = new THREE.BoxGeometry(0.12, 0.18, 0.18);
+      const caliperMesh = new THREE.Mesh(caliperGeo, brakeMat);
+      caliperMesh.position.set(x > 0 ? -0.05 : 0.05, 0.12, 0);
+      wheelGroup.add(caliperMesh);
 
       wheelGroup.position.set(x, y, z);
       carGroup.add(wheelGroup);
@@ -387,51 +462,48 @@ export default function RacerTab() {
       else rearWheelsRef.current.push(wheelGroup);
     };
 
-    createWheel(-bodyWidth / 2 - 0.05, 0.36, -bodyLength / 3, true);  // Front Left
-    createWheel(bodyWidth / 2 + 0.05, 0.36, -bodyLength / 3, true);   // Front Right
-    createWheel(-bodyWidth / 2 - 0.05, 0.36, bodyLength / 3, false);  // Rear Left
-    createWheel(bodyWidth / 2 + 0.05, 0.36, bodyLength / 3, false);   // Rear Right
+    createRealisticWheel(-bodyWidth / 2 - 0.05, 0.38, -bodyLength * 0.28, true);  // Front Left
+    createRealisticWheel(bodyWidth / 2 + 0.05, 0.38, -bodyLength * 0.28, true);   // Front Right
+    createRealisticWheel(-bodyWidth / 2 - 0.05, 0.38, bodyLength * 0.28, false);  // Rear Left
+    createRealisticWheel(bodyWidth / 2 + 0.05, 0.38, bodyLength * 0.28, false);   // Rear Right
 
-    // Headlights (High-intensity Xenon Spotlights)
-    const headlightLeft = new THREE.SpotLight('#ffffff', 5, 50, Math.PI / 5, 0.3);
-    headlightLeft.position.set(-0.8, 0.55, -bodyLength / 2);
-    headlightLeft.target.position.set(-0.8, 0, -30);
+    // 7. Headlights (Projected Xenon LED Spotlights)
+    const headlightLeft = new THREE.SpotLight('#ffffff', 6, 60, Math.PI / 5, 0.3);
+    headlightLeft.position.set(-0.85, 0.55, -bodyLength / 2);
+    headlightLeft.target.position.set(-0.85, 0, -35);
     carGroup.add(headlightLeft);
     carGroup.add(headlightLeft.target);
 
-    const headlightRight = new THREE.SpotLight('#ffffff', 5, 50, Math.PI / 5, 0.3);
-    headlightRight.position.set(0.8, 0.55, -bodyLength / 2);
-    headlightRight.target.position.set(0.8, 0, -30);
+    const headlightRight = new THREE.SpotLight('#ffffff', 6, 60, Math.PI / 5, 0.3);
+    headlightRight.position.set(0.85, 0.55, -bodyLength / 2);
+    headlightRight.target.position.set(0.85, 0, -35);
     carGroup.add(headlightRight);
     carGroup.add(headlightRight.target);
 
-    // Taillight Strip
-    const tailMat = new THREE.MeshStandardMaterial({ color: '#ff0055', emissive: '#ff0055', emissiveIntensity: 3.0 });
-    const tailGeo = new THREE.BoxGeometry(bodyWidth * 0.92, 0.08, 0.04);
+    // 8. 3D LED Taillight Light Bar
+    const tailMat = new THREE.MeshStandardMaterial({ color: '#ff0055', emissive: '#ff0055', emissiveIntensity: 4.0 });
+    const tailGeo = new THREE.BoxGeometry(bodyWidth * 0.94, 0.08, 0.05);
     const tailMesh = new THREE.Mesh(tailGeo, tailMat);
-    tailMesh.position.set(0, bodyHeight * 0.75, bodyLength / 2 + 0.01);
+    tailMesh.position.set(0, bodyHeight * 0.7, bodyLength / 2 + 0.02);
     carGroup.add(tailMesh);
 
-    // Underglow Light
-    const underglowLight = new THREE.PointLight(glowColor, 3.5, 12);
+    // 9. Underglow Neon Light
+    const underglowLight = new THREE.PointLight(glowColor, 4.0, 14);
     underglowLight.position.set(0, 0.1, 0);
     carGroup.add(underglowLight);
     underglowLightRef.current = underglowLight;
 
-    // Nitro Flame Cone
-    const flameGeo = new THREE.ConeGeometry(0.35, 1.4, 12);
+    // 10. Exhaust Nitro Flame Cone
+    const flameGeo = new THREE.ConeGeometry(0.38, 1.6, 12);
     const flameMat = new THREE.MeshBasicMaterial({ color: glowColor, transparent: true, opacity: 0 });
     const flameMesh = new THREE.Mesh(flameGeo, flameMat);
     flameMesh.rotation.x = Math.PI / 2;
-    flameMesh.position.set(0, 0.4, bodyLength / 2 + 0.7);
+    flameMesh.position.set(0, 0.35, bodyLength / 2 + 0.8);
     carGroup.add(flameMesh);
     playerFlameMeshRef.current = flameMesh;
 
-    const flameLight = new THREE.PointLight(glowColor, 0, 14);
-    flameLight.position.set(0, 0.4, bodyLength / 2 + 0.7);
-    carGroup.add(flameLight);
-    playerFlameLightRef.current = flameLight;
-
+    const flameLight = new THREE.PointLight(glowColor, 0, 15);
+    flameLight.position.set(0, 0.35, bodyLength / 2 + 0.8);
     carGroup.position.set(0, 0, 0);
     scene.add(carGroup);
     playerCarGroupRef.current = carGroup;
