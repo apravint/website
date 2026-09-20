@@ -3,17 +3,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Tv, BookOpen, Trophy, Zap
+  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home
 } from 'lucide-react';
 
+import HomeTab from '@/components/HomeTab';
 import RacerTab from '@/components/RacerTab';
 import CyberPongTab from '@/components/CyberPongTab';
 import AIAssistantTab from '@/components/AIAssistantTab';
 import IPTVTab from '@/components/IPTVTab';
 import ThirukkuralTab from '@/components/ThirukkuralTab';
+import CalendarTab from '@/components/CalendarTab';
+import KavithaiTab from '@/components/KavithaiTab';
 import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'ai' | 'arcade' | 'iptv' | 'thirukkural';
+type TabType = 'home' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
 type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
@@ -25,6 +28,9 @@ export default function Page() {
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
     { id: 'iptv', label: 'IPTV', icon: Tv, color: 'text-purple-400' },
     { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-blue-400' },
+    { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-amber-400' },
+    { id: 'kavithai', label: 'Kavithai', icon: Feather, color: 'text-rose-400' },
+    { id: 'home', label: 'Home Hub', icon: Home, color: 'text-emerald-400' },
   ];
 
   return (
@@ -80,6 +86,7 @@ export default function Page() {
             transition={{ duration: 0.18 }}
             className="w-full flex flex-col items-center justify-center"
           >
+            {activeTab === 'home' && <HomeTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
             {activeTab === 'ai' && <AIAssistantTab />}
 
             {activeTab === 'arcade' && (
@@ -119,6 +126,8 @@ export default function Page() {
 
             {activeTab === 'iptv' && <IPTVTab />}
             {activeTab === 'thirukkural' && <ThirukkuralTab />}
+            {activeTab === 'calendar' && <CalendarTab />}
+            {activeTab === 'kavithai' && <KavithaiTab />}
           </motion.div>
         </AnimatePresence>
       </main>

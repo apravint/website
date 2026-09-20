@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, BookOpen, Quote, Sparkles } from 'lucide-react';
+import { Search, BookOpen, Quote, Sparkles, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
 
 interface Meaning {
   ta_mu_va: string;
@@ -26,6 +26,10 @@ export default function ThirukkuralTab() {
   const [meaningAuthor, setMeaningAuthor] = useState<'ta_mu_va' | 'ta_salamon' | 'ta_kalaignar' | 'en'>('ta_mu_va');
   const [dailyKural, setDailyKural] = useState<Kural | null>(null);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
   // Fetch Kural records on mount
   useEffect(() => {
     fetch('/assets/thirukkural.json')
@@ -45,26 +49,39 @@ export default function ThirukkuralTab() {
 
   const sections = ['All', 'அறத்துப்பால்', 'பொருட்பால்', 'காமத்துப்பால்'];
 
+  // Reset pagination when search query or section changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSection]);
+
   const filteredKurals = kurals.filter(k => {
-    const query = searchQuery.toLowerCase();
-    const matchesSearch = 
-      k.number.toString() === query ||
-      k.chapter.toLowerCase().includes(query) ||
-      k.kural.some(line => line.includes(query));
-    
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) {
+      return selectedSection === 'All' || k.section === selectedSection;
+    }
+    const matchesNumber = k.number.toString() === query;
+    const matchesChapter = k.chapter.toLowerCase().includes(query);
+    const matchesText = k.kural.some(line => line.toLowerCase().includes(query));
+    const matchesMeaning = (k.meaning[meaningAuthor] || '').toLowerCase().includes(query);
+
+    const matchesSearch = matchesNumber || matchesChapter || matchesText || matchesMeaning;
     const matchesSection = selectedSection === 'All' || k.section === selectedSection;
     return matchesSearch && matchesSection;
-  }).slice(0, 15); // Limit to top 15 results for performance
+  });
+
+  // Calculate pagination indices
+  const totalPages = Math.ceil(filteredKurals.length / itemsPerPage) || 1;
+  const paginatedKurals = filteredKurals.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="w-full max-w-5xl space-y-6">
+    <div className="w-full max-w-5xl space-y-6 font-sans">
       
       {/* Daily Featured Kural */}
       {dailyKural && (
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 rounded-2xl glass-card border-cyber-cyan/20 bg-cyber-cyan/5 relative overflow-hidden"
+          className="p-6 rounded-2xl glass-card border-cyber-cyan/20 bg-cyber-cyan/5 relative overflow-hidden shadow-2xl"
         >
           <div className="aurora-glow-cyan top-0 right-0 -mr-16 -mt-16 opacity-30" />
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyber-cyan/10 border border-cyber-cyan/20 text-[10px] font-bold text-cyber-cyan w-fit mb-4">
@@ -79,13 +96,13 @@ export default function ThirukkuralTab() {
             <p className="text-lg md:text-xl font-bold text-white leading-relaxed font-sans">
               {dailyKural.kural[1]}
             </p>
-            <span className="text-xs text-zinc-500 font-bold block mt-3">
+            <span className="text-xs text-zinc-500 font-mono font-bold block mt-3">
               குறள் {dailyKural.number} | அதிகாரம்: {dailyKural.chapter} | பால்: {dailyKural.section}
             </span>
           </div>
 
           <div className="mt-6 pt-4 border-t border-zinc-800/40">
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-2">Meaning:</span>
+            <span className="text-[10px] text-zinc-500 font-mono font-bold uppercase tracking-wider block mb-2">Meaning:</span>
             <p className="text-sm text-zinc-300 leading-relaxed font-medium">
               {dailyKural.meaning[meaningAuthor]}
             </p>
@@ -94,15 +111,15 @@ export default function ThirukkuralTab() {
       )}
 
       {/* Search Console & Commentator Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 font-mono">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-500" />
           <input 
             type="text" 
-            placeholder="Search by Kural number or text..."
+            placeholder="Search by Kural #, chapter, or text..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg bg-zinc-950 border border-zinc-800 focus:border-cyber-cyan/50 focus:outline-none text-white"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg bg-zinc-950 border border-zinc-800 focus:border-cyber-cyan/50 focus:outline-none text-white"
           />
         </div>
 
@@ -127,8 +144,8 @@ export default function ThirukkuralTab() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
         {/* Commentator Selection Sidebar (Col span 1) */}
-        <div className="p-6 rounded-2xl glass-card h-fit space-y-4">
-          <h4 className="font-bold text-white text-sm uppercase tracking-wider flex items-center gap-1.5">
+        <div className="p-6 rounded-2xl glass-card h-fit space-y-4 border border-zinc-800 font-mono">
+          <h4 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
             <BookOpen className="w-4 h-4 text-cyber-pink" /> Commentator
           </h4>
           
@@ -152,21 +169,51 @@ export default function ThirukkuralTab() {
               </button>
             ))}
           </div>
+
+          <div className="pt-2 text-[10px] text-zinc-500 border-t border-zinc-800/80">
+            Total Database: {kurals.length} Kurals in 133 Chapters.
+          </div>
         </div>
 
         {/* Scrollable Kural Results (Col span 3) */}
         <div className="lg:col-span-3 space-y-4">
-          {filteredKurals.map((k) => (
+          
+          {/* Pagination Controls Header */}
+          <div className="flex items-center justify-between px-2 font-mono text-xs text-zinc-400">
+            <span>Showing {paginatedKurals.length} of {filteredKurals.length} Kurals</span>
+            
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className="p-1.5 rounded-lg border border-zinc-800 bg-zinc-900 disabled:opacity-30 hover:text-white"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="font-bold text-white">Page {currentPage} / {totalPages}</span>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  className="p-1.5 rounded-lg border border-zinc-800 bg-zinc-900 disabled:opacity-30 hover:text-white"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {paginatedKurals.map((k) => (
             <motion.div
               key={k.number}
               layout
-              className="p-5 rounded-2xl glass-card hover:border-cyber-cyan/20 transition-all space-y-4"
+              className="p-5 rounded-2xl glass-card hover:border-cyber-cyan/20 transition-all space-y-4 border border-zinc-800"
             >
-              <div className="flex justify-between items-center border-b border-zinc-800/40 pb-2">
-                <span className="text-xs font-extrabold text-cyber-cyan bg-cyber-cyan/10 px-2.5 py-0.5 rounded-full">
+              <div className="flex justify-between items-center border-b border-zinc-800/60 pb-2 font-mono">
+                <span className="text-xs font-extrabold text-cyber-cyan bg-cyber-cyan/10 px-2.5 py-0.5 rounded-full border border-cyber-cyan/20">
                   குறள் {k.number}
                 </span>
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
                   {k.chapter} | {k.section}
                 </span>
               </div>
@@ -176,18 +223,39 @@ export default function ThirukkuralTab() {
                 <p>{k.kural[1]}</p>
               </div>
 
-              <div className="pt-2 border-t border-zinc-850">
-                <span className="text-[9px] text-zinc-600 font-extrabold uppercase tracking-wider block mb-1">Meaning:</span>
-                <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+              <div className="pt-2 border-t border-zinc-900">
+                <span className="text-[9px] text-zinc-500 font-mono font-extrabold uppercase tracking-wider block mb-1">Meaning:</span>
+                <p className="text-xs text-zinc-300 leading-relaxed font-medium">
                   {k.meaning[meaningAuthor]}
                 </p>
               </div>
             </motion.div>
           ))}
 
+          {/* Pagination Controls Footer */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-3 pt-4 font-mono text-xs">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className="px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-900 text-white disabled:opacity-30 hover:bg-zinc-800"
+              >
+                Previous
+              </button>
+              <span className="font-bold text-zinc-400">Page {currentPage} of {totalPages}</span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className="px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-900 text-white disabled:opacity-30 hover:bg-zinc-800"
+              >
+                Next
+              </button>
+            </div>
+          )}
+
           {filteredKurals.length === 0 && (
-            <div className="py-12 text-center text-zinc-500 font-semibold">
-              {kurals.length === 0 ? "Loading Kural database..." : "No Kurals match your criteria."}
+            <div className="py-12 text-center text-zinc-500 font-mono text-xs">
+              {kurals.length === 0 ? "Loading Thirukkural database..." : "No Kurals match your search criteria."}
             </div>
           )}
         </div>

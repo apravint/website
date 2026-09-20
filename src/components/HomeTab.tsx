@@ -172,19 +172,19 @@ export default function HomeTab({ onTabChange }: HomeTabProps) {
         
         <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
           <button 
-            onClick={() => onTabChange('news')}
+            onClick={() => onTabChange('ai')}
             className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-cyber-cyan/30 text-center transition-all group"
           >
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📰</div>
-            <span className="text-xs font-bold text-zinc-300 block">News Hub</span>
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🤖</div>
+            <span className="text-xs font-bold text-zinc-300 block">Local LLM AI</span>
           </button>
 
           <button 
-            onClick={() => onTabChange('market')}
+            onClick={() => onTabChange('arcade')}
             className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-cyber-cyan/30 text-center transition-all group"
           >
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📈</div>
-            <span className="text-xs font-bold text-zinc-300 block">Markets</span>
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🕹️</div>
+            <span className="text-xs font-bold text-zinc-300 block">3D Arcade</span>
           </button>
 
           <button 
