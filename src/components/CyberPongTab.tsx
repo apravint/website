@@ -481,7 +481,7 @@ export default function CyberPongTab() {
   }, []);
 
   return (
-    <div className="w-full max-w-4xl flex flex-col items-center gap-4 font-sans">
+    <div className="w-full max-w-[1700px] flex flex-col items-center gap-4 font-sans">
       {/* Top Cyber HUD Bar */}
       <div className="w-full rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 shadow-xl glass-card flex flex-wrap items-center justify-between gap-4 font-mono">
         <div className="flex items-center gap-3">
@@ -541,7 +541,7 @@ export default function CyberPongTab() {
       </div>
 
       {/* Main Canvas Viewport container */}
-      <div className="relative w-full max-w-4xl aspect-[8/5] rounded-2xl border border-zinc-800 bg-zinc-950/90 overflow-hidden shadow-2xl flex items-center justify-center">
+      <div className="relative w-full max-w-[1700px] h-[650px] aspect-video rounded-2xl border border-zinc-800 bg-zinc-950/90 overflow-hidden shadow-2xl flex items-center justify-center">
         <canvas ref={canvasRef} className="w-full h-full object-contain cursor-crosshair" />
 
         {/* Overlay Overlay Menu */}

@@ -343,7 +343,7 @@ export default function AIAssistantTab() {
   };
 
   return (
-    <div className="w-full max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-950/80 overflow-hidden shadow-2xl flex flex-col h-[650px] glass-card font-sans">
+    <div className="w-full max-w-[1700px] rounded-2xl border border-zinc-800 bg-zinc-950/80 overflow-hidden shadow-2xl flex flex-col h-[720px] glass-card font-sans">
       
       {/* Console Header Bar */}
       <div className="flex justify-between items-center px-4 py-3 border-b border-zinc-900 bg-zinc-900/60 backdrop-blur-md">

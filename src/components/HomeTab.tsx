@@ -48,7 +48,7 @@ export default function HomeTab({ onTabChange }: HomeTabProps) {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl"
+      className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-[1700px]"
     >
       {/* Profile Bento Card (Col span 2) */}
       <motion.div 

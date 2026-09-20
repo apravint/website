@@ -83,7 +83,7 @@ export default function NewsTab() {
   });
 
   return (
-    <div className="w-full max-w-5xl space-y-6">
+    <div className="w-full max-w-[1700px] space-y-6">
       {/* Search and Filters Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
         <div className="relative flex-1 max-w-md">

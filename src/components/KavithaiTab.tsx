@@ -48,7 +48,7 @@ export default function KavithaiTab() {
   };
 
   return (
-    <div className="w-full max-w-4xl space-y-6">
+    <div className="w-full max-w-[1700px] space-y-6">
       <div className="text-center max-w-xl mx-auto mb-8">
         <h3 className="text-2xl font-black text-white flex items-center justify-center gap-2">
           ✍️ தமிழ் கவிதைகள் <span className="text-gradient">| Kavithai</span>

@@ -74,7 +74,7 @@ export default function ThirukkuralTab() {
   const paginatedKurals = filteredKurals.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="w-full max-w-5xl space-y-6 font-sans">
+    <div className="w-full max-w-[1700px] space-y-6 font-sans">
       
       {/* Daily Featured Kural */}
       {dailyKural && (

@@ -102,7 +102,7 @@ export default function CalendarTab() {
   };
 
   return (
-    <div className="w-full max-w-5xl space-y-6 font-sans">
+    <div className="w-full max-w-[1700px] space-y-6 font-sans">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Calendar Grid (Col span 2) */}

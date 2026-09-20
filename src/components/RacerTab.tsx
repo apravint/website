@@ -939,7 +939,7 @@ export default function RacerTab() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-zinc-950/80 rounded-2xl border border-zinc-800 glass-card w-full max-w-4xl font-sans">
+    <div className="flex flex-col items-center justify-center p-4 bg-zinc-950/80 rounded-2xl border border-zinc-800 glass-card w-full max-w-[1700px] font-sans">
       {/* Top Controls Bar */}
       <div className="flex justify-between items-center w-full mb-4 px-2 font-mono">
         <h3 className="text-xl md:text-2xl font-black text-cyber-pink tracking-wider neon-glow-text flex items-center gap-2">

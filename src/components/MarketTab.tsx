@@ -43,7 +43,7 @@ export default function MarketTab() {
   };
 
   return (
-    <div className="w-full max-w-5xl space-y-6">
+    <div className="w-full max-w-[1700px] space-y-6">
       {/* Header Info */}
       <div className="flex justify-between items-center p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
         <div>
