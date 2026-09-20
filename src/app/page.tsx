@@ -26,7 +26,7 @@ export default function Page() {
   const menuItems = [
     { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-cyber-cyan' },
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
-    { id: 'iptv', label: 'IPTV', icon: Tv, color: 'text-purple-400' },
+    { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-purple-400' },
     { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-blue-400' },
     { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-amber-400' },
     { id: 'kavithai', label: 'Kavithai', icon: Feather, color: 'text-rose-400' },
@@ -36,9 +36,9 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-[#02040a] text-slate-100 flex flex-col items-center cyber-grid selection:bg-cyber-cyan selection:text-black">
       
-      {/* Top Header Navigation Navbar */}
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md shadow-lg">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      {/* Top Header Navigation Navbar (Full Screen Width) */}
+      <header className="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-2xl">
+        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('ai')}>
             <span className="text-xl">🚀</span>
             <div className="flex flex-col">
@@ -46,7 +46,7 @@ export default function Page() {
                 PRAVIN TAMILAN PORTAL
               </span>
               <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest font-mono">
-                LOCAL LLM & 3D ARCADE HUB
+                FULLSCREEN LOCAL LLM & IPTV PORTAL
               </span>
             </div>
           </div>
@@ -60,9 +60,9 @@ export default function Page() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id as TabType)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     isSelected 
-                      ? 'bg-zinc-900 text-white border border-zinc-700 shadow-md scale-105' 
+                      ? 'bg-zinc-900 text-white border border-zinc-700 shadow-lg scale-105' 
                       : 'text-zinc-400 hover:text-white border border-transparent'
                   }`}
                 >
@@ -75,8 +75,8 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Main Tab Portal View */}
-      <main className="flex-1 w-full max-w-5xl mx-auto p-3 sm:p-6 flex flex-col items-center justify-center">
+      {/* Main Tab Portal View - Expanded to Full Screen max-w-[1700px] */}
+      <main className="flex-1 w-full max-w-[1700px] mx-auto p-3 sm:p-6 flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -92,7 +92,7 @@ export default function Page() {
             {activeTab === 'arcade' && (
               <div className="w-full flex flex-col items-center gap-4">
                 {/* Arcade Game Selector Sub-Header */}
-                <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-zinc-800 shadow-lg">
+                <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-zinc-800 shadow-lg font-mono">
                   <button
                     onClick={() => setArcadeGame('racer')}
                     className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
