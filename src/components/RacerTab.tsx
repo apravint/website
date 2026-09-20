@@ -3,11 +3,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import confetti from 'canvas-confetti';
-import { Play, RotateCcw, Heart, Zap, Volume2, VolumeX, Shield, Award, Camera, CloudRain, Sun, Flame, Sparkles, Trophy, Settings } from 'lucide-react';
+import { 
+  Play, RotateCcw, Heart, Zap, Volume2, VolumeX, Shield, Award, Camera, 
+  CloudRain, Sun, Flame, Sparkles, Trophy, Settings, Gauge, Compass, Eye 
+} from 'lucide-react';
 
 type CarModelType = 'supercar' | 'roadster' | 'titan';
-type TrackThemeType = 'synthwave' | 'rain' | 'mars';
-type CameraViewType = 'chase' | 'hood' | 'topdown';
+type TrackThemeType = 'tokyo' | 'rain' | 'canyon';
+type CameraViewType = 'chase' | 'cockpit' | 'hood' | 'topdown';
 
 interface HighScoreEntry {
   name: string;
@@ -21,11 +24,13 @@ export default function RacerTab() {
   // Customization & Garage State
   const [selectedCar, setSelectedCar] = useState<CarModelType>('supercar');
   const [underglowColor, setUnderglowColor] = useState<string>('#00f0ff');
-  const [trackTheme, setTrackTheme] = useState<TrackThemeType>('synthwave');
+  const [trackTheme, setTrackTheme] = useState<TrackThemeType>('tokyo');
   const [cameraView, setCameraView] = useState<CameraViewType>('chase');
 
   // Stats HUD State
   const [speed, setSpeed] = useState(0);
+  const [rpm, setRpm] = useState(1000);
+  const [gear, setGear] = useState(1);
   const [score, setScore] = useState(0);
   const [coins, setCoins] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -42,6 +47,9 @@ export default function RacerTab() {
   // Physics & Game Loop State Refs
   const speedRef = useRef(0);
   const playerXRef = useRef(0);
+  const playerRollRef = useRef(0);
+  const playerPitchRef = useRef(0);
+  const wheelRotationRef = useRef(0);
   const scoreRef = useRef(0);
   const coinsRef = useRef(0);
   const livesRef = useRef(3);
@@ -70,6 +78,8 @@ export default function RacerTab() {
 
   // 3D Objects Refs
   const playerCarGroupRef = useRef<THREE.Group | null>(null);
+  const frontWheelsRef = useRef<THREE.Group[]>([]);
+  const rearWheelsRef = useRef<THREE.Group[]>([]);
   const underglowLightRef = useRef<THREE.PointLight | null>(null);
   const playerFlameMeshRef = useRef<THREE.Mesh | null>(null);
   const playerFlameLightRef = useRef<THREE.PointLight | null>(null);
@@ -79,15 +89,9 @@ export default function RacerTab() {
   // Entities Pools
   const trafficCarsRef = useRef<{ group: THREE.Group; lane: number; z: number; speed: number }[]>([]);
   const pickupsRef = useRef<{ mesh: THREE.Mesh; type: 'coin' | 'nitro' | 'shield'; lane: number; z: number; collected: boolean }[]>([]);
-  const skidSmokeRef = useRef<THREE.Mesh[]>([]);
 
-  useEffect(() => {
-    soundEnabledRef.current = soundEnabled;
-  }, [soundEnabled]);
-
-  useEffect(() => {
-    cameraViewRef.current = cameraView;
-  }, [cameraView]);
+  useEffect(() => { soundEnabledRef.current = soundEnabled; }, [soundEnabled]);
+  useEffect(() => { cameraViewRef.current = cameraView; }, [cameraView]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -99,9 +103,9 @@ export default function RacerTab() {
         try { setHallOfFame(JSON.parse(savedHof)); } catch (e) {}
       } else {
         setHallOfFame([
-          { name: 'PRA', score: 25400 },
-          { name: 'NEO', score: 18900 },
-          { name: 'CYB', score: 14200 }
+          { name: 'PRA', score: 32400 },
+          { name: 'NEO', score: 24800 },
+          { name: 'CYB', score: 18200 }
         ]);
       }
     }
@@ -111,7 +115,7 @@ export default function RacerTab() {
     const handleResize = () => {
       if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
       const w = containerRef.current.clientWidth;
-      const h = Math.min(520, Math.max(340, w * 0.56));
+      const h = Math.min(540, Math.max(340, w * 0.56));
       cameraRef.current.aspect = w / h;
       cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(w, h);
@@ -139,7 +143,7 @@ export default function RacerTab() {
     }
   }, [selectedCar, underglowColor, trackTheme]);
 
-  // Web Audio Synthesizer
+  // Web Audio Synthesizer for Realistic V8 Engine & Sound FX
   const initAudio = () => {
     if (audioCtxRef.current) return;
     try {
@@ -152,22 +156,35 @@ export default function RacerTab() {
     const ctx = audioCtxRef.current;
     if (!ctx || ctx.state === 'suspended') return;
 
+    // Calculate gear (1 - 6) and RPM (1000 - 8000)
+    let currentGear = 1;
+    let gearMax = 60;
+    if (speedVal > 280) { currentGear = 6; gearMax = 380; }
+    else if (speedVal > 220) { currentGear = 5; gearMax = 280; }
+    else if (speedVal > 160) { currentGear = 4; gearMax = 220; }
+    else if (speedVal > 100) { currentGear = 3; gearMax = 160; }
+    else if (speedVal > 45) { currentGear = 2; gearMax = 100; }
+    setGear(currentGear);
+
+    const gearRatio = (speedVal % gearMax) / gearMax;
+    const calculatedRpm = Math.floor(1200 + gearRatio * 6800);
+    setRpm(calculatedRpm);
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sawtooth';
 
     const isNitro = isNitroActiveRef.current;
-    const baseFreq = isNitro ? 120 : 75;
-    const freqMult = isNitro ? 190 : 135;
+    const freq = 60 + (calculatedRpm / 8000) * 160 + (isNitro ? 80 : 0);
 
-    osc.frequency.setValueAtTime(baseFreq + (speedVal / 380) * freqMult, ctx.currentTime);
-    gain.gain.setValueAtTime(0.032, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.002, ctx.currentTime + 0.09);
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.003, ctx.currentTime + 0.08);
 
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.09);
+    osc.stop(ctx.currentTime + 0.08);
   };
 
   const playSoundEffect = (type: 'coin' | 'nitro' | 'shield' | 'crash' | 'drift') => {
@@ -191,18 +208,8 @@ export default function RacerTab() {
       osc.stop(now + 0.22);
     } else if (type === 'nitro') {
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(250, now);
-      osc.frequency.exponentialRampToValueAtTime(1400, now + 0.22);
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.25);
-    } else if (type === 'shield') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(523.25, now);
-      osc.frequency.setValueAtTime(1046.50, now + 0.1);
+      osc.frequency.setValueAtTime(280, now);
+      osc.frequency.exponentialRampToValueAtTime(1500, now + 0.25);
       gain.gain.setValueAtTime(0.1, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
       osc.connect(gain);
@@ -210,7 +217,7 @@ export default function RacerTab() {
       osc.start(now);
       osc.stop(now + 0.3);
     } else if (type === 'crash') {
-      const bufferSize = ctx.sampleRate * 0.6;
+      const bufferSize = ctx.sampleRate * 0.7;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
@@ -219,11 +226,11 @@ export default function RacerTab() {
       noise.buffer = buffer;
       const filter = ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(600, now);
-      filter.frequency.exponentialRampToValueAtTime(30, now + 0.6);
+      filter.frequency.setValueAtTime(700, now);
+      filter.frequency.exponentialRampToValueAtTime(40, now + 0.7);
 
-      gain.gain.setValueAtTime(0.35, now);
-      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.6);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.7);
 
       noise.connect(filter);
       filter.connect(gain);
@@ -236,12 +243,12 @@ export default function RacerTab() {
   const initThreeJS = () => {
     if (!containerRef.current) return;
     const width = containerRef.current.clientWidth;
-    const height = Math.min(520, Math.max(340, width * 0.56));
+    const height = Math.min(540, Math.max(340, width * 0.56));
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(62, width / height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 1000);
     camera.position.set(0, 3.2, 7.5);
     camera.lookAt(0, 1.2, -15);
     cameraRef.current = camera;
@@ -252,17 +259,19 @@ export default function RacerTab() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.2;
 
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    const ambientLight = new THREE.AmbientLight('#ffffff', 0.65);
+    const ambientLight = new THREE.AmbientLight('#ffffff', 0.75);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight('#00f0ff', 1.3);
-    dirLight.position.set(20, 45, -30);
+    const dirLight = new THREE.DirectionalLight('#ffffff', 1.5);
+    dirLight.position.set(25, 50, -25);
     dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
     applyTrackTheme(scene, trackTheme);
@@ -273,16 +282,15 @@ export default function RacerTab() {
     create3DPickups(scene);
   };
 
-  // Track Theme Switcher (Synthwave / Rain / Mars)
+  // Track Theme Switcher (Tokyo Night / Monaco Rain / Red Canyon)
   const applyTrackTheme = (scene: THREE.Scene, theme: TrackThemeType) => {
     if (theme === 'rain') {
-      scene.background = new THREE.Color('#04070d');
-      scene.fog = new THREE.FogExp2('#04070d', 0.007);
+      scene.background = new THREE.Color('#030712');
+      scene.fog = new THREE.FogExp2('#030712', 0.007);
 
-      // Rain Particle System
       if (!rainParticlesRef.current) {
         const rainGeo = new THREE.BufferGeometry();
-        const rainCount = 1200;
+        const rainCount = 1400;
         const pos = new Float32Array(rainCount * 3);
         for (let i = 0; i < rainCount * 3; i += 3) {
           pos[i] = (Math.random() - 0.5) * 60;
@@ -290,91 +298,137 @@ export default function RacerTab() {
           pos[i + 2] = (Math.random() - 0.5) * 300;
         }
         rainGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        const rainMat = new THREE.PointsMaterial({ color: '#38bdf8', size: 0.25, transparent: true, opacity: 0.6 });
+        const rainMat = new THREE.PointsMaterial({ color: '#38bdf8', size: 0.25, transparent: true, opacity: 0.65 });
         const rain = new THREE.Points(rainGeo, rainMat);
         scene.add(rain);
         rainParticlesRef.current = rain;
       }
-    } else if (theme === 'mars') {
+    } else if (theme === 'canyon') {
       scene.background = new THREE.Color('#1f0804');
       scene.fog = new THREE.FogExp2('#1f0804', 0.006);
       if (rainParticlesRef.current) { scene.remove(rainParticlesRef.current); rainParticlesRef.current = null; }
     } else {
-      scene.background = new THREE.Color('#030511');
-      scene.fog = new THREE.FogExp2('#030511', 0.0055);
+      scene.background = new THREE.Color('#020617');
+      scene.fog = new THREE.FogExp2('#020617', 0.005);
       if (rainParticlesRef.current) { scene.remove(rainParticlesRef.current); rainParticlesRef.current = null; }
     }
   };
 
-  // Rebuild 3D Supercar based on selected model & underglow
+  // Rebuild 3D Realistic Sports Car Model
   const rebuildPlayerCar = (scene: THREE.Scene, model: CarModelType, glowColor: string) => {
     if (playerCarGroupRef.current) scene.remove(playerCarGroupRef.current);
 
     const carGroup = new THREE.Group();
+    frontWheelsRef.current = [];
+    rearWheelsRef.current = [];
 
-    // Body Material
+    // Metallic Body Material
     const bodyMat = new THREE.MeshStandardMaterial({
       color: glowColor,
-      metalness: 0.9,
+      metalness: 0.85,
       roughness: 0.15,
       emissive: glowColor,
-      emissiveIntensity: 0.2
+      emissiveIntensity: 0.15
     });
 
-    let bodyWidth = 1.9, bodyHeight = 0.6, bodyLength = 3.8;
-    if (model === 'roadster') { bodyWidth = 1.85; bodyHeight = 0.48; bodyLength = 3.6; }
-    if (model === 'titan') { bodyWidth = 2.2; bodyHeight = 0.95; bodyLength = 4.2; }
+    let bodyWidth = 2.0, bodyHeight = 0.55, bodyLength = 4.2;
+    if (model === 'roadster') { bodyWidth = 1.9; bodyHeight = 0.48; bodyLength = 4.0; }
+    if (model === 'titan') { bodyWidth = 2.3; bodyHeight = 0.85; bodyLength = 4.6; }
 
+    // Lower Main Chassis Body
     const bodyGeo = new THREE.BoxGeometry(bodyWidth, bodyHeight, bodyLength);
     const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-    bodyMesh.position.y = bodyHeight / 2 + 0.2;
+    bodyMesh.position.y = bodyHeight / 2 + 0.25;
     bodyMesh.castShadow = true;
     carGroup.add(bodyMesh);
 
-    // Glass Windshield
-    const glassMat = new THREE.MeshStandardMaterial({ color: '#020617', metalness: 0.95, roughness: 0.05, opacity: 0.85, transparent: true });
-    const canopyGeo = new THREE.BoxGeometry(bodyWidth * 0.75, bodyHeight * 0.7, bodyLength * 0.45);
+    // Sleek Cabin & Windshield Glass
+    const glassMat = new THREE.MeshStandardMaterial({ 
+      color: '#090d16', 
+      metalness: 0.95, 
+      roughness: 0.05, 
+      opacity: 0.9, 
+      transparent: true 
+    });
+    const canopyGeo = new THREE.BoxGeometry(bodyWidth * 0.82, bodyHeight * 0.75, bodyLength * 0.45);
     const canopyMesh = new THREE.Mesh(canopyGeo, glassMat);
-    canopyMesh.position.set(0, bodyHeight + 0.25, -0.2);
+    canopyMesh.position.set(0, bodyHeight + 0.22, -0.15);
     carGroup.add(canopyMesh);
 
-    // Dynamic Underglow Light
+    // Active Aerodynamic Spoiler Wing
+    const spoilerWingGeo = new THREE.BoxGeometry(bodyWidth * 1.05, 0.06, 0.4);
+    const spoilerWingMat = new THREE.MeshStandardMaterial({ color: '#090d16', metalness: 0.9 });
+    const spoilerMesh = new THREE.Mesh(spoilerWingGeo, spoilerWingMat);
+    spoilerMesh.position.set(0, bodyHeight + 0.45, bodyLength / 2 - 0.2);
+    carGroup.add(spoilerMesh);
+
+    // Realistic 3D Alloy Wheels Helper
+    const createWheel = (x: number, y: number, z: number, isFront: boolean) => {
+      const wheelGroup = new THREE.Group();
+      
+      // Rubber Tire
+      const tireGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.25, 24);
+      const tireMat = new THREE.MeshStandardMaterial({ color: '#18181b', roughness: 0.85 });
+      const tireMesh = new THREE.Mesh(tireGeo, tireMat);
+      tireMesh.rotation.z = Math.PI / 2;
+      wheelGroup.add(tireMesh);
+
+      // Alloy Rim
+      const rimGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.26, 12);
+      const rimMat = new THREE.MeshStandardMaterial({ color: '#cbd5e1', metalness: 0.9, roughness: 0.1 });
+      const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+      rimMesh.rotation.z = Math.PI / 2;
+      wheelGroup.add(rimMesh);
+
+      wheelGroup.position.set(x, y, z);
+      carGroup.add(wheelGroup);
+
+      if (isFront) frontWheelsRef.current.push(wheelGroup);
+      else rearWheelsRef.current.push(wheelGroup);
+    };
+
+    createWheel(-bodyWidth / 2 - 0.05, 0.36, -bodyLength / 3, true);  // Front Left
+    createWheel(bodyWidth / 2 + 0.05, 0.36, -bodyLength / 3, true);   // Front Right
+    createWheel(-bodyWidth / 2 - 0.05, 0.36, bodyLength / 3, false);  // Rear Left
+    createWheel(bodyWidth / 2 + 0.05, 0.36, bodyLength / 3, false);   // Rear Right
+
+    // Headlights (High-intensity Xenon Spotlights)
+    const headlightLeft = new THREE.SpotLight('#ffffff', 5, 50, Math.PI / 5, 0.3);
+    headlightLeft.position.set(-0.8, 0.55, -bodyLength / 2);
+    headlightLeft.target.position.set(-0.8, 0, -30);
+    carGroup.add(headlightLeft);
+    carGroup.add(headlightLeft.target);
+
+    const headlightRight = new THREE.SpotLight('#ffffff', 5, 50, Math.PI / 5, 0.3);
+    headlightRight.position.set(0.8, 0.55, -bodyLength / 2);
+    headlightRight.target.position.set(0.8, 0, -30);
+    carGroup.add(headlightRight);
+    carGroup.add(headlightRight.target);
+
+    // Taillight Strip
+    const tailMat = new THREE.MeshStandardMaterial({ color: '#ff0055', emissive: '#ff0055', emissiveIntensity: 3.0 });
+    const tailGeo = new THREE.BoxGeometry(bodyWidth * 0.92, 0.08, 0.04);
+    const tailMesh = new THREE.Mesh(tailGeo, tailMat);
+    tailMesh.position.set(0, bodyHeight * 0.75, bodyLength / 2 + 0.01);
+    carGroup.add(tailMesh);
+
+    // Underglow Light
     const underglowLight = new THREE.PointLight(glowColor, 3.5, 12);
     underglowLight.position.set(0, 0.1, 0);
     carGroup.add(underglowLight);
     underglowLightRef.current = underglowLight;
 
-    // Headlights
-    const headlightLeft = new THREE.SpotLight(glowColor, 4, 45, Math.PI / 6, 0.4);
-    headlightLeft.position.set(-0.7, 0.5, -1.8);
-    headlightLeft.target.position.set(-0.7, 0, -25);
-    carGroup.add(headlightLeft);
-    carGroup.add(headlightLeft.target);
-
-    const headlightRight = new THREE.SpotLight(glowColor, 4, 45, Math.PI / 6, 0.4);
-    headlightRight.position.set(0.7, 0.5, -1.8);
-    headlightRight.target.position.set(0.7, 0, -25);
-    carGroup.add(headlightRight);
-    carGroup.add(headlightRight.target);
-
-    // Taillight
-    const tailMat = new THREE.MeshStandardMaterial({ color: '#ff007f', emissive: '#ff007f', emissiveIntensity: 2.5 });
-    const tailGeo = new THREE.BoxGeometry(bodyWidth * 0.9, 0.1, 0.05);
-    const tailMesh = new THREE.Mesh(tailGeo, tailMat);
-    tailMesh.position.set(0, bodyHeight * 0.8, bodyLength / 2 + 0.01);
-    carGroup.add(tailMesh);
-
-    // Exhaust Flame
-    const flameGeo = new THREE.ConeGeometry(0.32, 1.3, 8);
+    // Nitro Flame Cone
+    const flameGeo = new THREE.ConeGeometry(0.35, 1.4, 12);
     const flameMat = new THREE.MeshBasicMaterial({ color: glowColor, transparent: true, opacity: 0 });
     const flameMesh = new THREE.Mesh(flameGeo, flameMat);
     flameMesh.rotation.x = Math.PI / 2;
-    flameMesh.position.set(0, 0.4, bodyLength / 2 + 0.6);
+    flameMesh.position.set(0, 0.4, bodyLength / 2 + 0.7);
     carGroup.add(flameMesh);
     playerFlameMeshRef.current = flameMesh;
 
-    const flameLight = new THREE.PointLight(glowColor, 0, 12);
-    flameLight.position.set(0, 0.4, bodyLength / 2 + 0.6);
+    const flameLight = new THREE.PointLight(glowColor, 0, 14);
+    flameLight.position.set(0, 0.4, bodyLength / 2 + 0.7);
     carGroup.add(flameLight);
     playerFlameLightRef.current = flameLight;
 
@@ -384,16 +438,29 @@ export default function RacerTab() {
   };
 
   const create3DRoad = (scene: THREE.Scene) => {
-    const roadGeo = new THREE.PlaneGeometry(14, 400);
-    const roadMat = new THREE.MeshStandardMaterial({ color: '#0b0f1b', roughness: 0.4, metalness: 0.3 });
+    const roadGeo = new THREE.PlaneGeometry(16, 400);
+    const roadMat = new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.35, metalness: 0.4 });
     const roadMesh = new THREE.Mesh(roadGeo, roadMat);
     roadMesh.rotation.x = -Math.PI / 2;
     roadMesh.position.set(0, 0, -180);
     roadMesh.receiveShadow = true;
     scene.add(roadMesh);
 
-    const lineGeo = new THREE.PlaneGeometry(0.25, 4);
-    const lineMat = new THREE.MeshBasicMaterial({ color: '#00f0ff' });
+    // Highway Guardrails
+    const railMat = new THREE.MeshStandardMaterial({ color: '#64748b', metalness: 0.9, roughness: 0.2 });
+    const railGeo = new THREE.BoxGeometry(0.4, 0.6, 400);
+
+    const railLeft = new THREE.Mesh(railGeo, railMat);
+    railLeft.position.set(-8.2, 0.4, -180);
+    scene.add(railLeft);
+
+    const railRight = new THREE.Mesh(railGeo, railMat);
+    railRight.position.set(8.2, 0.4, -180);
+    scene.add(railRight);
+
+    // Center Dashed Lines
+    const lineGeo = new THREE.PlaneGeometry(0.3, 4.5);
+    const lineMat = new THREE.MeshBasicMaterial({ color: '#facc15' });
     const lineMesh = new THREE.InstancedMesh(lineGeo, lineMat, 40);
     const dummy = new THREE.Object3D();
 
@@ -410,14 +477,14 @@ export default function RacerTab() {
   const create3DCity = (scene: THREE.Scene) => {
     const buildingsGroup = new THREE.Group();
     const boxGeo = new THREE.BoxGeometry(1, 1, 1);
-    const buildingMat = new THREE.MeshStandardMaterial({ color: '#080e21', metalness: 0.8, roughness: 0.3, emissive: '#041d3a', emissiveIntensity: 0.3 });
+    const buildingMat = new THREE.MeshStandardMaterial({ color: '#050b1a', metalness: 0.85, roughness: 0.2, emissive: '#02132b', emissiveIntensity: 0.4 });
 
     for (let i = 0; i < 60; i++) {
       const bMesh = new THREE.Mesh(boxGeo, buildingMat);
-      const height = 15 + Math.random() * 45;
-      const width = 8 + Math.random() * 12;
-      const depth = 8 + Math.random() * 12;
-      const side = (i % 2 === 0 ? 1 : -1) * (18 + Math.random() * 25);
+      const height = 18 + Math.random() * 50;
+      const width = 9 + Math.random() * 14;
+      const depth = 9 + Math.random() * 14;
+      const side = (i % 2 === 0 ? 1 : -1) * (20 + Math.random() * 25);
       bMesh.scale.set(width, height, depth);
       bMesh.position.set(side, height / 2, -i * 12);
       buildingsGroup.add(bMesh);
@@ -427,23 +494,23 @@ export default function RacerTab() {
 
   const create3DTrafficCars = (scene: THREE.Scene) => {
     const cars: { group: THREE.Group; lane: number; z: number; speed: number }[] = [];
-    const carColors = ['#ff007f', '#facc15', '#a855f7', '#10b981', '#ef4444'];
-    const lanes = [-4, 0, 4];
+    const carColors = ['#ff0055', '#facc15', '#a855f7', '#10b981', '#38bdf8'];
+    const lanes = [-4.5, 0, 4.5];
 
     for (let i = 0; i < 15; i++) {
       const carGroup = new THREE.Group();
       const color = carColors[i % carColors.length];
 
       const bodyMat = new THREE.MeshStandardMaterial({ color, metalness: 0.8, roughness: 0.2 });
-      const bodyGeo = new THREE.BoxGeometry(1.8, 0.55, 3.6);
+      const bodyGeo = new THREE.BoxGeometry(1.9, 0.6, 3.8);
       const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-      bodyMesh.position.y = 0.45;
+      bodyMesh.position.y = 0.5;
       carGroup.add(bodyMesh);
 
-      const tailMat = new THREE.MeshBasicMaterial({ color: '#ef4444' });
-      const tailGeo = new THREE.BoxGeometry(1.6, 0.1, 0.05);
+      const tailMat = new THREE.MeshBasicMaterial({ color: '#ff0055' });
+      const tailGeo = new THREE.BoxGeometry(1.7, 0.1, 0.05);
       const tailMesh = new THREE.Mesh(tailGeo, tailMat);
-      tailMesh.position.set(0, 0.5, 1.81);
+      tailMesh.position.set(0, 0.55, 1.91);
       carGroup.add(tailMesh);
 
       const lane = lanes[i % lanes.length];
@@ -451,23 +518,23 @@ export default function RacerTab() {
       carGroup.position.set(lane, 0, z);
 
       scene.add(carGroup);
-      cars.push({ group: carGroup, lane, z, speed: 25 + Math.random() * 20 });
+      cars.push({ group: carGroup, lane, z, speed: 30 + Math.random() * 20 });
     }
     trafficCarsRef.current = cars;
   };
 
   const create3DPickups = (scene: THREE.Scene) => {
     const pickups: { mesh: THREE.Mesh; type: 'coin' | 'nitro' | 'shield'; lane: number; z: number; collected: boolean }[] = [];
-    const lanes = [-4, 0, 4];
+    const lanes = [-4.5, 0, 4.5];
 
-    const coinGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 16);
+    const coinGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.15, 16);
     const coinMat = new THREE.MeshStandardMaterial({ color: '#facc15', metalness: 0.9, roughness: 0.1 });
 
-    const nitroGeo = new THREE.IcosahedronGeometry(0.6, 1);
-    const nitroMat = new THREE.MeshStandardMaterial({ color: '#00f0ff', emissive: '#00f0ff', emissiveIntensity: 0.8 });
+    const nitroGeo = new THREE.IcosahedronGeometry(0.65, 1);
+    const nitroMat = new THREE.MeshStandardMaterial({ color: '#00f0ff', emissive: '#00f0ff', emissiveIntensity: 0.9 });
 
-    const shieldGeo = new THREE.OctahedronGeometry(0.7);
-    const shieldMat = new THREE.MeshStandardMaterial({ color: '#a855f7', emissive: '#a855f7', emissiveIntensity: 0.8 });
+    const shieldGeo = new THREE.OctahedronGeometry(0.75);
+    const shieldMat = new THREE.MeshStandardMaterial({ color: '#a855f7', emissive: '#a855f7', emissiveIntensity: 0.9 });
 
     for (let i = 0; i < 24; i++) {
       const rand = Math.random();
@@ -487,7 +554,7 @@ export default function RacerTab() {
     pickupsRef.current = pickups;
   };
 
-  // Keyboard Handlers
+  // Keyboard Event Handlers
   const handleKeyDown = (e: KeyboardEvent) => {
     initAudio();
     if (gameStateRef.current === 'start' || gameStateRef.current === 'gameover' || gameStateRef.current === 'garage') {
@@ -519,7 +586,7 @@ export default function RacerTab() {
   };
 
   const cycleCameraView = () => {
-    const views: CameraViewType[] = ['chase', 'hood', 'topdown'];
+    const views: CameraViewType[] = ['chase', 'cockpit', 'hood', 'topdown'];
     const nextIdx = (views.indexOf(cameraViewRef.current) + 1) % views.length;
     setCameraView(views[nextIdx]);
   };
@@ -534,6 +601,7 @@ export default function RacerTab() {
     setLives(3); livesRef.current = 3;
     speedRef.current = 0;
     playerXRef.current = 0;
+    playerRollRef.current = 0;
 
     setNitro(100); nitroRef.current = 100;
     setHasShield(false); shieldRef.current = false;
@@ -553,7 +621,7 @@ export default function RacerTab() {
 
   const lastTimeRef = useRef(0);
 
-  // Main Physics & Render Loop
+  // Main Physics Loop with Vehicle Handling Dynamics
   const gameLoop = (now: number) => {
     if (gameStateRef.current === 'start' || gameStateRef.current === 'gameover' || gameStateRef.current === 'garage') return;
 
@@ -567,62 +635,76 @@ export default function RacerTab() {
   };
 
   const update3DPhysics = (dt: number) => {
-    const maxSpeedLimit = isNitroActiveRef.current ? 385 : (selectedCar === 'roadster' ? 310 : (selectedCar === 'titan' ? 260 : 290));
+    const maxSpeedLimit = isNitroActiveRef.current ? 390 : (selectedCar === 'roadster' ? 320 : (selectedCar === 'titan' ? 280 : 300));
 
     if (gameStateRef.current === 'playing') {
-      // Drift Combo Logic
+      // Drift & Steering Physics
       const isSteering = keyLeftRef.current || keyRightRef.current;
-      if (isSteering && speedRef.current > 180) {
-        driftComboRef.current += dt * 2.5;
-        const mult = Math.min(4, Math.floor(driftComboRef.current) + 1);
+      if (isSteering && speedRef.current > 160) {
+        driftComboRef.current += dt * 2.8;
+        const mult = Math.min(5, Math.floor(driftComboRef.current) + 1);
         setDriftMultiplier(mult);
       } else {
-        driftComboRef.current = Math.max(0, driftComboRef.current - dt * 2);
+        driftComboRef.current = Math.max(0, driftComboRef.current - dt * 2.5);
         if (driftComboRef.current === 0) setDriftMultiplier(1);
       }
 
-      scoreRef.current += Math.round(speedRef.current * dt * 0.08 * (1 + (driftComboRef.current * 0.3)));
+      scoreRef.current += Math.round(speedRef.current * dt * 0.1 * (1 + (driftComboRef.current * 0.4)));
       setScore(scoreRef.current);
 
       if (keyNitroRef.current && nitroRef.current > 0 && speedRef.current > 60) {
         isNitroActiveRef.current = true;
         setIsNitroActive(true);
-        nitroRef.current = Math.max(0, nitroRef.current - dt * 42);
+        nitroRef.current = Math.max(0, nitroRef.current - dt * 45);
         setNitro(nitroRef.current);
-        speedRef.current = Math.min(maxSpeedLimit, speedRef.current + 230 * dt);
+        speedRef.current = Math.min(maxSpeedLimit, speedRef.current + 250 * dt);
       } else {
         isNitroActiveRef.current = false;
         setIsNitroActive(false);
-        nitroRef.current = Math.min(100, nitroRef.current + dt * 7.5);
+        nitroRef.current = Math.min(100, nitroRef.current + dt * 8);
         setNitro(nitroRef.current);
 
-        if (keyFasterRef.current) speedRef.current = Math.min(maxSpeedLimit, speedRef.current + 115 * dt);
-        else if (keySlowerRef.current) speedRef.current = Math.max(0, speedRef.current - 330 * dt);
-        else speedRef.current = Math.max(0, speedRef.current - 65 * dt);
+        if (keyFasterRef.current) speedRef.current = Math.min(maxSpeedLimit, speedRef.current + 125 * dt);
+        else if (keySlowerRef.current) speedRef.current = Math.max(0, speedRef.current - 350 * dt);
+        else speedRef.current = Math.max(0, speedRef.current - 70 * dt);
       }
 
       setSpeed(speedRef.current);
       playEngineSound(speedRef.current);
 
-      const steerFactor = isNitroActiveRef.current ? 7.5 : (selectedCar === 'roadster' ? 10.5 : 9.0);
-      if (keyLeftRef.current) playerXRef.current = Math.max(-5.2, playerXRef.current - dt * steerFactor);
-      else if (keyRightRef.current) playerXRef.current = Math.min(5.2, playerXRef.current + dt * steerFactor);
+      const steerFactor = isNitroActiveRef.current ? 8.0 : (selectedCar === 'roadster' ? 11.0 : 9.5);
+      if (keyLeftRef.current) playerXRef.current = Math.max(-5.5, playerXRef.current - dt * steerFactor);
+      else if (keyRightRef.current) playerXRef.current = Math.min(5.5, playerXRef.current + dt * steerFactor);
     } else if (gameStateRef.current === 'crashed') {
       isNitroActiveRef.current = false;
       setIsNitroActive(false);
-      speedRef.current = Math.max(0, speedRef.current - 400 * dt);
+      speedRef.current = Math.max(0, speedRef.current - 420 * dt);
       setSpeed(speedRef.current);
     }
 
+    // Realistic Car Suspension Pitch & Steering Wheel Rotation
     if (playerCarGroupRef.current) {
       playerCarGroupRef.current.position.x = playerXRef.current;
-      const targetRoll = keyLeftRef.current ? 0.14 : (keyRightRef.current ? -0.14 : 0);
-      playerCarGroupRef.current.rotation.z += (targetRoll - playerCarGroupRef.current.rotation.z) * 0.15;
+
+      // Body roll into corners
+      const targetRoll = keyLeftRef.current ? 0.16 : (keyRightRef.current ? -0.16 : 0);
+      playerRollRef.current += (targetRoll - playerRollRef.current) * 0.15;
+      playerCarGroupRef.current.rotation.z = playerRollRef.current;
+
+      // Wheel rotation on axle
+      wheelRotationRef.current += (speedRef.current * dt * 0.2);
+      frontWheelsRef.current.forEach(w => {
+        w.rotation.x = wheelRotationRef.current;
+        w.rotation.y = keyLeftRef.current ? 0.35 : (keyRightRef.current ? -0.35 : 0);
+      });
+      rearWheelsRef.current.forEach(w => {
+        w.rotation.x = wheelRotationRef.current;
+      });
 
       if (playerFlameMeshRef.current && playerFlameLightRef.current) {
         if (isNitroActiveRef.current) {
           (playerFlameMeshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.95;
-          playerFlameLightRef.current.intensity = 4.0;
+          playerFlameLightRef.current.intensity = 4.5;
         } else {
           (playerFlameMeshRef.current.material as THREE.MeshBasicMaterial).opacity = 0;
           playerFlameLightRef.current.intensity = 0;
@@ -630,17 +712,20 @@ export default function RacerTab() {
       }
     }
 
-    // Dynamic Camera View Angles (Chase / Hood / Topdown)
+    // Dynamic Camera Angles (Chase / Cockpit / Hood / Topdown)
     if (cameraRef.current) {
-      if (cameraViewRef.current === 'hood') {
-        cameraRef.current.position.set(playerXRef.current, 1.2, -0.5);
+      if (cameraViewRef.current === 'cockpit') {
+        cameraRef.current.position.set(playerXRef.current, 1.25, 0.1);
+        cameraRef.current.lookAt(playerXRef.current, 1.05, -25);
+      } else if (cameraViewRef.current === 'hood') {
+        cameraRef.current.position.set(playerXRef.current, 1.1, -1.2);
         cameraRef.current.lookAt(playerXRef.current, 1.0, -25);
       } else if (cameraViewRef.current === 'topdown') {
-        cameraRef.current.position.set(playerXRef.current * 0.5, 18, -4);
+        cameraRef.current.position.set(playerXRef.current * 0.5, 19, -4);
         cameraRef.current.lookAt(playerXRef.current * 0.5, 0, -18);
       } else {
-        // Chase Cam
-        const targetFOV = isNitroActiveRef.current ? 80 : (62 + (speedRef.current / 290) * 8);
+        // Realistic Dynamic Chase Cam with inertia follow
+        const targetFOV = isNitroActiveRef.current ? 82 : (62 + (speedRef.current / 300) * 10);
         cameraRef.current.fov += (targetFOV - cameraRef.current.fov) * 0.1;
         cameraRef.current.updateProjectionMatrix();
 
@@ -649,7 +734,7 @@ export default function RacerTab() {
           cameraRef.current.position.x = (Math.random() - 0.5) * screenShakeRef.current * 0.2;
           cameraRef.current.position.y = 3.2 + (Math.random() - 0.5) * screenShakeRef.current * 0.2;
         } else {
-          cameraRef.current.position.x = 0;
+          cameraRef.current.position.x = playerXRef.current * 0.25;
           cameraRef.current.position.y = 3.2;
         }
       }
@@ -659,7 +744,7 @@ export default function RacerTab() {
     if (rainParticlesRef.current) {
       const pos = rainParticlesRef.current.geometry.attributes.position.array as Float32Array;
       for (let i = 1; i < pos.length; i += 3) {
-        pos[i] -= dt * 45;
+        pos[i] -= dt * 50;
         if (pos[i] < 0) pos[i] = 40;
       }
       rainParticlesRef.current.geometry.attributes.position.needsUpdate = true;
@@ -683,7 +768,7 @@ export default function RacerTab() {
     pickupsRef.current.forEach(p => {
       p.mesh.rotation.y += dt * 3;
       p.z += moveDist;
-      if (p.z > 10) { p.z -= 420; p.collected = false; p.mesh.visible = true; p.lane = [-4, 0, 4][Math.floor(Math.random() * 3)]; p.mesh.position.x = p.lane; }
+      if (p.z > 10) { p.z -= 420; p.collected = false; p.mesh.visible = true; p.lane = [-4.5, 0, 4.5][Math.floor(Math.random() * 3)]; p.mesh.position.x = p.lane; }
       p.mesh.position.z = p.z;
 
       if (!p.collected && gameStateRef.current === 'playing' && Math.abs(p.z) < 2.2 && Math.abs(playerXRef.current - p.lane) < 1.4) {
@@ -706,7 +791,7 @@ export default function RacerTab() {
     // Traffic Collision
     trafficCarsRef.current.forEach(car => {
       car.z += moveDist - (car.speed * dt * 0.25);
-      if (car.z > 15) { car.z -= 380; car.lane = [-4, 0, 4][Math.floor(Math.random() * 3)]; car.group.position.x = car.lane; }
+      if (car.z > 15) { car.z -= 380; car.lane = [-4.5, 0, 4.5][Math.floor(Math.random() * 3)]; car.group.position.x = car.lane; }
       car.group.position.z = car.z;
 
       if (gameStateRef.current === 'playing' && Math.abs(car.z) < 2.4) {
@@ -725,7 +810,7 @@ export default function RacerTab() {
     if (shieldRef.current) {
       shieldRef.current = false; setHasShield(false);
       screenShakeRef.current = 6; playSoundEffect('shield');
-      addFloatingText('SHIELD ABSORBED CRASH!', '#38bdf8');
+      addFloatingText('SHIELD ABSORBED IMPACT!', '#38bdf8');
       return;
     }
 
@@ -742,7 +827,6 @@ export default function RacerTab() {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
       }
 
-      // Add score to Hall of Fame
       const newHof = [...hallOfFame, { name: playerName, score: scoreRef.current }].sort((a, b) => b.score - a.score).slice(0, 5);
       setHallOfFame(newHof);
       if (typeof localStorage !== 'undefined') localStorage.setItem('racer-hof', JSON.stringify(newHof));
@@ -783,17 +867,17 @@ export default function RacerTab() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-zinc-950/80 rounded-2xl border border-zinc-800 glass-card w-full max-w-4xl">
+    <div className="flex flex-col items-center justify-center p-4 bg-zinc-950/80 rounded-2xl border border-zinc-800 glass-card w-full max-w-4xl font-sans">
       {/* Top Controls Bar */}
-      <div className="flex justify-between items-center w-full mb-4 px-2">
+      <div className="flex justify-between items-center w-full mb-4 px-2 font-mono">
         <h3 className="text-xl md:text-2xl font-black text-cyber-pink tracking-wider neon-glow-text flex items-center gap-2">
-          <span>🏎️</span> CYBER RACER 3D
+          <span>🏎️</span> REALISTIC 3D RACER
         </h3>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button 
             onClick={cycleCameraView}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 text-xs font-bold text-cyber-cyan hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 text-xs font-bold text-cyber-cyan hover:text-white transition-colors"
           >
             <Camera className="w-4 h-4" />
             <span className="uppercase">{cameraView}</span>
@@ -802,6 +886,7 @@ export default function RacerTab() {
           <button 
             onClick={() => setGameState(gameState === 'garage' ? 'start' : 'garage')}
             className="p-2 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white transition-colors"
+            title="Garage Customizer"
           >
             <Settings className="w-4 h-4 text-cyber-pink" />
           </button>
@@ -809,44 +894,60 @@ export default function RacerTab() {
           <button 
             onClick={() => setSoundEnabled(!soundEnabled)}
             className="p-2 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white transition-colors"
+            title="Audio Synthesizer"
           >
             {soundEnabled ? <Volume2 className="w-4 h-4 text-cyber-cyan" /> : <VolumeX className="w-4 h-4 text-zinc-600" />}
           </button>
           
-          <div className="text-xs md:text-sm text-zinc-400 font-bold">
-            HIGH: <span className="text-gradient text-base font-extrabold ml-1">{highScore}</span>
+          <div className="text-xs md:text-sm text-zinc-400 font-bold ml-2">
+            RECORD: <span className="text-gradient text-base font-extrabold ml-1">{highScore}</span>
           </div>
         </div>
       </div>
 
-      {/* Dashboard Stats Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 w-full mb-4 p-3.5 rounded-xl bg-zinc-900/70 border border-zinc-800">
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">SPEED</span>
+      {/* Realistic Telemetry Dashboard Stats Panel */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 w-full mb-4 p-3.5 rounded-xl bg-zinc-900/80 border border-zinc-800 font-mono">
+        {/* Speedometer */}
+        <div className="flex flex-col items-center justify-center border-r border-zinc-800/80 pr-2">
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1">
+            <Gauge className="w-3 h-3 text-cyber-cyan" /> SPEED
+          </span>
           <span className={`text-xl md:text-2xl font-black ${isNitroActive ? 'text-cyber-pink animate-pulse' : 'text-cyber-cyan'}`}>
             {Math.round(speed)} <small className="text-[10px] font-normal text-zinc-400">KM/H</small>
           </span>
         </div>
 
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">SCORE</span>
+        {/* Tachometer RPM & Gear */}
+        <div className="flex flex-col items-center justify-center border-r border-zinc-800/80 pr-2">
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">TACH / GEAR</span>
+          <span className="text-sm font-black text-amber-400 flex items-center gap-1">
+            <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">G{gear}</span>
+            <span>{rpm} RPM</span>
+          </span>
+        </div>
+
+        {/* Score */}
+        <div className="flex flex-col items-center justify-center border-r border-zinc-800/80 pr-2">
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">SCORE</span>
           <span className="text-xl md:text-2xl font-black text-white">
             {score} {driftMultiplier > 1 && <small className="text-xs text-cyber-pink font-bold ml-1">x{driftMultiplier}</small>}
           </span>
         </div>
 
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1">
+        {/* Coins */}
+        <div className="flex flex-col items-center justify-center border-r border-zinc-800/80 pr-2">
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1">
             <span>🪙</span> COINS
           </span>
           <span className="text-xl md:text-2xl font-black text-amber-400">{coins}</span>
         </div>
 
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1">
+        {/* Nitro Meter */}
+        <div className="flex flex-col items-center justify-center border-r border-zinc-800/80 pr-2">
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1">
             <Zap className="w-3 h-3 text-cyber-cyan" /> NITRO
           </span>
-          <div className="w-20 md:w-24 h-2.5 bg-zinc-950 rounded-full overflow-hidden mt-1 border border-zinc-700">
+          <div className="w-16 md:w-20 h-2.5 bg-zinc-950 rounded-full overflow-hidden mt-1 border border-zinc-700">
             <div 
               className={`h-full rounded-full transition-all duration-75 ${
                 isNitroActive ? 'bg-gradient-to-r from-cyber-pink to-amber-500 animate-pulse' : 'bg-gradient-to-r from-cyber-cyan to-blue-500'
@@ -856,13 +957,14 @@ export default function RacerTab() {
           </div>
         </div>
 
+        {/* Lives */}
         <div className="flex flex-col items-center justify-center col-span-2 md:col-span-1">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">LIVES</span>
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">VEHICLE LIVES</span>
           <div className="flex gap-1.5 mt-1">
             {Array.from({ length: 3 }).map((_, idx) => (
               <Heart 
                 key={idx} 
-                className={`w-5 h-5 ${idx < lives ? 'text-red-500 fill-red-500 animate-bounce' : 'text-zinc-800'}`} 
+                className={`w-4 h-4 ${idx < lives ? 'text-red-500 fill-red-500 animate-bounce' : 'text-zinc-800'}`} 
               />
             ))}
           </div>
@@ -875,25 +977,29 @@ export default function RacerTab() {
 
         {/* Garage Customization Screen */}
         {gameState === 'garage' && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6">
-            <h2 className="text-2xl font-black text-cyber-cyan mb-4 flex items-center gap-2">
-              <span>🏎️</span> 3D GARAGE & CUSTOMIZER
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6 text-center space-y-6">
+            <h2 className="text-2xl font-black text-cyber-cyan flex items-center gap-2 font-mono">
+              <span>🏎️</span> REALISTIC 3D RACING GARAGE
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-2xl mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-2xl font-mono text-xs">
               {/* Select Supercar Model */}
               <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
-                <span className="text-xs font-bold text-zinc-400 block uppercase">Supercar Model</span>
+                <span className="text-xs font-bold text-zinc-400 block uppercase">Car Chassis Model</span>
                 <div className="flex flex-col gap-2">
-                  {(['supercar', 'roadster', 'titan'] as CarModelType[]).map(m => (
+                  {[
+                    { id: 'supercar', label: '🏎️ Gran Turismo GT' },
+                    { id: 'roadster', label: '🏎️ Le Mans GT' },
+                    { id: 'titan', label: '🛻 V8 Muscle Titan' }
+                  ].map(m => (
                     <button
-                      key={m}
-                      onClick={() => setSelectedCar(m)}
-                      className={`px-3 py-2 rounded-lg text-xs font-bold capitalize transition-all ${
-                        selectedCar === m ? 'bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan' : 'bg-zinc-950 text-zinc-400'
+                      key={m.id}
+                      onClick={() => setSelectedCar(m.id as CarModelType)}
+                      className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                        selectedCar === m.id ? 'bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan' : 'bg-zinc-950 text-zinc-400'
                       }`}
                     >
-                      {m}
+                      {m.label}
                     </button>
                   ))}
                 </div>
@@ -901,14 +1007,14 @@ export default function RacerTab() {
 
               {/* Select Underglow Color */}
               <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
-                <span className="text-xs font-bold text-zinc-400 block uppercase">Neon Underglow</span>
-                <div className="flex gap-3 justify-center pt-2">
-                  {['#00f0ff', '#ff007f', '#10b981', '#facc15'].map(color => (
+                <span className="text-xs font-bold text-zinc-400 block uppercase">Neon Paint & Underglow</span>
+                <div className="grid grid-cols-4 gap-2">
+                  {['#00f0ff', '#ff007f', '#facc15', '#10b981', '#a855f7', '#ef4444', '#ffffff', '#3b82f6'].map(color => (
                     <button
                       key={color}
                       onClick={() => setUnderglowColor(color)}
-                      className={`w-7 h-7 rounded-full transition-transform ${
-                        underglowColor === color ? 'scale-125 border-2 border-white' : ''
+                      className={`w-9 h-9 rounded-full border-2 transition-transform hover:scale-110 ${
+                        underglowColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent'
                       }`}
                       style={{ backgroundColor: color }}
                     />
@@ -916,122 +1022,121 @@ export default function RacerTab() {
                 </div>
               </div>
 
-              {/* Select Track Environment */}
+              {/* Select Real-World Track Theme */}
               <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
-                <span className="text-xs font-bold text-zinc-400 block uppercase">Track Theme</span>
+                <span className="text-xs font-bold text-zinc-400 block uppercase">Race Environment</span>
                 <div className="flex flex-col gap-2">
-                  {(['synthwave', 'rain', 'mars'] as TrackThemeType[]).map(t => (
+                  {[
+                    { id: 'tokyo', label: '🌃 Tokyo Night Highway' },
+                    { id: 'rain', label: '🌧️ Monaco Rain Circuit' },
+                    { id: 'canyon', label: '🏜️ Red Canyon Grand Prix' }
+                  ].map(t => (
                     <button
-                      key={t}
-                      onClick={() => setTrackTheme(t)}
-                      className={`px-3 py-2 rounded-lg text-xs font-bold capitalize transition-all ${
-                        trackTheme === t ? 'bg-cyber-pink/20 text-cyber-pink border border-cyber-pink' : 'bg-zinc-950 text-zinc-400'
+                      key={t.id}
+                      onClick={() => setTrackTheme(t.id as TrackThemeType)}
+                      className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                        trackTheme === t.id ? 'bg-cyber-pink/20 text-cyber-pink border border-cyber-pink' : 'bg-zinc-950 text-zinc-400'
                       }`}
                     >
-                      {t}
+                      {t.label}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <button 
+            <button
               onClick={startGame}
-              className="px-8 py-3 rounded-xl bg-gradient-to-r from-cyber-pink via-purple-600 to-cyber-cyan text-white font-black text-sm shadow-xl shadow-cyber-pink/30 hover:scale-105 active:scale-95 transition-all"
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyber-cyan via-blue-500 to-cyber-pink text-zinc-950 font-black text-sm tracking-wider hover:scale-105 active:scale-95 transition-all shadow-xl shadow-cyber-cyan/30 flex items-center gap-2 font-mono"
             >
-              RACE NOW 🚀
+              <Play className="w-5 h-5 fill-zinc-950" /> ENTER REAL-WORLD RACE
             </button>
           </div>
         )}
 
-        {/* Start / Gameover Overlay Modal */}
-        {(gameState === 'start' || gameState === 'gameover') && (
-          <div 
-            onClick={startGame} 
-            className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer z-10 p-6 text-center"
-          >
-            <h1 className="text-3xl md:text-5xl font-black tracking-widest text-cyber-cyan mb-2 drop-shadow-[0_0_20px_rgba(0,240,255,0.8)]">
-              CYBER RACER 3D
-            </h1>
+        {/* Start Overlay */}
+        {gameState === 'start' && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6 text-center space-y-4 font-mono">
+            <h3 className="text-2xl font-black text-white">READY TO RACE?</h3>
+            <p className="text-xs text-zinc-400 max-w-xs">
+              Steer with <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-white">A / D</kbd> or <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-white">← / →</kbd>. Press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-white">SHIFT</kbd> for Nitro!
+            </p>
+            <button
+              onClick={startGame}
+              className="px-8 py-3 rounded-xl bg-cyber-cyan text-zinc-950 font-black text-xs hover:scale-105 transition-all flex items-center gap-2 shadow-lg shadow-cyber-cyan/30"
+            >
+              <Play className="w-4 h-4 fill-zinc-950" /> START RACE
+            </button>
+          </div>
+        )}
+
+        {/* Game Over Screen */}
+        {gameState === 'gameover' && (
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6 text-center space-y-4 font-mono">
+            <Trophy className="w-12 h-12 text-amber-400 animate-bounce" />
+            <h3 className="text-2xl font-black text-white">RACE FINISHED!</h3>
+            <p className="text-xs text-zinc-400">Final Score: {score} | Coins: {coins}</p>
 
             {/* Hall of Fame Leaderboard */}
-            <div className="my-4 p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 max-w-sm w-full">
-              <span className="text-xs font-bold text-cyber-pink uppercase tracking-wider flex items-center justify-center gap-1 mb-2">
-                <Trophy className="w-4 h-4 text-amber-400" /> Hall of Fame
-              </span>
-              <div className="space-y-1 text-xs">
+            <div className="w-full max-w-xs p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs">
+              <span className="font-bold text-cyber-cyan block mb-2 uppercase">🏆 Hall of Fame Top Racers</span>
+              <div className="space-y-1">
                 {hallOfFame.map((entry, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-zinc-400">
+                  <div key={idx} className="flex justify-between font-bold text-zinc-300">
                     <span>{idx + 1}. {entry.name}</span>
-                    <span className="font-extrabold text-amber-400">{entry.score} PTS</span>
+                    <span className="text-amber-400">{entry.score}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <button className="flex items-center gap-2 px-8 py-3.5 font-black text-sm rounded-xl bg-gradient-to-r from-cyber-pink via-purple-600 to-cyber-cyan text-white shadow-xl shadow-cyber-pink/30 hover:scale-105 active:scale-95 transition-all">
-              <Play className="w-5 h-5 fill-white" />
-              <span>{gameState === 'start' ? 'START 3D RACE' : 'PLAY AGAIN'}</span>
+            <button
+              onClick={startGame}
+              className="px-6 py-3 rounded-xl bg-cyber-cyan text-zinc-950 font-black text-xs hover:scale-105 transition-all flex items-center gap-2 shadow-lg shadow-cyber-cyan/30"
+            >
+              <RotateCcw className="w-4 h-4" /> RETRY RACE
             </button>
           </div>
         )}
       </div>
 
       {/* Mobile Touch Controllers */}
-      <div className="flex justify-between w-full mt-4 gap-4 select-none touch-none">
-        <div className="flex gap-2">
-          <button 
-            onTouchStart={() => setMobileAction('left', true)}
-            onTouchEnd={() => setMobileAction('left', false)}
-            onMouseDown={() => setMobileAction('left', true)}
-            onMouseUp={() => setMobileAction('left', false)}
-            className="w-16 h-16 rounded-2xl border-2 border-cyber-cyan/40 bg-zinc-900/80 text-cyber-cyan font-black text-xl flex items-center justify-center active:bg-cyber-cyan/30 active:scale-95 shadow-lg select-none touch-none"
-          >
-            ◀
-          </button>
-          <button 
-            onTouchStart={() => setMobileAction('right', true)}
-            onTouchEnd={() => setMobileAction('right', false)}
-            onMouseDown={() => setMobileAction('right', true)}
-            onMouseUp={() => setMobileAction('right', false)}
-            className="w-16 h-16 rounded-2xl border-2 border-cyber-cyan/40 bg-zinc-900/80 text-cyber-cyan font-black text-xl flex items-center justify-center active:bg-cyber-cyan/30 active:scale-95 shadow-lg select-none touch-none"
-          >
-            ▶
-          </button>
-        </div>
-
-        <div className="flex gap-2">
-          <button 
-            onTouchStart={() => setMobileAction('stop', true)}
-            onTouchEnd={() => setMobileAction('stop', false)}
-            onMouseDown={() => setMobileAction('stop', true)}
-            onMouseUp={() => setMobileAction('stop', false)}
-            className="w-16 h-16 rounded-2xl border-2 border-red-500/40 bg-red-950/40 text-red-400 font-extrabold text-xs flex items-center justify-center active:bg-red-900/50 active:scale-95 shadow-lg select-none touch-none"
-          >
-            BRAKE
-          </button>
-          <button 
-            onTouchStart={() => setMobileAction('nitro', true)}
-            onTouchEnd={() => setMobileAction('nitro', false)}
-            onMouseDown={() => setMobileAction('nitro', true)}
-            onMouseUp={() => setMobileAction('nitro', false)}
-            disabled={nitro <= 0}
-            className={`w-16 h-16 rounded-2xl border-2 border-cyber-pink/50 bg-cyber-pink/20 text-cyber-pink font-black text-xs flex items-center justify-center active:bg-cyber-pink/40 active:scale-95 shadow-lg select-none touch-none ${
-              nitro <= 0 ? 'opacity-30 cursor-not-allowed' : ''
-            }`}
-          >
-            BOOST
-          </button>
-          <button 
-            onTouchStart={() => setMobileAction('go', true)}
-            onTouchEnd={() => setMobileAction('go', false)}
-            onMouseDown={() => setMobileAction('go', true)}
-            onMouseUp={() => setMobileAction('go', false)}
-            className="w-16 h-16 rounded-2xl border-2 border-emerald-500/40 bg-emerald-950/40 text-emerald-400 font-black text-sm flex items-center justify-center active:bg-emerald-900/50 active:scale-95 shadow-lg select-none touch-none"
-          >
-            GAS!
-          </button>
-        </div>
+      <div className="grid grid-cols-5 gap-2 w-full mt-4 sm:hidden font-mono">
+        <button
+          onMouseDown={() => setMobileAction('left', true)} onMouseUp={() => setMobileAction('left', false)}
+          onTouchStart={() => setMobileAction('left', true)} onTouchEnd={() => setMobileAction('left', false)}
+          className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-center active:bg-zinc-800"
+        >
+          ◀
+        </button>
+        <button
+          onMouseDown={() => setMobileAction('right', true)} onMouseUp={() => setMobileAction('right', false)}
+          onTouchStart={() => setMobileAction('right', true)} onTouchEnd={() => setMobileAction('right', false)}
+          className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-center active:bg-zinc-800"
+        >
+          ▶
+        </button>
+        <button
+          onMouseDown={() => setMobileAction('go', true)} onMouseUp={() => setMobileAction('go', false)}
+          onTouchStart={() => setMobileAction('go', true)} onTouchEnd={() => setMobileAction('go', false)}
+          className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-center active:bg-emerald-500/40"
+        >
+          GAS
+        </button>
+        <button
+          onMouseDown={() => setMobileAction('stop', true)} onMouseUp={() => setMobileAction('stop', false)}
+          onTouchStart={() => setMobileAction('stop', true)} onTouchEnd={() => setMobileAction('stop', false)}
+          className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 font-bold text-center active:bg-red-500/40"
+        >
+          BRAKE
+        </button>
+        <button
+          onMouseDown={() => setMobileAction('nitro', true)} onMouseUp={() => setMobileAction('nitro', false)}
+          onTouchStart={() => setMobileAction('nitro', true)} onTouchEnd={() => setMobileAction('nitro', false)}
+          className="p-3 rounded-xl bg-cyber-pink/20 border border-cyber-pink/40 text-cyber-pink font-bold text-center active:bg-cyber-pink/40"
+        >
+          NITRO
+        </button>
       </div>
     </div>
   );
