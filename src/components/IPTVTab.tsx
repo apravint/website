@@ -174,7 +174,7 @@ export default function IPTVTab() {
         video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       });
 
-      hls.on(Hls.Events.ERROR, (_, data) => {
+      hls.on(Hls.Events.ERROR, (_: unknown, data: { fatal?: boolean; type?: string }) => {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:

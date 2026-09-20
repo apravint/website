@@ -39,6 +39,7 @@ export default function RacerTab() {
   const [hasShield, setHasShield] = useState(false);
   const [driftMultiplier, setDriftMultiplier] = useState(1);
   const [isNitroActive, setIsNitroActive] = useState(false);
+  const [orbitalCooldown, setOrbitalCooldown] = useState(0);
   const [gameState, setGameState] = useState<'garage' | 'start' | 'playing' | 'crashed' | 'gameover'>('garage');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hallOfFame, setHallOfFame] = useState<HighScoreEntry[]>([]);
@@ -200,7 +201,7 @@ export default function RacerTab() {
     osc.stop(ctx.currentTime + 0.08);
   };
 
-  const playSoundEffect = (type: 'coin' | 'nitro' | 'shield' | 'crash' | 'drift') => {
+  const playSoundEffect = (type: 'coin' | 'nitro' | 'shield' | 'crash' | 'drift' | 'orbital') => {
     if (!soundEnabledRef.current) return;
     const ctx = audioCtxRef.current;
     if (!ctx) return;
@@ -229,6 +230,16 @@ export default function RacerTab() {
       gain.connect(ctx.destination);
       osc.start(now);
       osc.stop(now + 0.3);
+    } else if (type === 'orbital') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(1400, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.5);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.5);
     } else if (type === 'crash') {
       const bufferSize = ctx.sampleRate * 0.7;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -709,6 +720,25 @@ export default function RacerTab() {
     animationFrameRef.current = requestAnimationFrame(gameLoop);
   };
 
+  const triggerOrbitalStrike = () => {
+    if (orbitalCooldown > 0 || gameStateRef.current !== 'playing') return;
+
+    setOrbitalCooldown(12);
+    screenShakeRef.current = 20;
+    playSoundEffect('orbital');
+    addFloatingText('SATELLITE ORBITAL STRIKE! +1000', '#10b981');
+    scoreRef.current += 1000;
+    setScore(scoreRef.current);
+
+    // Clear traffic in current lane
+    trafficCarsRef.current.forEach(car => {
+      if (Math.abs(car.group.position.x - playerXRef.current) < 2.2 && car.z < 0 && car.z > -120) {
+        car.z -= 220;
+        car.group.position.z = car.z;
+      }
+    });
+  };
+
   const lastTimeRef = useRef(0);
 
   // Main Physics Loop with Vehicle Handling Dynamics
@@ -717,6 +747,8 @@ export default function RacerTab() {
 
     const dt = Math.min(0.08, (now - lastTimeRef.current) / 1000);
     lastTimeRef.current = now;
+
+    setOrbitalCooldown(prev => Math.max(0, prev - dt));
 
     update3DPhysics(dt);
     render3DScene();
@@ -1065,6 +1097,54 @@ export default function RacerTab() {
       <div className="relative w-full min-h-[480px] md:min-h-[660px] border-2 border-cyber-cyan/40 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,240,255,0.15)] bg-black font-sans">
         <div ref={containerRef} className="w-full h-full min-h-[480px] md:min-h-[660px] flex items-center justify-center overflow-hidden block" />
 
+        {/* God's Eye View Tactical Satellite Overlay */}
+        {cameraView === 'topdown' && gameState === 'playing' && (
+          <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4 font-mono select-none">
+            {/* Top Satellite Telemetry Bar */}
+            <div className="flex justify-between items-start bg-black/60 backdrop-blur-md p-3 rounded-xl border border-emerald-500/40 text-[10px] text-emerald-400">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                <span className="font-extrabold uppercase tracking-widest text-emerald-300">
+                  📡 GOD'S EYE SATELLITE RADAR - LAT 35.67° N / LON 139.65° E
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="block text-zinc-400">TARGET LOCK: ACTIVE</span>
+                <span className="text-cyber-cyan font-bold">ALT: 450M | SCAN: 60Hz</span>
+              </div>
+            </div>
+
+            {/* Center Reticle Scanning Grid Lines */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
+              <div className="w-64 h-64 border-2 border-dashed border-emerald-400 rounded-full animate-spin-slow flex items-center justify-center">
+                <div className="w-48 h-48 border border-emerald-500/50 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-emerald-400 rounded-full animate-ping" />
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Orbital Laser Strike Action Control */}
+            <div className="flex justify-center pointer-events-auto pb-4">
+              <button
+                onClick={triggerOrbitalStrike}
+                disabled={orbitalCooldown > 0}
+                className={`px-6 py-3 rounded-2xl font-black text-xs md:text-sm tracking-widest uppercase transition-all flex items-center gap-2 shadow-2xl backdrop-blur-md ${
+                  orbitalCooldown > 0
+                    ? 'bg-zinc-900/80 text-zinc-500 border border-zinc-800 opacity-60 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyber-cyan text-zinc-950 border border-emerald-400 shadow-emerald-500/50 hover:scale-105 active:scale-95 animate-pulse'
+                }`}
+              >
+                <span>📡⚡</span>
+                <span>
+                  {orbitalCooldown > 0 
+                    ? `ORBITAL RECHARGE (${Math.ceil(orbitalCooldown)}s)` 
+                    : 'ORBITAL LASER STRIKE [READY]'}
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Garage Customization Screen */}
         {gameState === 'garage' && (
           <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6 text-center space-y-6">
@@ -1191,41 +1271,52 @@ export default function RacerTab() {
       </div>
 
       {/* Mobile Touch Controllers */}
-      <div className="grid grid-cols-5 gap-2 w-full mt-4 sm:hidden font-mono">
+      <div className="grid grid-cols-6 gap-1.5 w-full mt-3 font-mono select-none touch-none">
         <button
           onMouseDown={() => setMobileAction('left', true)} onMouseUp={() => setMobileAction('left', false)}
-          onTouchStart={() => setMobileAction('left', true)} onTouchEnd={() => setMobileAction('left', false)}
-          className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-center active:bg-zinc-800"
+          onTouchStart={(e) => { e.preventDefault(); setMobileAction('left', true); }} onTouchEnd={(e) => { e.preventDefault(); setMobileAction('left', false); }}
+          className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-black text-center text-lg active:bg-zinc-800 touch-none select-none"
         >
           ◀
         </button>
         <button
           onMouseDown={() => setMobileAction('right', true)} onMouseUp={() => setMobileAction('right', false)}
-          onTouchStart={() => setMobileAction('right', true)} onTouchEnd={() => setMobileAction('right', false)}
-          className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-center active:bg-zinc-800"
+          onTouchStart={(e) => { e.preventDefault(); setMobileAction('right', true); }} onTouchEnd={(e) => { e.preventDefault(); setMobileAction('right', false); }}
+          className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-black text-center text-lg active:bg-zinc-800 touch-none select-none"
         >
           ▶
         </button>
         <button
           onMouseDown={() => setMobileAction('go', true)} onMouseUp={() => setMobileAction('go', false)}
-          onTouchStart={() => setMobileAction('go', true)} onTouchEnd={() => setMobileAction('go', false)}
-          className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-center active:bg-emerald-500/40"
+          onTouchStart={(e) => { e.preventDefault(); setMobileAction('go', true); }} onTouchEnd={(e) => { e.preventDefault(); setMobileAction('go', false); }}
+          className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs text-center active:bg-emerald-500/40 touch-none select-none"
         >
           GAS
         </button>
         <button
           onMouseDown={() => setMobileAction('stop', true)} onMouseUp={() => setMobileAction('stop', false)}
-          onTouchStart={() => setMobileAction('stop', true)} onTouchEnd={() => setMobileAction('stop', false)}
-          className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 font-bold text-center active:bg-red-500/40"
+          onTouchStart={(e) => { e.preventDefault(); setMobileAction('stop', true); }} onTouchEnd={(e) => { e.preventDefault(); setMobileAction('stop', false); }}
+          className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 font-bold text-xs text-center active:bg-red-500/40 touch-none select-none"
         >
           BRAKE
         </button>
         <button
           onMouseDown={() => setMobileAction('nitro', true)} onMouseUp={() => setMobileAction('nitro', false)}
-          onTouchStart={() => setMobileAction('nitro', true)} onTouchEnd={() => setMobileAction('nitro', false)}
-          className="p-3 rounded-xl bg-cyber-pink/20 border border-cyber-pink/40 text-cyber-pink font-bold text-center active:bg-cyber-pink/40"
+          onTouchStart={(e) => { e.preventDefault(); setMobileAction('nitro', true); }} onTouchEnd={(e) => { e.preventDefault(); setMobileAction('nitro', false); }}
+          className="p-3 rounded-xl bg-cyber-pink/20 border border-cyber-pink/40 text-cyber-pink font-bold text-xs text-center active:bg-cyber-pink/40 touch-none select-none"
         >
           NITRO
+        </button>
+        <button
+          onClick={cycleCameraView}
+          className={`p-3 rounded-xl border text-xs font-bold text-center transition-all touch-none select-none ${
+            cameraView === 'topdown' 
+              ? 'bg-emerald-500/30 border-emerald-400 text-emerald-300 font-black animate-pulse'
+              : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
+          }`}
+          title="Toggle Camera View (Chase / Hood / Cockpit / God's Eye Topdown)"
+        >
+          {cameraView === 'topdown' ? '📡 RADAR' : '🎥 CAM'}
         </button>
       </div>
     </div>
