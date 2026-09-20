@@ -3,19 +3,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Sparkles, BarChart2, Tv, BookOpen, Trophy, Zap
+  Gamepad2, Bot, Tv, BookOpen, Trophy, Zap
 } from 'lucide-react';
 
 import RacerTab from '@/components/RacerTab';
 import CyberPongTab from '@/components/CyberPongTab';
 import AIAssistantTab from '@/components/AIAssistantTab';
-import NewsTab from '@/components/NewsTab';
-import MarketTab from '@/components/MarketTab';
 import IPTVTab from '@/components/IPTVTab';
 import ThirukkuralTab from '@/components/ThirukkuralTab';
 import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'ai' | 'arcade' | 'news' | 'market' | 'iptv' | 'thirukkural';
+type TabType = 'ai' | 'arcade' | 'iptv' | 'thirukkural';
 type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
@@ -25,8 +23,6 @@ export default function Page() {
   const menuItems = [
     { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-cyber-cyan' },
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
-    { id: 'news', label: 'News', icon: Sparkles, color: 'text-amber-400' },
-    { id: 'market', label: 'Markets', icon: BarChart2, color: 'text-emerald-400' },
     { id: 'iptv', label: 'IPTV', icon: Tv, color: 'text-purple-400' },
     { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-blue-400' },
   ];
@@ -121,8 +117,6 @@ export default function Page() {
               </div>
             )}
 
-            {activeTab === 'news' && <NewsTab />}
-            {activeTab === 'market' && <MarketTab />}
             {activeTab === 'iptv' && <IPTVTab />}
             {activeTab === 'thirukkural' && <ThirukkuralTab />}
           </motion.div>
