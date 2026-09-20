@@ -115,17 +115,30 @@ export default function RacerTab() {
     const handleResize = () => {
       if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
       const w = containerRef.current.clientWidth;
-      const h = Math.min(540, Math.max(340, w * 0.56));
+      if (!w || w === 0) return;
+      const h = Math.min(720, Math.max(480, Math.round(w * 0.48)));
       cameraRef.current.aspect = w / h;
       cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(w, h);
     };
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    const timer = setTimeout(handleResize, 150);
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
     return () => {
+      resizeObserver.disconnect();
+      clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
@@ -242,8 +255,9 @@ export default function RacerTab() {
   // Three.js WebGL 3D Engine Initialization
   const initThreeJS = () => {
     if (!containerRef.current) return;
-    const width = containerRef.current.clientWidth;
-    const height = Math.min(540, Math.max(340, width * 0.56));
+    containerRef.current.innerHTML = '';
+    const width = containerRef.current.clientWidth || 1200;
+    const height = Math.min(720, Math.max(480, Math.round(width * 0.48)));
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -260,6 +274,10 @@ export default function RacerTab() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
+
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.display = 'block';
 
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -1044,8 +1062,8 @@ export default function RacerTab() {
       </div>
 
       {/* Main 3D WebGL Viewport Container */}
-      <div className="relative w-full border-2 border-cyber-cyan/40 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,240,255,0.15)] bg-black">
-        <div ref={containerRef} className="w-full h-auto block" />
+      <div className="relative w-full min-h-[480px] md:min-h-[660px] border-2 border-cyber-cyan/40 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,240,255,0.15)] bg-black font-sans">
+        <div ref={containerRef} className="w-full h-full min-h-[480px] md:min-h-[660px] flex items-center justify-center overflow-hidden block" />
 
         {/* Garage Customization Screen */}
         {gameState === 'garage' && (
