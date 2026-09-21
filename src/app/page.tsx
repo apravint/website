@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home
+  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Radar
 } from 'lucide-react';
 
 import HomeTab from '@/components/HomeTab';
@@ -14,23 +14,25 @@ import IPTVTab from '@/components/IPTVTab';
 import ThirukkuralTab from '@/components/ThirukkuralTab';
 import CalendarTab from '@/components/CalendarTab';
 import KavithaiTab from '@/components/KavithaiTab';
+import GodsEyeViewTab from '@/components/GodsEyeViewTab';
 import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'home' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
+type TabType = 'godseye' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai' | 'home';
 type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState<TabType>('ai');
+  const [activeTab, setActiveTab] = useState<TabType>('godseye');
   const [arcadeGame, setArcadeGame] = useState<ArcadeGameType>('racer');
 
   const menuItems = [
-    { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-cyber-cyan' },
+    { id: 'godseye', label: "God's Eye View", icon: Radar, color: 'text-cyber-cyan' },
+    { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-emerald-400' },
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
     { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-purple-400' },
     { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-blue-400' },
     { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-amber-400' },
     { id: 'kavithai', label: 'Kavithai', icon: Feather, color: 'text-rose-400' },
-    { id: 'home', label: 'Home Hub', icon: Home, color: 'text-emerald-400' },
+    { id: 'home', label: 'Home Hub', icon: Home, color: 'text-zinc-400' },
   ];
 
   return (
@@ -86,6 +88,7 @@ export default function Page() {
             transition={{ duration: 0.18 }}
             className="w-full flex flex-col items-center justify-center"
           >
+            {activeTab === 'godseye' && <GodsEyeViewTab />}
             {activeTab === 'home' && <HomeTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
             {activeTab === 'ai' && <AIAssistantTab />}
 
