@@ -76,7 +76,7 @@ export default function Page() {
       </header>
 
       {/* Main Tab Portal View - Expanded to Full Screen max-w-[1700px] */}
-      <main className="flex-1 w-full max-w-[1700px] mx-auto p-3 sm:p-6 flex flex-col items-center justify-center">
+      <main className="flex-1 w-full max-w-[1700px] mx-auto p-2 sm:p-6 pb-20 md:pb-6 flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -95,7 +95,7 @@ export default function Page() {
                 <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-zinc-800 shadow-lg font-mono">
                   <button
                     onClick={() => setArcadeGame('racer')}
-                    className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
+                    className={`px-4 sm:px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
                       arcadeGame === 'racer'
                         ? 'bg-cyber-pink text-white shadow-lg shadow-cyber-pink/30 scale-105'
                         : 'text-zinc-400 hover:text-white'
@@ -105,7 +105,7 @@ export default function Page() {
                   </button>
                   <button
                     onClick={() => setArcadeGame('pong')}
-                    className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
+                    className={`px-4 sm:px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
                       arcadeGame === 'pong'
                         ? 'bg-cyber-cyan text-zinc-950 shadow-lg shadow-cyber-cyan/30 scale-105'
                         : 'text-zinc-400 hover:text-white'
@@ -131,6 +131,26 @@ export default function Page() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Mobile Sticky Bottom Navigation Bar */}
+      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 border-t border-zinc-800 backdrop-blur-md flex justify-around items-center p-1.5 md:hidden">
+        {menuItems.slice(0, 5).map((item) => {
+          const Icon = item.icon;
+          const isSelected = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id as TabType)}
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-all ${
+                isSelected ? 'text-cyber-cyan scale-105 font-extrabold' : 'text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              <Icon className={`w-5 h-5 ${isSelected ? 'text-cyber-cyan' : item.color}`} />
+              <span className="text-[9px] tracking-wider">{item.label}</span>
+            </button>
+          );
+        })}
+      </footer>
     </div>
   );
 }
