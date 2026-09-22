@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Radar, Shield, Flag
+  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, ScanEye, Shield, Flag
 } from 'lucide-react';
 
 import HomeTab from '@/components/HomeTab';
@@ -25,7 +25,7 @@ export default function Page() {
   const [arcadeGame, setArcadeGame] = useState<ArcadeGameType>('racer');
 
   const menuItems = [
-    { id: 'godseye', label: "God's Eye View", icon: Radar, color: 'text-cyan-400' },
+    { id: 'godseye', label: "God's Eye View", icon: ScanEye, color: 'text-cyan-400' },
     { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-emerald-400' },
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-pink-400' },
     { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-purple-400' },

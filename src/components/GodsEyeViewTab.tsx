@@ -4,10 +4,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Radar, Globe, Eye, Flame, Plane, Ship, Activity, Satellite,
-  Volume2, VolumeX, Crosshair, Search, Compass, ShieldAlert,
-  Layers, Info, Lock, Maximize2, RotateCcw, Zap, Target, Sliders,
-  EyeOff, Navigation, Share2, Check, Moon, Sun, Map, X, MapPin
+  ScanEye, Orbit, Radar, Globe, Globe2, Eye, Flame, Plane, Ship, Activity, Satellite,
+  Volume2, VolumeX, Crosshair, Search, Compass, ShieldAlert, Waves, Anchor, Radio,
+  SlidersHorizontal, Layers, Info, Lock, Maximize2, RotateCcw, Zap, Target,
+  EyeOff, Navigation, Share2, Check, Moon, Sun, Map, X, MapPin, LocateFixed,
+  Terminal, Cpu, Grid, Aperture, Gauge, Sparkles
 } from 'lucide-react';
 
 // Sensor Filter Modes
@@ -743,7 +744,7 @@ export default function GodsEyeViewTab() {
           
           <div className="flex items-center gap-3 z-10">
             <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-              <Eye className="w-5 h-5" />
+              <ScanEye className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
@@ -803,13 +804,13 @@ export default function GodsEyeViewTab() {
             {/* Map Imagery Style Switcher */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <Map className="w-4 h-4" /> Map Imagery Style
+                <Globe2 className="w-4 h-4" /> Map Imagery Style
               </div>
               <div className="grid grid-cols-3 gap-1.5">
                 {[
-                  { id: 'SATELLITE', label: 'NASA SAT', icon: Sun },
-                  { id: 'NIGHT', label: 'CITY LIGHTS', icon: Moon },
-                  { id: 'VECTOR', label: 'VECTOR', icon: Globe },
+                  { id: 'SATELLITE', label: 'NASA SAT', icon: Satellite },
+                  { id: 'NIGHT', label: 'CITY LIGHTS', icon: Sparkles },
+                  { id: 'VECTOR', label: 'VECTOR', icon: Grid },
                 ].map(item => {
                   const Icon = item.icon;
                   const isSelected = mapStyle === item.id;
@@ -834,7 +835,7 @@ export default function GodsEyeViewTab() {
             {/* Sensor Mode Switcher Card */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center justify-between text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <span className="flex items-center gap-2"><Layers className="w-4 h-4" /> Sensor Filter Mode</span>
+                <span className="flex items-center gap-2"><Aperture className="w-4 h-4" /> Sensor Filter Mode</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {(['OPTICAL', 'FLIR', 'NVG', 'AMBER'] as SensorMode[]).map(mode => (
@@ -862,7 +863,7 @@ export default function GodsEyeViewTab() {
             {/* HUD Layout & Viewport Toggles */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <Sliders className="w-4 h-4" /> Viewport Controls
+                <SlidersHorizontal className="w-4 h-4" /> Viewport Controls
               </div>
               
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -877,7 +878,7 @@ export default function GodsEyeViewTab() {
                       : 'bg-slate-900/60 border-slate-800 text-slate-500'
                   }`}
                 >
-                  <Target className="w-3.5 h-3.5" /> Scope Mask
+                  <Crosshair className="w-3.5 h-3.5" /> Scope Mask
                 </button>
 
                 <button
@@ -891,7 +892,7 @@ export default function GodsEyeViewTab() {
                       : 'bg-slate-900/60 border-slate-800 text-slate-500'
                   }`}
                 >
-                  <Navigation className="w-3.5 h-3.5" /> Cockpit HUD
+                  <Gauge className="w-3.5 h-3.5" /> Cockpit HUD
                 </button>
               </div>
 
@@ -914,18 +915,18 @@ export default function GodsEyeViewTab() {
             {/* Intelligence Stream Categories */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center justify-between text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <span className="flex items-center gap-2"><Radar className="w-4 h-4" /> Intel Categories</span>
+                <span className="flex items-center gap-2"><Radio className="w-4 h-4 animate-pulse" /> Intel Categories</span>
                 <span className="text-[10px] text-slate-500 font-mono">{filteredEntitiesList.length} Active</span>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 {[
-                  { id: 'all', label: 'All Intel Feeds', icon: Globe, count: entities.length, color: 'text-white' },
+                  { id: 'all', label: 'All Intel Feeds', icon: Orbit, count: entities.length, color: 'text-cyan-400' },
                   { id: 'satellites', label: 'Orbiting Satellites', icon: Satellite, count: entities.filter(e => e.type === 'satellite').length, color: 'text-amber-400' },
                   { id: 'flights', label: 'Commercial Flights', icon: Plane, count: entities.filter(e => e.type === 'flight').length, color: 'text-sky-400' },
-                  { id: 'earthquakes', label: 'USGS Earthquakes', icon: Activity, count: earthquakeCount, color: 'text-rose-400' },
+                  { id: 'earthquakes', label: 'USGS Earthquakes', icon: Waves, count: earthquakeCount, color: 'text-rose-400' },
                   { id: 'fires', label: 'Thermal Hotspots', icon: Flame, count: entities.filter(e => e.type === 'fire').length, color: 'text-orange-400' },
-                  { id: 'vessels', label: 'Maritime AIS Ships', icon: Ship, count: entities.filter(e => e.type === 'vessel').length, color: 'text-emerald-400' },
+                  { id: 'vessels', label: 'Maritime AIS Ships', icon: Anchor, count: entities.filter(e => e.type === 'vessel').length, color: 'text-emerald-400' },
                 ].map(cat => {
                   const Icon = cat.icon;
                   const isSelected = activeCategory === cat.id;
@@ -958,7 +959,7 @@ export default function GodsEyeViewTab() {
             {/* Quick Jump Hotspot Target Presets */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center gap-2 text-xs font-bold text-pink-400 uppercase tracking-wider">
-                <Compass className="w-4 h-4" /> Hotspot Jump Targets
+                <LocateFixed className="w-4 h-4" /> Hotspot Jump Targets
               </div>
               <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto scrollbar-thin">
                 {TACTICAL_PRESETS.map((preset, idx) => (
@@ -1004,7 +1005,11 @@ export default function GodsEyeViewTab() {
                   tag.type === 'fire' ? 'bg-orange-950/80 border-orange-500/50 text-orange-300' :
                   'bg-emerald-950/80 border-emerald-500/50 text-emerald-300'
                 }`}>
-                  <MapPin className="w-2.5 h-2.5 animate-pulse" />
+                  {tag.type === 'satellite' && <Satellite className="w-2.5 h-2.5 animate-pulse" />}
+                  {tag.type === 'flight' && <Plane className="w-2.5 h-2.5 animate-pulse" />}
+                  {tag.type === 'earthquake' && <Waves className="w-2.5 h-2.5 animate-pulse" />}
+                  {tag.type === 'fire' && <Flame className="w-2.5 h-2.5 animate-pulse" />}
+                  {tag.type === 'vessel' && <Anchor className="w-2.5 h-2.5 animate-pulse" />}
                   <span>{tag.name.length > 18 ? tag.name.substring(0, 18) + '...' : tag.name}</span>
                 </div>
                 <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-md animate-ping" />
@@ -1146,7 +1151,7 @@ export default function GodsEyeViewTab() {
           {!cleanUiMode && (
             <div className="p-3 sm:p-4 rounded-2xl glass-card border border-slate-800/80 bg-slate-950/70 flex flex-col gap-2">
               <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <Zap className="w-4 h-4" /> Live Recon Intel Telemetry Logs
+                <Terminal className="w-4 h-4" /> Live Recon Intel Telemetry Logs
               </div>
               <div className="flex flex-col gap-1 text-[11px] font-mono text-slate-400 max-h-[80px] overflow-y-auto scrollbar-thin">
                 {intelLogs.map((log, index) => (
@@ -1264,7 +1269,7 @@ export default function GodsEyeViewTab() {
             {/* Live Targets List */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70 max-h-[300px] overflow-hidden">
               <div className="flex items-center justify-between text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <span className="flex items-center gap-2"><Info className="w-4 h-4" /> Live Target Mesh</span>
+                <span className="flex items-center gap-2"><Cpu className="w-4 h-4" /> Live Target Mesh</span>
                 <span className="text-[10px] text-slate-500">{filteredEntitiesList.length} Targets</span>
               </div>
 
