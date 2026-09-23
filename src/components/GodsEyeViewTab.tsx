@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ScanEye, Orbit, Radar, Globe, Globe2, Eye, Flame, Plane, Ship, Activity, Satellite,
   Volume2, VolumeX, Crosshair, Search, Compass, ShieldAlert, Waves, Anchor, Radio,
-  SlidersHorizontal, Layers, Info, Lock, Maximize2, RotateCcw, Zap, Target,
+  SlidersHorizontal, Layers, Info, Lock, Maximize2, Minimize2, RotateCcw, Zap, Target,
   EyeOff, Navigation, Share2, Check, Moon, Sun, Map, X, MapPin, LocateFixed,
   Terminal, Cpu, Grid, Aperture, Gauge, Sparkles, Video, Play, Pause, FastForward,
-  ShieldCheck, UserCheck, AlertTriangle, RadioTower, RefreshCw, Camera, Move
+  ShieldCheck, UserCheck, AlertTriangle, RadioTower, RefreshCw, Camera, Move, LayoutGrid
 } from 'lucide-react';
 
 // Sensor Filter Modes
@@ -72,6 +72,10 @@ const TACTICAL_PRESETS = [
 export default function GodsEyeViewTab() {
   const mountRef = useRef<HTMLDivElement>(null);
   const pipCanvasRef = useRef<HTMLCanvasElement>(null);
+  const cam1CanvasRef = useRef<HTMLCanvasElement>(null);
+  const cam2CanvasRef = useRef<HTMLCanvasElement>(null);
+  const cam3CanvasRef = useRef<HTMLCanvasElement>(null);
+  const cam4CanvasRef = useRef<HTMLCanvasElement>(null);
   
   // HUD & UI States
   const [sensorMode, setSensorMode] = useState<SensorMode>('OPTICAL');
@@ -81,8 +85,18 @@ export default function GodsEyeViewTab() {
   const [cockpitMode, setCockpitMode] = useState<boolean>(false);
   const [cleanUiMode, setCleanUiMode] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  // Surveillance Camera & God's Eye Webcam States
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [showPipFeed, setShowPipFeed] = useState<boolean>(true);
-  const [pipCameraMode, setPipCameraMode] = useState<'OPTICAL' | 'FLIR' | 'NVG' | 'INFRARED'>('FLIR');
+  const [pipCameraMode, setPipCameraMode] = useState<'OPTICAL' | 'FLIR' | 'NVG' | 'INFRARED' | 'WEBCAM_GODSEYE'>('FLIR');
+  const [webcamActive, setWebcamActive] = useState<boolean>(false);
+  const [webcamError, setWebcamError] = useState<string | null>(null);
+  const [dewarpAmount, setDewarpAmount] = useState<number>(65); // Fisheye dewarp distortion correction
+  const [topDownTilt, setTopDownTilt] = useState<number>(45); // Bird's eye overhead perspective tilt
+  const [showRoomGrid, setShowRoomGrid] = useState<boolean>(true); // Spatial room grid
+  const [multiCamMode, setMultiCamMode] = useState<boolean>(false);
+  const [pipExpanded, setPipExpanded] = useState<boolean>(false);
   
   const [activeCategory, setActiveCategory] = useState<IntelCategory>('all');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
@@ -163,6 +177,31 @@ export default function GodsEyeViewTab() {
     }
   }, [soundEnabled]);
 
+  const playShutterSound = useCallback(() => {
+    if (!soundEnabled) return;
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1800, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    } catch {
+      // Fallback
+    }
+  }, [soundEnabled]);
+
   // Three.js References
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -201,6 +240,51 @@ export default function GodsEyeViewTab() {
     playBeep(1300, 0.15, 'square');
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  // Capture Camera Snapshot
+  const captureCameraSnapshot = () => {
+    playShutterSound();
+    setToastMessage(`SURVEILLANCE SNAPSHOT SAVED`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Start Hardware Webcam Stream (God's Eye Mode)
+  const startWebcamStream = useCallback(async () => {
+    try {
+      setWebcamError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setWebcamActive(true);
+      setPipCameraMode('WEBCAM_GODSEYE');
+      setShowPipFeed(true);
+      setToastMessage("GOD'S EYE WEBCAM STREAM ACTIVE");
+      playBeep(1200, 0.15, 'triangle');
+      setTimeout(() => setToastMessage(null), 3000);
+    } catch (err) {
+      console.error("Webcam error:", err);
+      setWebcamError("Camera access denied or device unavailable.");
+      setToastMessage("WEBCAM ACCESS DENIED");
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  }, [playBeep]);
+
+  // Stop Hardware Webcam Stream
+  const stopWebcamStream = useCallback(() => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setWebcamActive(false);
+    setPipCameraMode('FLIR');
+    setToastMessage("GOD'S EYE WEBCAM DISCONNECTED");
+    setTimeout(() => setToastMessage(null), 3000);
+  }, []);
 
   // Fetch Live Earthquakes
   const fetchLiveEarthquakes = useCallback(async () => {
@@ -418,7 +502,6 @@ export default function GodsEyeViewTab() {
       prog += 5;
       setReconProgress(prog);
 
-      // Random target spin sound during scan
       if (prog % 15 === 0) playBeep(900 + Math.random() * 400, 0.05, 'square');
       targetRotationRef.current.y += (Math.random() - 0.5) * 0.8;
       targetRotationRef.current.x += (Math.random() - 0.5) * 0.4;
@@ -427,7 +510,6 @@ export default function GodsEyeViewTab() {
         clearInterval(interval);
         setIsReconScanning(false);
 
-        // Find matching entity or random entity
         const match = entities.find(e => 
           e.name.toLowerCase().includes(targetQueryName.toLowerCase()) || 
           (e.targetPerson && e.targetPerson.toLowerCase().includes(targetQueryName.toLowerCase())) ||
@@ -446,107 +528,218 @@ export default function GodsEyeViewTab() {
     }, 100);
   };
 
-  // Render PiP Camera Simulator Feed
-  useEffect(() => {
-    if (!showPipFeed || !pipCanvasRef.current) return;
-    const canvas = pipCanvasRef.current;
+  // Render Procedural & Live God's Eye Camera Feed Helper
+  const drawCameraFeedOnCanvas = useCallback((
+    canvas: HTMLCanvasElement | null,
+    mode: 'OPTICAL' | 'FLIR' | 'NVG' | 'INFRARED' | 'WEBCAM_GODSEYE',
+    label: string,
+    time: number
+  ) => {
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
-    let time = 0;
+    const w = canvas.width;
+    const h = canvas.height;
 
-    const renderPipFeed = () => {
-      time += 0.05;
-      const w = canvas.width;
-      const h = canvas.height;
+    // IF LIVE WEBCAM MODE IS ACTIVE AND VIDEO STREAM IS PLAYING
+    if (mode === 'WEBCAM_GODSEYE' && webcamActive && videoRef.current && videoRef.current.readyState >= 2) {
+      ctx.save();
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, w, h);
 
-      // Clear & Base Background according to camera mode
-      if (pipCameraMode === 'FLIR') {
-        ctx.fillStyle = '#060214';
+      // Apply Top-Down Perspective Tilt Skew & Fisheye Scale Transformation
+      const tiltScaleY = 0.5 + (topDownTilt / 90) * 0.5;
+      const dewarpScale = 1.0 + (dewarpAmount / 100) * 0.3;
+
+      ctx.translate(w / 2, h / 2);
+      ctx.scale(dewarpScale, dewarpScale * tiltScaleY);
+      
+      // Draw Video Frame
+      ctx.drawImage(videoRef.current, -w / 2, -h / 2, w, h);
+      ctx.restore();
+
+      // Apply Optional Color Sensor Filter on Live Video
+      if (sensorMode === 'NVG') {
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.2)';
         ctx.fillRect(0, 0, w, h);
-      } else if (pipCameraMode === 'NVG') {
-        ctx.fillStyle = '#011508';
+      } else if (sensorMode === 'FLIR') {
+        ctx.fillStyle = 'rgba(236, 72, 153, 0.2)';
         ctx.fillRect(0, 0, w, h);
-      } else if (pipCameraMode === 'INFRARED') {
-        ctx.fillStyle = '#1c0303';
-        ctx.fillRect(0, 0, w, h);
-      } else {
-        ctx.fillStyle = '#050c1a';
+      } else if (sensorMode === 'CRT_MATRIX') {
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
         ctx.fillRect(0, 0, w, h);
       }
 
-      // Draw Simulated Wireframe Terrain Grid
-      ctx.strokeStyle = pipCameraMode === 'NVG' ? 'rgba(34, 197, 94, 0.25)' : 
-                        pipCameraMode === 'FLIR' ? 'rgba(236, 72, 153, 0.25)' : 
-                        pipCameraMode === 'INFRARED' ? 'rgba(239, 68, 68, 0.3)' : 
-                        'rgba(6, 182, 212, 0.25)';
-      ctx.lineWidth = 1;
-
-      for (let x = 0; x < w; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
+      // Overhead Room Spatial Grid Overlay
+      if (showRoomGrid) {
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+        ctx.lineWidth = 1;
+        const gridStep = 24;
+        for (let x = 0; x < w; x += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+        for (let y = 0; y < h; y += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
       }
-      for (let y = 0; y < h; y += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
-      }
 
-      // Draw Target Lock Box & Bounding Box in Center
-      const cx = w / 2 + Math.sin(time * 2) * 15;
+      // Dynamic Target Bounding Box
+      const cx = w / 2 + Math.sin(time * 2) * 14;
       const cy = h / 2 + Math.cos(time * 1.5) * 10;
-
-      ctx.strokeStyle = pipCameraMode === 'NVG' ? '#22c55e' : 
-                        pipCameraMode === 'FLIR' ? '#f43f5e' : 
-                        pipCameraMode === 'INFRARED' ? '#ef4444' : '#06b6d4';
+      ctx.strokeStyle = '#06b6d4';
       ctx.lineWidth = 2;
-
-      // Lock Reticle Corner Brackets
-      const boxSize = 50;
-      ctx.strokeRect(cx - boxSize / 2, cy - boxSize / 2, boxSize, boxSize);
-
-      // Inner Pulse Dot
-      ctx.fillStyle = ctx.strokeStyle;
+      ctx.strokeRect(cx - 24, cy - 24, 48, 48);
+      ctx.fillStyle = '#06b6d4';
       ctx.beginPath();
       ctx.arc(cx, cy, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // Simulated Thermal Heatmap Hotspot Blobs
-      if (pipCameraMode === 'FLIR' || pipCameraMode === 'INFRARED') {
-        const heatGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 35);
-        heatGrad.addColorStop(0, '#fef08a');
-        heatGrad.addColorStop(0.4, '#f97316');
-        heatGrad.addColorStop(0.8, '#7c2d12');
-        heatGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = heatGrad;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 35, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Tactical Telemetry Text Overlay
+      // Live Telemetry Text
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(`[GOD'S EYE WEBCAM - BIRD'S EYE TOP-DOWN]`, 6, 12);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '9px monospace';
-      ctx.fillText(`SAT-CAM: ${pipCameraMode} FEED`, 8, 14);
-      ctx.fillText(`TARGET: ${selectedEntity ? selectedEntity.name.substring(0, 20) : 'ORBITAL LOCK'}`, 8, 26);
-      ctx.fillText(`TEMP: ${(36.8 + Math.sin(time) * 1.5).toFixed(1)}°C | REC ●`, 8, h - 10);
+      ctx.fillText(`DEWARP: ${dewarpAmount}% | PITCH: ${topDownTilt}° | GRID: ${showRoomGrid ? 'ON' : 'OFF'}`, 6, 22);
+      ctx.fillText(`FPS: 60 | FEED: LIVE HD WEBCAM ●`, 6, h - 8);
 
-      // Scanline effect overlay
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      // Scanlines
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
       for (let sl = 0; sl < h; sl += 4) {
         ctx.fillRect(0, sl, w, 2);
       }
 
-      animId = requestAnimationFrame(renderPipFeed);
+      return;
+    }
+
+    // IF WEBCAM MODE SELECTED BUT NOT ACTIVE YET
+    if (mode === 'WEBCAM_GODSEYE' && !webcamActive) {
+      ctx.fillStyle = '#030816';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText("📷 GOD'S EYE LIVE WEBCAM DISCONNECTED", w / 2, h / 2 - 12);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '9px monospace';
+      ctx.fillText("Click 'START WEBCAM' in control bar to view top-down feed", w / 2, h / 2 + 8);
+      ctx.textAlign = 'left';
+      return;
+    }
+
+    // SIMULATED CAMERAS (OPTICAL, FLIR, NVG, INFRARED)
+    if (mode === 'FLIR') ctx.fillStyle = '#060214';
+    else if (mode === 'NVG') ctx.fillStyle = '#011508';
+    else if (mode === 'INFRARED') ctx.fillStyle = '#1c0303';
+    else ctx.fillStyle = '#050c1a';
+
+    ctx.fillRect(0, 0, w, h);
+
+    // Wireframe Grid Lines
+    ctx.strokeStyle = mode === 'NVG' ? 'rgba(34, 197, 94, 0.25)' : 
+                      mode === 'FLIR' ? 'rgba(236, 72, 153, 0.25)' : 
+                      mode === 'INFRARED' ? 'rgba(239, 68, 68, 0.3)' : 
+                      'rgba(6, 182, 212, 0.25)';
+    ctx.lineWidth = 1;
+
+    for (let x = 0; x < w; x += 18) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+    for (let y = 0; y < h; y += 18) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+
+    // Dynamic Target Bounding Box
+    const cx = w / 2 + Math.sin(time * 2) * 12;
+    const cy = h / 2 + Math.cos(time * 1.5) * 8;
+
+    ctx.strokeStyle = mode === 'NVG' ? '#22c55e' : 
+                      mode === 'FLIR' ? '#f43f5e' : 
+                      mode === 'INFRARED' ? '#ef4444' : '#06b6d4';
+    ctx.lineWidth = 2;
+
+    const boxSize = 44;
+    ctx.strokeRect(cx - boxSize / 2, cy - boxSize / 2, boxSize, boxSize);
+
+    // Target Pulse Dot
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Thermal Heatmap Gradient
+    if (mode === 'FLIR' || mode === 'INFRARED') {
+      const heatGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 30);
+      heatGrad.addColorStop(0, '#fef08a');
+      heatGrad.addColorStop(0.4, '#f97316');
+      heatGrad.addColorStop(0.8, '#7c2d12');
+      heatGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = heatGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Telemetry text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '8px monospace';
+    ctx.fillText(`${label}`, 6, 12);
+    ctx.fillText(`TARGET: ${selectedEntity ? selectedEntity.name.substring(0, 16) : 'LOCK ACTIVE'}`, 6, 22);
+    ctx.fillText(`TEMP: ${(36.6 + Math.sin(time) * 1.2).toFixed(1)}°C | REC ●`, 6, h - 8);
+
+    // Scanlines
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    for (let sl = 0; sl < h; sl += 4) {
+      ctx.fillRect(0, sl, w, 2);
+    }
+  }, [selectedEntity, webcamActive, dewarpAmount, topDownTilt, showRoomGrid, sensorMode]);
+
+  // Main PiP Camera & Multi-Cam Canvas Render Loop
+  useEffect(() => {
+    let animId: number;
+    let time = 0;
+
+    const renderLoop = () => {
+      time += 0.05;
+
+      if (showPipFeed) {
+        drawCameraFeedOnCanvas(pipCanvasRef.current, pipCameraMode, `CAM 01 (${pipCameraMode})`, time);
+      }
+
+      if (multiCamMode) {
+        drawCameraFeedOnCanvas(
+          cam1CanvasRef.current,
+          webcamActive ? 'WEBCAM_GODSEYE' : 'OPTICAL',
+          webcamActive ? "CAM 01: GOD'S EYE WEBCAM" : 'CAM 01: SATELLITE OPTICAL',
+          time
+        );
+        drawCameraFeedOnCanvas(cam2CanvasRef.current, 'FLIR', 'CAM 02: DRONE FLIR THERMAL', time);
+        drawCameraFeedOnCanvas(cam3CanvasRef.current, 'NVG', 'CAM 03: GROUND NVG RECON', time);
+        drawCameraFeedOnCanvas(cam4CanvasRef.current, 'INFRARED', 'CAM 04: INFRARED SPECTRUM', time);
+      }
+
+      animId = requestAnimationFrame(renderLoop);
     };
 
-    renderPipFeed();
+    renderLoop();
     return () => cancelAnimationFrame(animId);
-  }, [showPipFeed, pipCameraMode, selectedEntity]);
+  }, [showPipFeed, multiCamMode, pipCameraMode, drawCameraFeedOnCanvas]);
 
   // Initialize Three.js 3D Scene
   useEffect(() => {
@@ -754,17 +947,14 @@ export default function GodsEyeViewTab() {
       animationFrameIdRef.current = requestAnimationFrame(animate);
       const delta = clock.getDelta();
 
-      // Clouds rotation
       if (cloudsMeshRef.current) {
         cloudsMeshRef.current.rotation.y += delta * 0.03;
       }
 
-      // Globe auto rotation when unlocked
       if (!isDraggingRef.current && !isLockedOn) {
         targetRotationRef.current.y += 0.0012 * timeMultiplier;
       }
 
-      // Smooth Lerp Camera Controls
       currentRotationRef.current.x += (targetRotationRef.current.x - currentRotationRef.current.x) * 0.08;
       currentRotationRef.current.y += (targetRotationRef.current.y - currentRotationRef.current.y) * 0.08;
       currentCameraDistanceRef.current += (targetCameraDistanceRef.current - currentCameraDistanceRef.current) * 0.08;
@@ -782,7 +972,6 @@ export default function GodsEyeViewTab() {
         orbitsGroupRef.current.rotation.y += delta * 0.05 * timeMultiplier;
       }
 
-      // Pulse markers
       if (markersGroupRef.current) {
         markersGroupRef.current.children.forEach(child => {
           if (child.userData.isPulse) {
@@ -792,7 +981,6 @@ export default function GodsEyeViewTab() {
         });
       }
 
-      // Compute 2D Screen Overlay Tags
       if (cameraRef.current && globeGroupRef.current && mountRef.current && entities.length > 0) {
         const w = mountRef.current.clientWidth;
         const h = mountRef.current.clientHeight;
@@ -828,7 +1016,6 @@ export default function GodsEyeViewTab() {
         setScreenOverlays(overlays);
       }
 
-      // Camera Coordinates Output
       const currentLng = ((-currentRotationRef.current.y * (180 / Math.PI)) % 360 + 540) % 360 - 180;
       const currentLat = currentRotationRef.current.x * (180 / Math.PI);
       const currentAlt = Math.round((currentCameraDistanceRef.current - 1.6) * 250);
@@ -857,7 +1044,6 @@ export default function GodsEyeViewTab() {
   useEffect(() => {
     if (!markersGroupRef.current || !arcsGroupRef.current || !uplinksGroupRef.current) return;
 
-    // Clear previous children
     while (markersGroupRef.current.children.length > 0) markersGroupRef.current.remove(markersGroupRef.current.children[0]);
     while (arcsGroupRef.current.children.length > 0) arcsGroupRef.current.remove(arcsGroupRef.current.children[0]);
     while (uplinksGroupRef.current.children.length > 0) uplinksGroupRef.current.remove(uplinksGroupRef.current.children[0]);
@@ -897,7 +1083,6 @@ export default function GodsEyeViewTab() {
         size = 0.038;
       }
 
-      // Marker Mesh
       const geom = new THREE.SphereGeometry(size, 16, 16);
       const mat = new THREE.MeshBasicMaterial({ color });
       const mesh = new THREE.Mesh(geom, mat);
@@ -914,13 +1099,12 @@ export default function GodsEyeViewTab() {
       markersGroupRef.current?.add(mesh);
       markersGroupRef.current?.add(ringMesh);
 
-      // Trajectory 3D Bezier Arcs
       if (showTrajectories && entity.trajectoryEndLat !== undefined && entity.trajectoryEndLng !== undefined) {
         const startPos = latLngToVector3(entity.lat, entity.lng, sphereRadius, 0.02);
         const endPos = latLngToVector3(entity.trajectoryEndLat, entity.trajectoryEndLng, sphereRadius, 0.02);
 
         const midPos = new THREE.Vector3().addVectors(startPos, endPos).multiplyScalar(0.5);
-        midPos.multiplyScalar(1.25); // Curve height arc
+        midPos.multiplyScalar(1.25);
 
         const curve = new THREE.QuadraticBezierCurve3(startPos, midPos, endPos);
         const points = curve.getPoints(32);
@@ -929,7 +1113,6 @@ export default function GodsEyeViewTab() {
         arcsGroupRef.current?.add(new THREE.Line(arcGeo, arcMat));
       }
 
-      // Satellite Laser Uplink Beams to Earth Surface
       if (showUplinks && entity.type === 'satellite') {
         const surfacePos = latLngToVector3(entity.lat, entity.lng, sphereRadius, 0.005);
         const beamPts = [pos, surfacePos];
@@ -996,6 +1179,7 @@ export default function GodsEyeViewTab() {
 
   return (
     <div className="w-full max-w-[1700px] flex flex-col items-center gap-4 text-slate-100 font-mono select-none relative">
+      <video ref={videoRef} className="hidden" playsInline muted />
       
       {/* Toast Notification */}
       <AnimatePresence>
@@ -1037,7 +1221,6 @@ export default function GodsEyeViewTab() {
                 <span className="text-xs text-slate-400">Target query: "{reconTargetQuery}"</span>
               </div>
 
-              {/* Progress Bar */}
               <div className="w-full flex flex-col gap-2">
                 <div className="w-full h-3 rounded-full bg-slate-900 border border-slate-800 overflow-hidden relative">
                   <motion.div
@@ -1096,7 +1279,7 @@ export default function GodsEyeViewTab() {
         )}
       </AnimatePresence>
 
-      {/* Header Banner */}
+      {/* Full Header Banner (Normal UI Mode) */}
       {!cleanUiMode && (
         <div className="w-full glass-card p-3.5 sm:p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3 border border-slate-800/80 bg-slate-950/80 backdrop-blur-md shadow-xl relative overflow-hidden">
           <div className="aurora-glow-cyan top-0 left-0 -ml-20 -mt-20 opacity-30" />
@@ -1115,13 +1298,26 @@ export default function GodsEyeViewTab() {
                 </span>
               </div>
               <span className="text-[10px] sm:text-xs text-slate-400 font-medium tracking-wider">
-                ORBITAL SATELLITE RECON, BIOMETRIC SCANNING & TELEMETRY MESH
+                ORBITAL SATELLITE RECON, BIOMETRIC SCANNING & LIVE WEBCAM DEWARPING
               </span>
             </div>
           </div>
 
-          {/* Quick Target Recon Bar & Audio Controls */}
           <div className="flex items-center gap-2 z-10 text-xs">
+            <button
+              onClick={() => {
+                if (webcamActive) stopWebcamStream();
+                else startWebcamStream();
+              }}
+              className={`px-3 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-all ${
+                webcamActive 
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-lg shadow-emerald-500/30 animate-pulse' 
+                  : 'bg-slate-900 border-slate-800 text-cyan-400 hover:border-cyan-500'
+              }`}
+            >
+              <Camera className="w-4 h-4" /> {webcamActive ? "● WEBCAM LIVE" : "START LIVE WEBCAM"}
+            </button>
+
             <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
               <input
                 type="text"
@@ -1138,10 +1334,14 @@ export default function GodsEyeViewTab() {
               </button>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-slate-300 font-semibold">{utcTime || 'UPLINK ACTIVE'}</span>
-            </div>
+            <button
+              onClick={() => setMultiCamMode(!multiCamMode)}
+              className={`p-2 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-all ${
+                multiCamMode ? 'bg-pink-500/20 border-pink-500 text-pink-300' : 'bg-slate-900 border-slate-800 text-slate-400'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" /> 4-Cam Grid
+            </button>
 
             <button
               onClick={copyCoordinatesToClipboard}
@@ -1169,17 +1369,105 @@ export default function GodsEyeViewTab() {
         </div>
       )}
 
-      {/* Main Layout Grid */}
+      {/* Floating Clean UI Top Command Bar (Visible when Clean UI is active) */}
+      {cleanUiMode && (
+        <div className="w-full glass-card px-4 py-2.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 border border-cyan-500/40 bg-slate-950/90 backdrop-blur-xl shadow-2xl z-40">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
+              <ScanEye className="w-4 h-4 animate-pulse" />
+            </div>
+            <span className="text-xs font-black tracking-wider text-white uppercase">
+              GOD'S EYE <span className="text-cyan-400">CLEAN RECON</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+            <input
+              type="text"
+              value={reconTargetQuery}
+              onChange={e => setReconTargetQuery(e.target.value)}
+              placeholder="Search Target..."
+              className="w-28 sm:w-36 px-2 py-0.5 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none"
+            />
+            <button
+              onClick={() => startBiometricReconScan(reconTargetQuery)}
+              className="px-2 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-[10px] uppercase flex items-center gap-1"
+            >
+              <Zap className="w-3 h-3" /> Scan
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (webcamActive) stopWebcamStream();
+                else startWebcamStream();
+              }}
+              className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1 ${
+                webcamActive 
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-extrabold shadow-lg shadow-emerald-500/30 animate-pulse' 
+                  : 'bg-slate-900 border-slate-800 text-cyan-400 hover:text-white'
+              }`}
+            >
+              <Camera className="w-3 h-3" /> {webcamActive ? "● WEBCAM LIVE" : "📷 WEBCAM"}
+            </button>
+
+            <button
+              onClick={() => setShowPipFeed(!showPipFeed)}
+              className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1 ${
+                showPipFeed ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300' : 'bg-slate-900 border-slate-800 text-slate-500'
+              }`}
+            >
+              <Video className="w-3 h-3" /> PiP Cam
+            </button>
+
+            <button
+              onClick={() => setMultiCamMode(!multiCamMode)}
+              className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1 ${
+                multiCamMode ? 'bg-pink-500/20 border-pink-500 text-pink-300' : 'bg-slate-900 border-slate-800 text-slate-500'
+              }`}
+            >
+              <LayoutGrid className="w-3 h-3" /> 4-Cam Grid
+            </button>
+
+            <div className="hidden sm:flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+              {(['OPTICAL', 'FLIR', 'NVG', 'CRT_MATRIX'] as SensorMode[]).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setSensorMode(mode)}
+                  className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                    sensorMode === mode ? 'bg-cyan-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {mode === 'OPTICAL' && 'OPT'}
+                  {mode === 'FLIR' && 'FLIR'}
+                  {mode === 'NVG' && 'NVG'}
+                  {mode === 'CRT_MATRIX' && 'MATRIX'}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCleanUiMode(false)}
+              className="px-3 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-bold text-xs text-cyan-400 flex items-center gap-1 transition-all"
+            >
+              <Eye className="w-3.5 h-3.5" /> Full UI
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Grid Layout */}
       <div className={`w-full grid ${cleanUiMode ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-4'} gap-4`}>
         
-        {/* Left Side: Controls, Layers & Presets */}
+        {/* Left Side (Hidden in Clean UI Mode) */}
         {!cleanUiMode && (
           <div className="lg:col-span-1 flex flex-col gap-4">
             
-            {/* Map Imagery Style Switcher */}
+            {/* Map Style */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <Globe2 className="w-4 h-4" /> Map Imagery Style
+                <Globe2 className="w-4 h-4" /> Map Style
               </div>
               <div className="grid grid-cols-3 gap-1.5">
                 {[
@@ -1207,10 +1495,10 @@ export default function GodsEyeViewTab() {
               </div>
             </div>
 
-            {/* Sensor Filter Mode */}
+            {/* Sensor Filters */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center justify-between text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <span className="flex items-center gap-2"><Aperture className="w-4 h-4" /> Sensor Filter Mode</span>
+                <span className="flex items-center gap-2"><Aperture className="w-4 h-4" /> Sensor Mode</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {(['OPTICAL', 'FLIR', 'NVG', 'AMBER', 'CRT_MATRIX'] as SensorMode[]).map(mode => (
@@ -1236,12 +1524,11 @@ export default function GodsEyeViewTab() {
               </div>
             </div>
 
-            {/* Viewport & 3D Layer Overlays */}
+            {/* 3D Layers */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <Layers className="w-4 h-4" /> 3D Spatial Layers
+                <Layers className="w-4 h-4" /> 3D Layers
               </div>
-              
               <div className="grid grid-cols-3 gap-1.5 text-[10px]">
                 <button
                   onClick={() => setShowGridLines(!showGridLines)}
@@ -1251,7 +1538,6 @@ export default function GodsEyeViewTab() {
                 >
                   <Grid className="w-3.5 h-3.5" /> Grid Lines
                 </button>
-
                 <button
                   onClick={() => setShowTrajectories(!showTrajectories)}
                   className={`py-2 px-1 rounded-xl font-bold border transition-all flex flex-col items-center gap-1 ${
@@ -1260,45 +1546,23 @@ export default function GodsEyeViewTab() {
                 >
                   <Activity className="w-3.5 h-3.5" /> 3D Arcs
                 </button>
-
                 <button
                   onClick={() => setShowUplinks(!showUplinks)}
                   className={`py-2 px-1 rounded-xl font-bold border transition-all flex flex-col items-center gap-1 ${
                     showUplinks ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300' : 'bg-slate-900/60 border-slate-800 text-slate-500'
                   }`}
                 >
-                  <RadioTower className="w-3.5 h-3.5" /> Uplink Beams
+                  <RadioTower className="w-3.5 h-3.5" /> Uplinks
                 </button>
-              </div>
-
-              {/* Time Speed Multiplier */}
-              <div className="flex items-center justify-between gap-2 p-2 bg-slate-900 rounded-xl border border-slate-800 text-xs">
-                <span className="text-slate-400 text-[10px] uppercase font-bold flex items-center gap-1">
-                  <FastForward className="w-3 h-3 text-cyan-400" /> Orbital Speed
-                </span>
-                <div className="flex items-center gap-1">
-                  {[1, 5, 10, 50].map(speed => (
-                    <button
-                      key={speed}
-                      onClick={() => setTimeMultiplier(speed)}
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        timeMultiplier === speed ? 'bg-cyan-500 text-slate-950' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
 
             {/* Intel Stream Categories */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center justify-between text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                <span className="flex items-center gap-2"><Radio className="w-4 h-4 animate-pulse" /> Intel Categories</span>
-                <span className="text-[10px] text-slate-500 font-mono">{filteredEntitiesList.length} Active</span>
+                <span className="flex items-center gap-2"><Radio className="w-4 h-4 animate-pulse" /> Intel Feeds</span>
+                <span className="text-[10px] text-slate-500">{filteredEntitiesList.length} Active</span>
               </div>
-
               <div className="flex flex-col gap-1.5">
                 {[
                   { id: 'all', label: 'All Recon Feeds', icon: Orbit, count: entities.length, color: 'text-cyan-400' },
@@ -1318,9 +1582,7 @@ export default function GodsEyeViewTab() {
                         playBeep(750, 0.08);
                       }}
                       className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                        isSelected
-                          ? 'bg-slate-900 border border-slate-700 text-white shadow-md'
-                          : 'text-slate-400 hover:text-white border border-transparent'
+                        isSelected ? 'bg-slate-900 border border-slate-700 text-white' : 'text-slate-400 hover:text-white border border-transparent'
                       }`}
                     >
                       <div className="flex items-center gap-2">
@@ -1336,10 +1598,10 @@ export default function GodsEyeViewTab() {
               </div>
             </div>
 
-            {/* Tactical Jump Presets */}
+            {/* Presets */}
             <div className="p-4 rounded-2xl glass-card flex flex-col gap-3 border border-slate-800/80 bg-slate-950/70">
               <div className="flex items-center gap-2 text-xs font-bold text-pink-400 uppercase tracking-wider">
-                <LocateFixed className="w-4 h-4" /> Hotspot Targets
+                <LocateFixed className="w-4 h-4" /> Hotspots
               </div>
               <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto scrollbar-thin">
                 {TACTICAL_PRESETS.map((preset, idx) => (
@@ -1349,7 +1611,7 @@ export default function GodsEyeViewTab() {
                     className="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800/80 text-xs text-left transition-all text-slate-300 hover:text-cyan-400"
                   >
                     <span className="font-semibold">{preset.name}</span>
-                    <span className="text-[9px] text-slate-500 font-mono">{preset.lat.toFixed(1)}°, {preset.lng.toFixed(1)}°</span>
+                    <span className="text-[9px] text-slate-500">{preset.lat.toFixed(1)}°, {preset.lng.toFixed(1)}°</span>
                   </button>
                 ))}
               </div>
@@ -1357,20 +1619,20 @@ export default function GodsEyeViewTab() {
           </div>
         )}
 
-        {/* Center: 3D Globe Viewport & HUD Command Center */}
-        <div className={`${cleanUiMode ? 'col-span-1' : 'lg:col-span-2'} flex flex-col gap-4`}>
+        {/* Center: 3D Globe & Camera Surveillance Layer */}
+        <div className={`${cleanUiMode ? 'col-span-1' : 'lg:col-span-2'} flex flex-col gap-4 relative`}>
           
-          {/* Main 3D Canvas Box */}
-          <div className={`relative w-full ${cleanUiMode ? 'h-[85vh]' : 'h-[520px] sm:h-[620px]'} rounded-3xl glass-card border border-cyan-500/30 overflow-hidden shadow-2xl group`}>
+          {/* Main Viewport Box */}
+          <div className={`relative w-full ${cleanUiMode ? 'h-[88vh]' : 'h-[520px] sm:h-[620px]'} rounded-3xl glass-card border border-cyan-500/40 overflow-hidden shadow-2xl group`}>
             
-            {/* 3D Mount Container */}
+            {/* 3D Canvas */}
             <div
               ref={mountRef}
               onClick={handleCanvasClick}
               className={`w-full h-full cursor-grab active:cursor-grabbing transition-all duration-300 ${getSensorModeStyle()}`}
             />
 
-            {/* Floating 2D Overlay Badges */}
+            {/* 2D Badges */}
             {screenOverlays.map(tag => (
               <div
                 key={tag.id}
@@ -1396,7 +1658,7 @@ export default function GodsEyeViewTab() {
               </div>
             ))}
 
-            {/* Scope Vignette Overlay */}
+            {/* Scope Vignette */}
             {scopeEnabled && (
               <div
                 className="absolute inset-0 pointer-events-none rounded-3xl"
@@ -1406,33 +1668,161 @@ export default function GodsEyeViewTab() {
               />
             )}
 
-            {/* PiP Live Camera Recon Feed Simulator Box */}
-            {showPipFeed && (
-              <div className="absolute top-4 right-4 z-30 w-52 sm:w-64 rounded-2xl glass-card border border-cyan-500/40 bg-slate-950/90 shadow-2xl flex flex-col p-2.5 gap-2 overflow-hidden pointer-events-auto">
-                <div className="flex items-center justify-between text-[10px] font-bold text-cyan-400">
-                  <span className="flex items-center gap-1"><Video className="w-3 h-3 animate-pulse text-rose-400" /> LIVE RECON CAM</span>
-                  <div className="flex items-center gap-1">
-                    {(['OPTICAL', 'FLIR', 'NVG'] as const).map(mode => (
-                      <button
-                        key={mode}
-                        onClick={() => setPipCameraMode(mode)}
-                        className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
-                          pipCameraMode === mode ? 'bg-cyan-500 text-slate-950' : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        {mode}
-                      </button>
-                    ))}
+            {/* 4-Camera Surveillance Split Grid Overlay */}
+            {multiCamMode && (
+              <div className="absolute inset-4 z-30 pointer-events-auto bg-slate-950/95 border border-cyan-500/60 rounded-2xl p-3 grid grid-cols-2 grid-rows-2 gap-3 shadow-2xl backdrop-blur-xl">
+                <div className="w-full h-full rounded-xl bg-black border border-slate-800 relative overflow-hidden flex flex-col">
+                  <canvas ref={cam1CanvasRef} width={320} height={180} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 text-[9px] font-bold text-cyan-400 bg-slate-950/80 px-2 py-0.5 rounded border border-cyan-500/30">
+                    CAM 01: SATELLITE OPTICAL
+                  </div>
+                </div>
+                <div className="w-full h-full rounded-xl bg-black border border-slate-800 relative overflow-hidden flex flex-col">
+                  <canvas ref={cam2CanvasRef} width={320} height={180} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 text-[9px] font-bold text-rose-400 bg-slate-950/80 px-2 py-0.5 rounded border border-rose-500/30">
+                    CAM 02: DRONE FLIR THERMAL
+                  </div>
+                </div>
+                <div className="w-full h-full rounded-xl bg-black border border-slate-800 relative overflow-hidden flex flex-col">
+                  <canvas ref={cam3CanvasRef} width={320} height={180} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 text-[9px] font-bold text-emerald-400 bg-slate-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                    CAM 03: GROUND NVG RECON
+                  </div>
+                </div>
+                <div className="w-full h-full rounded-xl bg-black border border-slate-800 relative overflow-hidden flex flex-col">
+                  <canvas ref={cam4CanvasRef} width={320} height={180} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 text-[9px] font-bold text-red-400 bg-slate-950/80 px-2 py-0.5 rounded border border-red-500/30">
+                    CAM 04: INFRARED SPECTRUM
                   </div>
                 </div>
 
-                <div className="w-full h-32 rounded-xl bg-black border border-slate-800 overflow-hidden relative">
-                  <canvas ref={pipCanvasRef} width={256} height={128} className="w-full h-full object-cover" />
-                </div>
+                <button
+                  onClick={() => setMultiCamMode(false)}
+                  className="absolute top-4 right-4 z-40 p-1.5 rounded-xl bg-rose-500 text-slate-950 font-bold hover:bg-rose-400 transition-all flex items-center gap-1 text-[10px]"
+                >
+                  <X className="w-4 h-4" /> Close 4-Cam Grid
+                </button>
               </div>
             )}
 
-            {/* Tactical Crosshair Reticle Overlay */}
+            {/* PiP Camera Surveillance Feed Monitor (Always available & interactive) */}
+            {showPipFeed && !multiCamMode && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className={`absolute ${pipExpanded ? 'inset-6 sm:inset-10 z-40' : 'top-4 right-4 z-30 w-56 sm:w-72'} rounded-2xl glass-card border border-cyan-500/50 bg-slate-950/95 shadow-2xl flex flex-col p-2.5 gap-2 overflow-hidden pointer-events-auto transition-all`}
+              >
+                <div className="flex items-center justify-between text-[10px] font-bold text-cyan-400">
+                  <div className="flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 animate-pulse text-rose-400" />
+                    <span>SURVEILLANCE CAM ({pipCameraMode})</span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={captureCameraSnapshot}
+                      className="p-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-300"
+                      title="Take Surveillance Snapshot"
+                    >
+                      <Camera className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => setPipExpanded(!pipExpanded)}
+                      className="p-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-300"
+                      title={pipExpanded ? "Minimize Cam" : "Maximize Cam"}
+                    >
+                      {pipExpanded ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                    </button>
+                    <button
+                      onClick={() => setShowPipFeed(false)}
+                      className="p-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-500 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mode Selector Tabs including WEBCAM */}
+                <div className="flex items-center justify-between gap-1 p-1 bg-slate-900 rounded-lg border border-slate-800 text-[8px] font-bold overflow-x-auto scrollbar-none">
+                  {(['OPTICAL', 'FLIR', 'NVG', 'INFRARED', 'WEBCAM_GODSEYE'] as const).map(mode => (
+                    <button
+                      key={mode}
+                      onClick={() => {
+                        setPipCameraMode(mode);
+                        if (mode === 'WEBCAM_GODSEYE' && !webcamActive) {
+                          startWebcamStream();
+                        }
+                      }}
+                      className={`flex-1 py-1 px-1 rounded uppercase transition-all whitespace-nowrap ${
+                        pipCameraMode === mode ? 'bg-cyan-500 text-slate-950 shadow-sm font-extrabold' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {mode === 'WEBCAM_GODSEYE' ? '📷 WEBCAM' : mode}
+                    </button>
+                  ))}
+                </div>
+
+                {/* God's Eye Webcam Dewarping & Top-Down Dewarp Controls */}
+                {pipCameraMode === 'WEBCAM_GODSEYE' && (
+                  <div className="p-2 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex flex-col gap-1.5 text-[9px]">
+                    <div className="flex items-center justify-between font-bold text-cyan-400">
+                      <span>FISHEYE DEWARP CORRECTION</span>
+                      <span>{dewarpAmount}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={dewarpAmount}
+                      onChange={e => setDewarpAmount(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                    />
+
+                    <div className="flex items-center justify-between font-bold text-pink-400">
+                      <span>TOP-DOWN PITCH TILT</span>
+                      <span>{topDownTilt}°</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="90"
+                      value={topDownTilt}
+                      onChange={e => setTopDownTilt(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-400"
+                    />
+
+                    <div className="flex items-center justify-between pt-1">
+                      <button
+                        onClick={() => setShowRoomGrid(!showRoomGrid)}
+                        className={`px-2 py-0.5 rounded text-[8px] font-bold border transition-all ${
+                          showRoomGrid ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-500'
+                        }`}
+                      >
+                        {showRoomGrid ? "GRID: ON" : "GRID: OFF"}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (webcamActive) stopWebcamStream();
+                          else startWebcamStream();
+                        }}
+                        className={`px-2 py-0.5 rounded text-[8px] font-bold border transition-all ${
+                          webcamActive ? 'bg-rose-500/20 border-rose-500 text-rose-300' : 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                        }`}
+                      >
+                        {webcamActive ? "STOP WEBCAM" : "START WEBCAM"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className={`w-full ${pipExpanded ? 'flex-1 min-h-[300px]' : 'h-36'} rounded-xl bg-black border border-slate-800 overflow-hidden relative`}>
+                  <canvas ref={pipCanvasRef} width={320} height={180} className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+            )}
+
+            {/* Tactical Crosshair Overlay */}
             <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
               <div className="relative w-48 h-48 border border-cyan-500/30 rounded-full flex items-center justify-center animate-pulse">
                 <div className="absolute w-2 h-2 bg-cyan-400 rounded-full" />
@@ -1442,8 +1832,8 @@ export default function GodsEyeViewTab() {
               </div>
             </div>
 
-            {/* HUD Status Header Overlay */}
-            {hudLayout !== 'minimal' && (
+            {/* Tactical HUD Header Info Overlay (Minimal in Clean UI) */}
+            {hudLayout !== 'minimal' && !cleanUiMode && (
               <div className="absolute top-4 left-4 pointer-events-none flex flex-col gap-1 text-[10px] font-mono text-cyan-400 bg-slate-950/80 backdrop-blur-md p-2.5 rounded-xl border border-cyan-500/30">
                 <div className="flex items-center gap-1.5 font-bold">
                   <ShieldAlert className="w-3.5 h-3.5 text-rose-400" /> GOD'S EYE ORBITAL RECON
@@ -1453,7 +1843,7 @@ export default function GodsEyeViewTab() {
               </div>
             )}
 
-            {/* Bottom Command Bar Controls */}
+            {/* Bottom Controls Bar */}
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-auto bg-slate-950/90 backdrop-blur-md p-2.5 rounded-2xl border border-slate-800 text-xs">
               <div className="flex items-center gap-2">
                 <button
@@ -1464,15 +1854,14 @@ export default function GodsEyeViewTab() {
                     setSelectedEntity(null);
                     playBeep(600, 0.1);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 font-bold flex items-center gap-1.5 transition-all"
-                  title="Reset Camera View"
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 font-bold flex items-center gap-1.5 transition-all text-xs"
                 >
                   <RotateCcw className="w-3.5 h-3.5" /> Reset
                 </button>
 
                 <button
                   onClick={() => setCleanUiMode(!cleanUiMode)}
-                  className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1.5 transition-all ${
+                  className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1.5 transition-all text-xs ${
                     cleanUiMode 
                       ? 'bg-cyan-500 text-slate-950 border-cyan-400' 
                       : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700'
@@ -1481,14 +1870,14 @@ export default function GodsEyeViewTab() {
                   <EyeOff className="w-3.5 h-3.5" /> {cleanUiMode ? 'Exit Clean UI' : 'Clean UI'}
                 </button>
 
-                <button
-                  onClick={() => setShowPipFeed(!showPipFeed)}
-                  className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1.5 transition-all ${
-                    showPipFeed ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300' : 'bg-slate-900 border-slate-800 text-slate-500'
-                  }`}
-                >
-                  <Video className="w-3.5 h-3.5" /> PiP Cam
-                </button>
+                {!showPipFeed && (
+                  <button
+                    onClick={() => setShowPipFeed(true)}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-cyan-400 font-bold text-xs flex items-center gap-1.5"
+                  >
+                    <Video className="w-3.5 h-3.5" /> Open Cam
+                  </button>
+                )}
 
                 {isLockedOn && (
                   <button
@@ -1497,7 +1886,7 @@ export default function GodsEyeViewTab() {
                       setSelectedEntity(null);
                       playBeep(500, 0.1);
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 font-bold flex items-center gap-1.5 transition-all"
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 font-bold flex items-center gap-1.5 transition-all text-xs"
                   >
                     <Lock className="w-3.5 h-3.5 text-rose-400" /> Unlock
                   </button>
@@ -1510,7 +1899,7 @@ export default function GodsEyeViewTab() {
             </div>
           </div>
 
-          {/* Recon Telemetry Logs Stream */}
+          {/* Logs stream in normal UI mode */}
           {!cleanUiMode && (
             <div className="p-3 sm:p-4 rounded-2xl glass-card border border-slate-800/80 bg-slate-950/70 flex flex-col gap-2">
               <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
@@ -1528,7 +1917,7 @@ export default function GodsEyeViewTab() {
           )}
         </div>
 
-        {/* Right Side: Selected Target Detail & Search Target Mesh */}
+        {/* Right Side (Hidden in Clean UI Mode) */}
         {!cleanUiMode && (
           <div className="lg:col-span-1 flex flex-col gap-4">
             
@@ -1549,7 +1938,7 @@ export default function GodsEyeViewTab() {
               </div>
             </div>
 
-            {/* Selected Target Recon Inspection Card */}
+            {/* Selected Target Recon Card */}
             <AnimatePresence mode="wait">
               {selectedEntity ? (
                 <motion.div
@@ -1673,4 +2062,3 @@ export default function GodsEyeViewTab() {
     </div>
   );
 }
-
