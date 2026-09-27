@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Volume2, VolumeX, FolderGit2
+  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Volume2, VolumeX, FolderGit2, TrendingUp
 } from 'lucide-react';
 
 import HomeTab from '@/components/HomeTab';
@@ -15,9 +15,10 @@ import ThirukkuralTab from '@/components/ThirukkuralTab';
 import CalendarTab from '@/components/CalendarTab';
 import KavithaiTab from '@/components/KavithaiTab';
 import ProjectsTab from '@/components/ProjectsTab';
+import MarketTab from '@/components/MarketTab';
 import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'home' | 'projects' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
+type TabType = 'home' | 'projects' | 'market' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
 type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
@@ -56,11 +57,12 @@ export default function Page() {
 
   const menuItems = [
     { id: 'projects', label: 'Projects & Code', icon: FolderGit2, color: 'text-cyber-cyan' },
+    { id: 'market', label: 'Stock Markets', icon: TrendingUp, color: 'text-emerald-400' },
     { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-purple-400' },
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
     { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-blue-400' },
     { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-amber-400' },
-    { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-emerald-400' },
+    { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-amber-300' },
     { id: 'kavithai', label: 'Kavithai', icon: Feather, color: 'text-rose-400' },
     { id: 'home', label: 'Home Hub', icon: Home, color: 'text-zinc-400' },
   ];
@@ -130,6 +132,7 @@ export default function Page() {
           >
             {activeTab === 'home' && <HomeTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
             {activeTab === 'projects' && <ProjectsTab />}
+            {activeTab === 'market' && <MarketTab />}
             {activeTab === 'ai' && <AIAssistantTab />}
 
             {activeTab === 'arcade' && (
