@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home
+  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Volume2, VolumeX, FolderGit2
 } from 'lucide-react';
 
 import HomeTab from '@/components/HomeTab';
@@ -14,23 +14,55 @@ import IPTVTab from '@/components/IPTVTab';
 import ThirukkuralTab from '@/components/ThirukkuralTab';
 import CalendarTab from '@/components/CalendarTab';
 import KavithaiTab from '@/components/KavithaiTab';
+import ProjectsTab from '@/components/ProjectsTab';
 import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'home' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
+type TabType = 'home' | 'projects' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
 type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState<TabType>('ai');
+  const [activeTab, setActiveTab] = useState<TabType>('projects');
   const [arcadeGame, setArcadeGame] = useState<ArcadeGameType>('racer');
+  const [sfxEnabled, setSfxEnabled] = useState(true);
+
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const playClickSfx = () => {
+    if (!sfxEnabled) return;
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.05);
+    } catch (e) {}
+  };
+
+  const handleTabSelect = (tab: TabType) => {
+    playClickSfx();
+    setActiveTab(tab);
+  };
 
   const menuItems = [
-    { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-cyber-cyan' },
+    { id: 'projects', label: 'Projects & Code', icon: FolderGit2, color: 'text-cyber-cyan' },
+    { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-purple-400' },
     { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
-    { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-purple-400' },
-    { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-blue-400' },
-    { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-amber-400' },
+    { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-blue-400' },
+    { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-amber-400' },
+    { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-emerald-400' },
     { id: 'kavithai', label: 'Kavithai', icon: Feather, color: 'text-rose-400' },
-    { id: 'home', label: 'Home Hub', icon: Home, color: 'text-emerald-400' },
+    { id: 'home', label: 'Home Hub', icon: Home, color: 'text-zinc-400' },
   ];
 
   return (
@@ -39,7 +71,7 @@ export default function Page() {
       {/* Top Header Navigation Navbar (Full Screen Width) */}
       <header className="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-2xl">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('ai')}>
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => handleTabSelect('ai')}>
             <span className="text-xl">🚀</span>
             <div className="flex flex-col">
               <span className="font-extrabold text-sm md:text-base tracking-wider text-gradient">
@@ -51,27 +83,37 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Navigation Bar Buttons */}
-          <nav className="flex items-center gap-1 overflow-x-auto scrollbar-none py-1">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isSelected = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id as TabType)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                    isSelected 
-                      ? 'bg-zinc-900 text-white border border-zinc-700 shadow-lg scale-105' 
-                      : 'text-zinc-400 hover:text-white border border-transparent'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 ${item.color}`} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+          {/* Navigation Bar Buttons & Global SFX Toggle */}
+          <div className="flex items-center gap-2">
+            <nav className="flex items-center gap-1 overflow-x-auto scrollbar-none py-1">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isSelected = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabSelect(item.id as TabType)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                      isSelected 
+                        ? 'bg-zinc-900 text-white border border-zinc-700 shadow-lg scale-105' 
+                        : 'text-zinc-400 hover:text-white border border-transparent'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${item.color}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            <button
+              onClick={() => setSfxEnabled(!sfxEnabled)}
+              className="p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white transition-colors"
+              title="Toggle Navigation Sound FX"
+            >
+              {sfxEnabled ? <Volume2 className="w-4 h-4 text-cyber-cyan" /> : <VolumeX className="w-4 h-4 text-zinc-600" />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -87,6 +129,7 @@ export default function Page() {
             className="w-full flex flex-col items-center justify-center"
           >
             {activeTab === 'home' && <HomeTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
+            {activeTab === 'projects' && <ProjectsTab />}
             {activeTab === 'ai' && <AIAssistantTab />}
 
             {activeTab === 'arcade' && (

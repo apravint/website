@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, BookOpen, Quote, Sparkles, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
+import { Search, BookOpen, Quote, Sparkles, ChevronLeft, ChevronRight, Bookmark, Volume2, Copy, Check } from 'lucide-react';
 
 interface Meaning {
   ta_mu_va: string;
@@ -25,6 +25,34 @@ export default function ThirukkuralTab() {
   const [selectedSection, setSelectedSection] = useState('All');
   const [meaningAuthor, setMeaningAuthor] = useState<'ta_mu_va' | 'ta_salamon' | 'ta_kalaignar' | 'en'>('ta_mu_va');
   const [dailyKural, setDailyKural] = useState<Kural | null>(null);
+
+  // Audio & Copy states
+  const [speakingKuralNum, setSpeakingKuralNum] = useState<number | null>(null);
+  const [copiedKuralNum, setCopiedKuralNum] = useState<number | null>(null);
+
+  const speakKural = (kural: Kural) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    if (speakingKuralNum === kural.number) {
+      setSpeakingKuralNum(null);
+      return;
+    }
+    const textToSpeak = `${kural.kural[0]}. ${kural.kural[1]}`;
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'ta-IN';
+    utterance.rate = 0.85;
+    utterance.onend = () => setSpeakingKuralNum(null);
+    utterance.onerror = () => setSpeakingKuralNum(null);
+    setSpeakingKuralNum(kural.number);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const copyKural = (kural: Kural) => {
+    const textToCopy = `📖 திருக்குறள் ${kural.number} (${kural.chapter})\n${kural.kural[0]}\n${kural.kural[1]}\n\n💡 உரை: ${kural.meaning[meaningAuthor]}`;
+    navigator.clipboard.writeText(textToCopy);
+    setCopiedKuralNum(kural.number);
+    setTimeout(() => setCopiedKuralNum(null), 2000);
+  };
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -213,9 +241,34 @@ export default function ThirukkuralTab() {
                 <span className="text-xs font-extrabold text-cyber-cyan bg-cyber-cyan/10 px-2.5 py-0.5 rounded-full border border-cyber-cyan/20">
                   குறள் {k.number}
                 </span>
-                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                  {k.chapter} | {k.section}
-                </span>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => speakKural(k)}
+                    className={`p-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1 ${
+                      speakingKuralNum === k.number
+                        ? 'bg-cyber-pink text-white border-cyber-pink animate-pulse'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                    }`}
+                    title="Listen Tamil Recitation"
+                  >
+                    <Volume2 className="w-3.5 h-3.5" />
+                    <span className="text-[10px]">Listen</span>
+                  </button>
+
+                  <button
+                    onClick={() => copyKural(k)}
+                    className="p-1.5 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white text-xs font-bold transition-all flex items-center gap-1"
+                    title="Copy Kural text"
+                  >
+                    {copiedKuralNum === k.number ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span className="text-[10px]">{copiedKuralNum === k.number ? 'Copied' : 'Copy'}</span>
+                  </button>
+
+                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider ml-1">
+                    {k.chapter} | {k.section}
+                  </span>
+                </div>
               </div>
 
               <div className="font-sans font-bold text-white text-base leading-relaxed pl-2">
