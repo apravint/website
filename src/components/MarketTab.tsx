@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, TrendingDown, RefreshCw, Activity, Clock
+  TrendingUp, TrendingDown, RefreshCw, Activity, Clock, AlertCircle
 } from 'lucide-react';
 
 interface StockIndex {
@@ -37,13 +37,78 @@ interface CommodityRate {
   isUp: boolean;
 }
 
+// Calculate real-time market open/closed status based on exact international market time zones
+function calculateIsMarketOpen(symbol: string, region: 'India' | 'USA' | 'World'): boolean {
+  const now = new Date();
+
+  if (region === 'India') {
+    try {
+      // Convert to IST (Asia/Kolkata)
+      const istString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+      const istDate = new Date(istString);
+      const day = istDate.getDay(); // 0 = Sunday, 6 = Saturday
+      if (day === 0 || day === 6) return false; // Closed weekends
+      const mins = istDate.getHours() * 60 + istDate.getMinutes();
+      // 09:15 IST = 555 mins, 15:30 IST = 930 mins
+      return mins >= 555 && mins <= 930;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  if (region === 'USA') {
+    try {
+      // Convert to EST (America/New_York)
+      const estString = now.toLocaleString("en-US", { timeZone: "America/New_York" });
+      const estDate = new Date(estString);
+      const day = estDate.getDay();
+      if (day === 0 || day === 6) return false; // Closed weekends
+      const mins = estDate.getHours() * 60 + estDate.getMinutes();
+      // 09:30 EST = 570 mins, 16:00 EST = 960 mins
+      return mins >= 570 && mins <= 960;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // World (Europe & Asia)
+  try {
+    if (symbol === '^N225') { // Tokyo 09:00 - 15:00 JST
+      const t = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+      if (t.getDay() === 0 || t.getDay() === 6) return false;
+      const m = t.getHours() * 60 + t.getMinutes();
+      return m >= 540 && m <= 900;
+    }
+    if (symbol === '^HSI') { // Hong Kong 09:30 - 16:00 HKT
+      const t = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Hong_Kong" }));
+      if (t.getDay() === 0 || t.getDay() === 6) return false;
+      const m = t.getHours() * 60 + t.getMinutes();
+      return m >= 570 && m <= 960;
+    }
+    if (symbol === '^FTSE') { // London 08:00 - 16:30 GMT
+      const t = new Date(now.toLocaleString("en-US", { timeZone: "Europe/London" }));
+      if (t.getDay() === 0 || t.getDay() === 6) return false;
+      const m = t.getHours() * 60 + t.getMinutes();
+      return m >= 480 && m <= 990;
+    }
+    if (symbol === '^GDAXI') { // Frankfurt 09:00 - 17:30 CET
+      const t = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));
+      if (t.getDay() === 0 || t.getDay() === 6) return false;
+      const m = t.getHours() * 60 + t.getMinutes();
+      return m >= 540 && m <= 1050;
+    }
+  } catch (e) {}
+
+  return false;
+}
+
 export default function MarketTab() {
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [flashSymbol, setFlashSymbol] = useState<string | null>(null);
 
-  // Initial Real-World Index Baseline Data
+  // Initial Baseline Stock Indexes Data
   const [indexes, setIndexes] = useState<StockIndex[]>([
     // INDIA (NSE/BSE)
     {
@@ -57,7 +122,7 @@ export default function MarketTab() {
       changePercent: 0.59,
       high: 25240.00,
       low: 25010.20,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:15 - 15:30 IST'
     },
     {
@@ -71,7 +136,7 @@ export default function MarketTab() {
       changePercent: 0.58,
       high: 82510.00,
       low: 81890.40,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:15 - 15:30 IST'
     },
     {
@@ -85,7 +150,7 @@ export default function MarketTab() {
       changePercent: -0.21,
       high: 51680.00,
       low: 51200.00,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:15 - 15:30 IST'
     },
     {
@@ -99,7 +164,7 @@ export default function MarketTab() {
       changePercent: 1.47,
       high: 43100.00,
       low: 42350.00,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:15 - 15:30 IST'
     },
 
@@ -115,7 +180,7 @@ export default function MarketTab() {
       changePercent: 0.43,
       high: 5750.40,
       low: 5712.00,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:30 - 16:00 EST'
     },
     {
@@ -129,7 +194,7 @@ export default function MarketTab() {
       changePercent: 0.61,
       high: 18120.00,
       low: 17950.00,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:30 - 16:00 EST'
     },
     {
@@ -143,7 +208,7 @@ export default function MarketTab() {
       changePercent: -0.20,
       high: 42280.00,
       low: 41990.00,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:30 - 16:00 EST'
     },
     {
@@ -157,7 +222,7 @@ export default function MarketTab() {
       changePercent: 0.56,
       high: 2235.00,
       low: 2205.00,
-      isOpen: true,
+      isOpen: false,
       marketHours: '09:30 - 16:00 EST'
     },
 
@@ -236,27 +301,47 @@ export default function MarketTab() {
     { name: "Sugar (White refined)", price: "₹45.00", unit: "per Kg", change: "+₹1.00", isUp: true }
   ];
 
-  // Auto-Polling Real-Time Update Simulator
+  // Dynamically calculate and update market open/closed status & real-time ticks
   useEffect(() => {
-    setLastUpdated(new Date().toLocaleTimeString());
+    const updateMarketStatuses = () => {
+      setIndexes(prevIndexes =>
+        prevIndexes.map(idx => ({
+          ...idx,
+          isOpen: calculateIsMarketOpen(idx.symbol, idx.region)
+        }))
+      );
+      setLastUpdated(new Date().toLocaleTimeString());
+    };
 
+    updateMarketStatuses();
+
+    // Periodic simulation of ticks ONLY for open markets (or after-hours subtle ticks)
     const interval = setInterval(() => {
       setIndexes(prevIndexes => {
-        const randomIndex = Math.floor(Math.random() * prevIndexes.length);
-        const target = prevIndexes[randomIndex];
-        
-        // Micro fluctuation between -0.15% and +0.15%
-        const deltaPercent = (Math.random() * 0.3 - 0.15);
-        const deltaPrice = target.price * (deltaPercent / 100);
-        const newPrice = Number((target.price + deltaPrice).toFixed(2));
-        const newChange = Number((target.change + deltaPrice).toFixed(2));
-        const newChangePercent = Number((target.changePercent + deltaPercent).toFixed(2));
+        // Calculate updated market statuses
+        const updated = prevIndexes.map(idx => ({
+          ...idx,
+          isOpen: calculateIsMarketOpen(idx.symbol, idx.region)
+        }));
 
-        setFlashSymbol(target.symbol);
+        // Pick a random open (or any) index for tick update
+        const openIndexes = updated.filter(i => i.isOpen);
+        const targetList = openIndexes.length > 0 ? openIndexes : updated;
+        const randomIndex = Math.floor(Math.random() * targetList.length);
+        const targetSymbol = targetList[randomIndex].symbol;
+
+        setFlashSymbol(targetSymbol);
         setTimeout(() => setFlashSymbol(null), 1000);
 
-        return prevIndexes.map((item, idx) => {
-          if (idx === randomIndex) {
+        return updated.map(item => {
+          if (item.symbol === targetSymbol) {
+            // Micro tick fluctuation
+            const deltaPercent = (Math.random() * 0.2 - 0.1);
+            const deltaPrice = item.price * (deltaPercent / 100);
+            const newPrice = Number((item.price + deltaPrice).toFixed(2));
+            const newChange = Number((item.change + deltaPrice).toFixed(2));
+            const newChangePercent = Number((item.changePercent + deltaPercent).toFixed(2));
+
             return {
               ...item,
               price: newPrice,
@@ -278,6 +363,12 @@ export default function MarketTab() {
 
   const handleManualRefresh = () => {
     setIsRefreshing(true);
+    setIndexes(prev =>
+      prev.map(idx => ({
+        ...idx,
+        isOpen: calculateIsMarketOpen(idx.symbol, idx.region)
+      }))
+    );
     setLastUpdated(new Date().toLocaleTimeString());
     setTimeout(() => setIsRefreshing(false), 600);
   };
@@ -336,7 +427,7 @@ export default function MarketTab() {
             </h2>
           </div>
           <p className="text-xs text-zinc-400">
-            Live index trackers for India (NSE/BSE), USA (Wall Street), and Global World Markets.
+            Live time-zone synchronized index trackers for India (NSE/BSE), USA (Wall Street), and Global World Markets.
           </p>
         </div>
 
@@ -447,7 +538,7 @@ export default function MarketTab() {
               {/* Bottom Market Hours Info */}
               <div className="mt-4 pt-3 border-t border-zinc-800/40 flex items-center justify-between text-[10px] text-zinc-500 font-mono">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-zinc-500" /> Hours
+                  <Clock className="w-3 h-3 text-zinc-500" /> Trading Hours
                 </span>
                 <span>{idx.marketHours}</span>
               </div>
