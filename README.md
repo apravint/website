@@ -1,79 +1,83 @@
-# Pravin Tamilan - Personal Website
+# Pravin Tamilan - Fullscreen Local LLM, 3D Arcade & Live IPTV Portal
 
-A modern Angular 19 personal website featuring a portfolio, Tamil poetry (Kavithai) collection, client-side IPTV player, and a powerful Card Creator tool for designing social media graphics.
+A modern, high-performance Next.js web application and native Android app featuring an in-browser Local LLM AI assistant, 3D web games, client-side Live IPTV player, Tamil poetry & Thirukkural literature collection, and interactive event calendar.
 
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/apravint?style=social)](https://x.com/apravint)
-[![Build Status](https://github.com/apravint/website/actions/workflows/angular.yml/badge.svg)](https://github.com/apravint/website/actions)
+[![Deploy Status](https://github.com/apravint/website/actions/workflows/deploy.yml/badge.svg)](https://github.com/apravint/website/actions/workflows/deploy.yml)
+[![Android Build Status](https://github.com/apravint/website/actions/workflows/android.yml/badge.svg)](https://github.com/apravint/website/actions/workflows/android.yml)
 
 ---
 
 ## ✨ Key Features
 
-### 🎨 Card Creator
-A professional-grade graphic design tool for creating social media cards, poetry posts, and posters:
-- **Canvas Presets**: Optimized formats for Instagram Post/Story, WhatsApp Status, Facebook, X/Twitter, and YouTube Thumbnail.
-- **Advanced Text Editing**:
-  - 20+ Google Fonts (including premium Tamil fonts).
-  - Font size, color, alignment, styling (Bold, Italic, Underline, Strikethrough).
-  - Customizable letter spacing, line height, text opacity, and text transforms.
-  - Shadows (offset, blur, color) and text outlines/strokes.
-- **Presets & Backdrops**: 25+ pre-designed templates, 30+ gradient backgrounds, and solid color palettes.
-- **Exporting Options**: PNG, JPEG, SVG format options, customizable export multipliers (1x, 2x, 4x), WebP export, 300 DPI print marks, and size indicators.
+### 🤖 Local LLM AI Assistant (`@mlc-ai/web-llm`)
+- **Browser-Native Inferencing**: Runs AI models directly in the user's browser powered by WebGPU via `@mlc-ai/web-llm`.
+- **Zero-Server Overhead**: Completely serverless client-side AI processing with privacy-focused offline capabilities.
+- **Interactive Portal Integration**: Integrated assistant tab providing quick access, custom prompts, and natural language assistance.
 
-### 📺 client-side IPTV Player
-A completely serverless IPTV player built directly into the client:
-- **M3U Parser**: Parses local or custom playlists entirely on the client side.
-- **HLS Playback**: Integrates `Hls.js` dynamically via CDN for adaptive bitrate streaming of live channels.
-- **User Interface**: Volume, mute, fullscreen controls, search filtering, and playback state indicators.
-- **Legal Preloads**: Comes preloaded with verified public broadcasters (NASA TV, DW News, NHK World, France 24, Red Bull TV).
+### 🏎️ 3D Arcade: Cyber Racer & Neon Pong
+- **3D Cyber Racer**:
+  - Realistic supercar model rendered with Three.js (slanted hood, GT wing spoiler, carbon diffuser, alloy wheels).
+  - Telemetry HUD display, cockpit camera perspective, vehicle roll/pitch suspension physics.
+  - Synthesized V8 engine audio and dynamic viewport height scaling with `ResizeObserver`.
+- **3D Neon Pong**: Retro cyber-neon table tennis game with custom paddle controls and physics.
+- **Arcade Companion Widget**: Floating AI companion providing real-time in-game hints, commentary, and user interactions.
 
-### 📜 Tamil Poetry (Kavithai)
-- **Poem Browser**: Dynamic display of Tamil poems, backed by a robust Firestore integration.
-- **AI Poetry Assistant**: Interactive assistant to help explore poetry and generate custom compositions.
-- **Flexible Reading Toolbar**: Toggle themes (Parchment, Onyx, Serif, Sans-serif) and adjust text sizes for optimal legibility.
-- **Social Sharing**: One-click sharing of formatted verses to WhatsApp, X (Twitter), and clipboard.
+### 📺 Client-Side Live IPTV Player
+- **Multi-Language Channel Selector**: Supports streams in Tamil, English, Hindi, Telugu, Malayalam, Kannada, French, German, Japanese, and Spanish.
+- **Adaptive Bitrate HLS Playback**: Integrated `Hls.js` engine for smooth, adaptive live video streaming.
+- **Serverless Architecture**: Parses M3U playlists directly on the client side with legal preloaded channels (NASA TV, DW News, NHK World, France 24, Red Bull TV).
 
-### 📰 News Feed
-- Aggregates trending Tamil news from Google News RSS feeds.
-- Responsive bento-style card design with clean layout settings.
+### 📜 Tamil Poetry (Kavithai) & Thirukkural
+- **Kavithai Collection**: Interactive Tamil poetry reader with custom reading themes (Onyx, Parchment), font adjustments, and social sharing options.
+- **Thirukkural Explorer**: Complete 1330 Thirukkural chapter browser with Tamil & English translations (`thirukkural.json`, i18n support).
 
-### 🏆 World Cup 2026 Hub
-- A dedicated sports dashboard for the 48-team tournament hosted in North America.
-- Live standings tables for all 12 groups (A to L) showing qualified zone indicators, played matches, goal difference, and points.
-- Dynamic match schedules, scores, and venues with live status badges.
-- Real-time tournament news and updates parsed client-side using a public Google News RSS reader.
+### 📅 Calendar & News Hub
+- **Event Tracker**: Interactive calendar interface for managing events and key dates.
+- **News Aggregator**: Bento-style news feed displaying dynamic updates.
 
----
-
-### 💻 Interactive Terminal Simulator
-- A browser-based Termux emulator that lets visitors interact with your portfolio using commands.
-- Custom actions: `neofetch` (system info ASCII), `cowsay` (talking ASCII cow), `kavithai` (poem printer), and `about`/`skills`/`projects` commands.
-- Canvas-rendered `cmatrix` falling code screensaver effect (exitable on click or ESC).
-- Command history memory navigating with arrow keys.
-
-### 📚 Termux & Antigravity Guides
-- Bilingual developer tutorials (English & Tamil) detailing mobile website construction.
-- Step-by-step setup walkthrough for F-Droid Termux packages, git config, dev server running, automated testing, and code deploying with Antigravity AI.
-
----
-
-## 💅 Modern Design System
-
-The application has been upgraded with a sleek, premium, and interactive user interface:
-- **Obsidian Theme**: A deep obsidian-dark background (`#05070f`) with subtle, glowing blue accent fields.
-- **Aurora Glow Effect**: Custom CSS keyframe-animated glow spheres drifting in the background.
-- **Glassmorphic Floating Navbar**: A responsive glass pill navigation navbar with blur backdrops and active state highlights.
-- **Micro-Animations**: Hover-triggered translations, bento card elevation offsets, and interactive status markers.
+### 📱 Cross-Platform Mobile App (Android)
+- **Capacitor Integration**: Native Android wrapper configured with Capacitor (`@capacitor/android`), packaging the Next.js static bundle for Android deployment.
+- **Automated CI Build**: GitHub Actions workflow (`.github/workflows/android.yml`) builds `.aab` release bundles and `.apk` binaries automatically.
 
 ---
 
 ## 🛠️ Tech Stack & Dependencies
 
-- **Framework**: Angular 19 (Signals, Control Flow, and Standalone Components)
-- **Styling**: SCSS (utilizing CSS Custom Properties & responsive utility grids)
-- **Canvas engine**: Fabric.js 6.x (locked to maintain stable object-editor behavior)
-- **Database**: Firebase / Firestore (designed with resilient fallback logic for offline/misconfigured setups)
-- **Hosting/Deployment**: GitHub Pages (staged build output inside `docs/` directory)
+- **Framework**: Next.js 16 (App Router, React 19, TypeScript)
+- **Styling**: Tailwind CSS v4, Framer Motion animations, Lucide React icons
+- **3D Graphics & Media**: Three.js, Canvas Confetti, `Hls.js`
+- **Local AI Engine**: `@mlc-ai/web-llm`
+- **Native Runtime**: Capacitor 8 (`@capacitor/core`, `@capacitor/android`, `@capacitor/cli`)
+- **Hosting & Deployment**: GitHub Pages (served from `docs/` or via GitHub Actions deployment workflow)
+
+---
+
+## 📂 Codebase Structure
+
+```
+src/
+├── app/                      # Next.js App Router root layout & main page
+│   ├── layout.tsx            # Global metadata & body wrapper
+│   ├── page.tsx              # Main portal layout with tab navbar navigation
+│   └── globals.css           # Global Tailwind CSS styles & cyber grid themes
+└── components/               # Portal feature tab components
+    ├── AIAssistantTab.tsx    # Local WebLLM AI Assistant interface
+    ├── RacerTab.tsx          # 3D Cyber Racer supercar game (Three.js)
+    ├── CyberPongTab.tsx      # 3D Neon Pong arcade game
+    ├── ArcadeCompanionWidget.tsx # Floating game AI companion widget
+    ├── IPTVTab.tsx           # Multi-language HLS IPTV player
+    ├── ThirukkuralTab.tsx    # Thirukkural literature browser
+    ├── KavithaiTab.tsx       # Tamil poetry collection viewer
+    ├── CalendarTab.tsx       # Event calendar tab
+    ├── HomeTab.tsx           # Home hub portal overview
+    ├── NewsTab.tsx           # News aggregator feed
+    └── MarketTab.tsx         # Showcase & product view
+android/                      # Capacitor Android native project configuration
+docs/                         # GitHub Pages static export deployment output
+deploy.sh                     # Local deployment & docs/ build copy script
+capacitor.config.ts           # Capacitor mobile app configuration
+```
 
 ---
 
@@ -81,45 +85,39 @@ The application has been upgraded with a sleek, premium, and interactive user in
 
 ### Prerequisites
 - Node.js v20+ or v22+
-- Angular CLI
+- npm v10+
 
-### Installation & Run
+### Installation & Local Development
+
 ```bash
+# 1. Install dependencies
 npm install
-ng serve
+
+# 2. Run Next.js dev server
+npm run dev
 ```
-Open `http://localhost:4200/` to test changes interactively.
 
-### Firebase Setup
-If you want to configure your own poetry database:
-1. Edit `src/environments/environment.ts` and paste your Firebase Web API config.
-2. Avoid committing local credentials by running:
-   ```bash
-   git update-index --assume-unchanged src/environments/environment.ts
-   ```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Running Tests
+### Building for Production & GitHub Pages
+
 ```bash
-# Run unit specs in watch mode
-ng test
+# Compile static export to /out
+npm run build
 
-# CI Headless testing
-npm test -- --watch=false
+# Or run the local deployment script (builds Next.js and copies to /docs)
+bash deploy.sh
 ```
 
----
+### Android App Build
 
-## 📂 Codebase Structure
+```bash
+# Sync web build with Capacitor Android project
+npx cap sync android
 
-```
-src/app/
-├── card-creator/       # Graphics canvas designer (Fabric.js 6)
-├── iptv/               # Client-side IPTV & HLS player
-├── kavithai/           # Tamil poetry collection & reader options
-├── news/               # Google News RSS aggregator
-├── navbar/             # Floating pill glassmorphic navbar
-├── footer/             # Social links & contact panel
-└── shared/             # SEO metadata & share integration services
+# Build debug APK using Gradle
+cd android
+./gradlew assembleDebug
 ```
 
 ---
