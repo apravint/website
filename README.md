@@ -1,14 +1,24 @@
-# Pravin Tamilan - Fullscreen Local LLM, 3D Arcade & Live IPTV Portal
+# Pravin Tamilan - IRAM OS 26.10, Autonomous Agentic Swarms & Web Portal
 
-A modern, high-performance Next.js web application and native Android app featuring an in-browser Local LLM AI assistant, 3D web games, client-side Live IPTV player, Tamil poetry & Thirukkural literature collection, and interactive event calendar.
+A high-performance Next.js flagship web portal and Android application showcasing the **IRAM OS** autonomous agentic operating system ecosystem, **Storytold Craft Suite** (11 creative applications), **FastMCP Linux Desktop** (28 system automation tools), **OpenMontage** video pipelines, **ALPORA Dynamic Theming** (49 themes), client-side **Local LLM** AI assistant (`@mlc-ai/web-llm`), 3D arcade games, live IPTV player, and Tamil literature archives.
 
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/apravint?style=social)](https://x.com/apravint)
 [![Deploy Status](https://github.com/apravint/website/actions/workflows/deploy.yml/badge.svg)](https://github.com/apravint/website/actions/workflows/deploy.yml)
-[![Android Build Status](https://github.com/apravint/website/actions/workflows/android.yml/badge.svg)](https://github.com/apravint/website/actions/workflows/android.yml)
+[![fastmcp-linux-desktop PyPI](https://img.shields.io/pypi/v/fastmcp-linux-desktop.svg)](https://pypi.org/project/fastmcp-linux-desktop/)
+[![fastmcp-linux-desktop Glama Badge](https://glama.ai/mcp/servers/apravint/fastmcp-linux-desktop/badges/score.svg)](https://glama.ai/mcp/servers/apravint/fastmcp-linux-desktop)
+[![IRAM OS Documentation](https://img.shields.io/badge/Docs-IRAM%20OS%20v26.10-06b6d4)](https://apravint.github.io/iram-docs/)
 
 ---
 
 ## ✨ Key Features
+
+### 🌌 IRAM OS 26.10 Flagship Ecosystem Dashboard
+- **Autonomous Agentic OS Architecture**: Interactive explorer for Ubuntu 26.10 + Hyprland 0.56 + Waybar + System AI Bridge + LiteRT GPU/NPU acceleration.
+- **Storytold Craft Suite (11 Applications)**: Native Linux multi-format creative workstation suite including Storyboarder, CanvasCraft, AudioCraft, PromptCraft, FontCraft, MotionCraft, ArtCraft, ColorCraft, ModelCraft, VectorCraft, and Archify.
+- **FastMCP Linux Desktop Control**: 28 native system automation tools, dual transport (stdio + SSE/streamable HTTP on port 8000), audited and published on PyPI (`fastmcp-linux-desktop` v0.1.0) with Glama Grade-A verification.
+- **ALPORA Dynamic Theming**: Instant zero-restart CSS theme engine spanning 49 cohesive palettes (Tokyo Storm, Alpora Alpine, Cyber Neon, Rose Pine, Gruvbox, etc.) synchronizing Waybar, Hyprland, Rofi, Kitty, and web portals.
+- **OpenMontage & Video Generation Engine**: 12 modular video pipelines (`text2video`, `remotion-render`, `tts-dubbing`, `b-roll-agent`, `hyperframes`, `face-sync`, `auto-captions`, etc.) with copyable CLI execution commands.
+- **Direct Interactive Documentation Link**: One-click jump to the standalone technical docs portal at [apravint.github.io/iram-docs](https://apravint.github.io/iram-docs/).
 
 ### 🤖 Local LLM AI Assistant (`@mlc-ai/web-llm`)
 - **Browser-Native Inferencing**: Runs AI models directly in the user's browser powered by WebGPU via `@mlc-ai/web-llm`.
@@ -62,6 +72,9 @@ src/
 │   ├── page.tsx              # Main portal layout with tab navbar navigation
 │   └── globals.css           # Global Tailwind CSS styles & cyber grid themes
 └── components/               # Portal feature tab components
+    ├── IramOsTab.tsx         # IRAM OS 26.10 Flagship Ecosystem Dashboard
+    ├── HomeTab.tsx           # Home hub portal overview & quick telemetry
+    ├── ProjectsTab.tsx       # 12-project filtered portfolio matrix
     ├── AIAssistantTab.tsx    # Local WebLLM AI Assistant interface
     ├── RacerTab.tsx          # 3D Cyber Racer supercar game (Three.js)
     ├── CyberPongTab.tsx      # 3D Neon Pong arcade game
@@ -70,7 +83,6 @@ src/
     ├── ThirukkuralTab.tsx    # Thirukkural literature browser
     ├── KavithaiTab.tsx       # Tamil poetry collection viewer
     ├── CalendarTab.tsx       # Event calendar tab
-    ├── HomeTab.tsx           # Home hub portal overview
     ├── NewsTab.tsx           # News aggregator feed
     └── MarketTab.tsx         # Showcase & product view
 android/                      # Capacitor Android native project configuration

@@ -3,10 +3,11 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Volume2, VolumeX, FolderGit2, TrendingUp
+  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Volume2, VolumeX, FolderGit2, TrendingUp, Layers
 } from 'lucide-react';
 
 import HomeTab from '@/components/HomeTab';
+import IramOsTab from '@/components/IramOsTab';
 import RacerTab from '@/components/RacerTab';
 import CyberPongTab from '@/components/CyberPongTab';
 import AIAssistantTab from '@/components/AIAssistantTab';
@@ -18,11 +19,11 @@ import ProjectsTab from '@/components/ProjectsTab';
 import MarketTab from '@/components/MarketTab';
 import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
 
-type TabType = 'home' | 'projects' | 'market' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
+type TabType = 'iram-os' | 'home' | 'projects' | 'market' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
 type ArcadeGameType = 'racer' | 'pong';
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState<TabType>('projects');
+  const [activeTab, setActiveTab] = useState<TabType>('iram-os');
   const [arcadeGame, setArcadeGame] = useState<ArcadeGameType>('racer');
   const [sfxEnabled, setSfxEnabled] = useState(true);
 
@@ -56,6 +57,7 @@ export default function Page() {
   };
 
   const menuItems = [
+    { id: 'iram-os', label: '🌌 IRAM OS 26.10', icon: Layers, color: 'text-cyber-cyan' },
     { id: 'projects', label: 'Projects & Code', icon: FolderGit2, color: 'text-cyber-cyan' },
     { id: 'market', label: 'Stock Markets', icon: TrendingUp, color: 'text-emerald-400' },
     { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-purple-400' },
@@ -130,6 +132,7 @@ export default function Page() {
             transition={{ duration: 0.18 }}
             className="w-full flex flex-col items-center justify-center"
           >
+            {activeTab === 'iram-os' && <IramOsTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
             {activeTab === 'home' && <HomeTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
             {activeTab === 'projects' && <ProjectsTab />}
             {activeTab === 'market' && <MarketTab />}
