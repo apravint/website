@@ -473,6 +473,39 @@ export default function IramOsTab({ onTabChange }: IramOsTabProps) {
                 </div>
               </div>
 
+              {/* PersonaLive Spotlight Banner */}
+              <div className="p-4 rounded-xl bg-gradient-to-r from-purple-950/40 via-zinc-950/80 to-cyan-950/40 border border-purple-500/30 mb-5">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🗣️</span>
+                    <h4 className="font-bold text-white text-sm sm:text-base">
+                      PersonaLive — Real-Time Streamable Portrait Diffusion
+                    </h4>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold">
+                      CVPR 2026
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono text-zinc-400">12GB VRAM · $0.00 Cloud Cost</span>
+                </div>
+                <p className="text-xs text-zinc-300 leading-relaxed mb-3">
+                  Integrated directly into <code className="text-cyber-cyan font-mono">iram video --avatar</code> and OpenMontage <code className="text-purple-300 font-mono">avatar-spokesperson</code>. Generates infinite-length, expressive talking digital human presenters from a single portrait and driving audio/video stream.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-[11px]">
+                  <div className="p-2 rounded bg-zinc-900/80 border border-zinc-800 text-zinc-300">
+                    <span className="text-zinc-500 block text-[9px] uppercase">Standalone Avatar</span>
+                    iram video --avatar auto -o avatar.mp4
+                  </div>
+                  <div className="p-2 rounded bg-zinc-900/80 border border-zinc-800 text-zinc-300">
+                    <span className="text-zinc-500 block text-[9px] uppercase">Custom Face & Motion</span>
+                    iram video --avatar --face me.png --drive motion.mp4
+                  </div>
+                  <div className="p-2 rounded bg-zinc-900/80 border border-zinc-800 text-zinc-300">
+                    <span className="text-zinc-500 block text-[9px] uppercase">Live Streaming WebUI</span>
+                    cd ~/PersonaLive/webcam &amp;&amp; bash start.sh
+                  </div>
+                </div>
+              </div>
+
               {/* Pipeline Category Filters */}
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none my-3">
                 {[
