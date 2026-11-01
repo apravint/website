@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pravintamilan.com/sitemap.xml
+Sitemap: https://www.pravintamilan.com/sitemap.xml

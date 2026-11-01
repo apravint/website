@@ -42,9 +42,8 @@ A high-performance Next.js flagship web portal and Android application showcasin
 - **Kavithai Collection**: Interactive Tamil poetry reader with custom reading themes (Onyx, Parchment), font adjustments, and social sharing options.
 - **Thirukkural Explorer**: Complete 1330 Thirukkural chapter browser with Tamil & English translations (`thirukkural.json`, i18n support).
 
-### 📅 Calendar & News Hub
+### 📅 Calendar
 - **Event Tracker**: Interactive calendar interface for managing events and key dates.
-- **News Aggregator**: Bento-style news feed displaying dynamic updates.
 
 ### 📱 Cross-Platform Mobile App (Android)
 - **Capacitor Integration**: Native Android wrapper configured with Capacitor (`@capacitor/android`), packaging the Next.js static bundle for Android deployment.
