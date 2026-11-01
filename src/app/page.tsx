@@ -1,185 +1,108 @@
-"use client";
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { PROJECTS } from "@/data/projects";
 
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Gamepad2, Bot, Tv, BookOpen, Calendar as CalendarIcon, Feather, Home, Volume2, VolumeX, FolderGit2, TrendingUp, Layers
-} from 'lucide-react';
+const STATS = [
+  { value: "11", label: "creative apps" },
+  { value: "28", label: "desktop tools for agents" },
+  { value: "12", label: "video pipelines" },
+  { value: "49", label: "desktop themes" },
+];
 
-import HomeTab from '@/components/HomeTab';
-import IramOsTab from '@/components/IramOsTab';
-import RacerTab from '@/components/RacerTab';
-import CyberPongTab from '@/components/CyberPongTab';
-import AIAssistantTab from '@/components/AIAssistantTab';
-import IPTVTab from '@/components/IPTVTab';
-import ThirukkuralTab from '@/components/ThirukkuralTab';
-import CalendarTab from '@/components/CalendarTab';
-import KavithaiTab from '@/components/KavithaiTab';
-import ProjectsTab from '@/components/ProjectsTab';
-import MarketTab from '@/components/MarketTab';
-import ArcadeCompanionWidget from '@/components/ArcadeCompanionWidget';
+const SECTIONS = [
+  { href: "/thirukkural/", title: "Thirukkural", ta: "திருக்குறள்", desc: "All 1,330 couplets with four commentaries." },
+  { href: "/kavithai/", title: "Kavithai", ta: "கவிதை", desc: "Tamil poems to read and listen to." },
+  { href: "/calendar/", title: "Calendar", ta: "நாட்காட்டி", desc: "Tamil dates, holidays and daily timings." },
+  { href: "/markets/", title: "Markets", desc: "Which exchanges are open right now." },
+  { href: "/arcade/", title: "Arcade", desc: "3D Cyber Racer and Neon Pong." },
+  { href: "/tv/", title: "TV", desc: "Open IPTV channels in 11 languages." },
+  { href: "/ai/", title: "AI", desc: "Chat with a model that runs in your browser." },
+];
 
-type TabType = 'iram-os' | 'home' | 'projects' | 'market' | 'ai' | 'arcade' | 'iptv' | 'thirukkural' | 'calendar' | 'kavithai';
-type ArcadeGameType = 'racer' | 'pong';
-
-export default function Page() {
-  const [activeTab, setActiveTab] = useState<TabType>('iram-os');
-  const [arcadeGame, setArcadeGame] = useState<ArcadeGameType>('racer');
-  const [sfxEnabled, setSfxEnabled] = useState(true);
-
-  const audioCtxRef = useRef<AudioContext | null>(null);
-
-  const playClickSfx = () => {
-    if (!sfxEnabled) return;
-    try {
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    } catch (e) {}
-  };
-
-  const handleTabSelect = (tab: TabType) => {
-    playClickSfx();
-    setActiveTab(tab);
-  };
-
-  const menuItems = [
-    { id: 'iram-os', label: '🌌 IRAM OS 26.10', icon: Layers, color: 'text-cyber-cyan' },
-    { id: 'projects', label: 'Projects & Code', icon: FolderGit2, color: 'text-cyber-cyan' },
-    { id: 'market', label: 'Stock Markets', icon: TrendingUp, color: 'text-emerald-400' },
-    { id: 'ai', label: 'Local LLM AI', icon: Bot, color: 'text-purple-400' },
-    { id: 'arcade', label: '3D Arcade', icon: Gamepad2, color: 'text-cyber-pink' },
-    { id: 'iptv', label: 'Live IPTV', icon: Tv, color: 'text-blue-400' },
-    { id: 'thirukkural', label: 'Thirukkural', icon: BookOpen, color: 'text-amber-400' },
-    { id: 'calendar', label: 'Calendar', icon: CalendarIcon, color: 'text-amber-300' },
-    { id: 'kavithai', label: 'Kavithai', icon: Feather, color: 'text-rose-400' },
-    { id: 'home', label: 'Home Hub', icon: Home, color: 'text-zinc-400' },
-  ];
+export default function Home() {
+  const selected = ["fastmcp-linux-desktop", "video-gen", "storytold-craft-linux", "BookGeneratorAI"]
+    .map((name) => PROJECTS.find((p) => p.name === name)!);
 
   return (
-    <div className="min-h-screen bg-[#02040a] text-slate-100 flex flex-col items-center cyber-grid selection:bg-cyber-cyan selection:text-black">
-      
-      {/* Top Header Navigation Navbar (Full Screen Width) */}
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-2xl">
-        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => handleTabSelect('ai')}>
-            <span className="text-xl">🚀</span>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-sm md:text-base tracking-wider text-gradient">
-                PRAVIN TAMILAN PORTAL
-              </span>
-              <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest font-mono">
-                FULLSCREEN LOCAL LLM & IPTV PORTAL
-              </span>
-            </div>
-          </div>
-
-          {/* Navigation Bar Buttons & Global SFX Toggle */}
-          <div className="flex items-center gap-2">
-            <nav className="flex items-center gap-1 overflow-x-auto scrollbar-none py-1">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                const isSelected = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleTabSelect(item.id as TabType)}
-                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                      isSelected 
-                        ? 'bg-zinc-900 text-white border border-zinc-700 shadow-lg scale-105' 
-                        : 'text-zinc-400 hover:text-white border border-transparent'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${item.color}`} />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-
-            <button
-              onClick={() => setSfxEnabled(!sfxEnabled)}
-              className="p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white transition-colors"
-              title="Toggle Navigation Sound FX"
-            >
-              {sfxEnabled ? <Volume2 className="w-4 h-4 text-cyber-cyan" /> : <VolumeX className="w-4 h-4 text-zinc-600" />}
-            </button>
-          </div>
+    <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <section className="pt-16 sm:pt-28 pb-16 sm:pb-24">
+        <h1 className="font-display text-5xl sm:text-7xl tracking-tight leading-[1.05] max-w-4xl">
+          I build operating systems for AI agents, and archives for Tamil literature.
+        </h1>
+        <p className="mt-6 text-lg text-muted max-w-2xl leading-relaxed">
+          I&apos;m Pravin Tamilan, creator of IRAM OS. I work on Linux desktops, agent tooling and
+          local-first media software, and most of it is open source.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/iram-os/" className="btn btn-primary">
+            Explore IRAM OS <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link href="/projects/" className="btn">All projects</Link>
         </div>
-      </header>
+      </section>
 
-      {/* Main Tab Portal View - Expanded to Full Screen max-w-[1700px] */}
-      <main className="flex-1 w-full max-w-[1700px] mx-auto p-3 sm:p-6 flex flex-col items-center justify-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.18 }}
-            className="w-full flex flex-col items-center justify-center"
-          >
-            {activeTab === 'iram-os' && <IramOsTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
-            {activeTab === 'home' && <HomeTab onTabChange={(tab) => setActiveTab(tab as TabType)} />}
-            {activeTab === 'projects' && <ProjectsTab />}
-            {activeTab === 'market' && <MarketTab />}
-            {activeTab === 'ai' && <AIAssistantTab />}
-
-            {activeTab === 'arcade' && (
-              <div className="w-full flex flex-col items-center gap-4">
-                {/* Arcade Game Selector Sub-Header */}
-                <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-zinc-800 shadow-lg font-mono">
-                  <button
-                    onClick={() => setArcadeGame('racer')}
-                    className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
-                      arcadeGame === 'racer'
-                        ? 'bg-cyber-pink text-white shadow-lg shadow-cyber-pink/30 scale-105'
-                        : 'text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    🏎️ 3D CYBER RACER
-                  </button>
-                  <button
-                    onClick={() => setArcadeGame('pong')}
-                    className={`px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
-                      arcadeGame === 'pong'
-                        ? 'bg-cyber-cyan text-zinc-950 shadow-lg shadow-cyber-cyan/30 scale-105'
-                        : 'text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    🏓 3D NEON PONG
-                  </button>
-                </div>
-
-                {/* Selected Game View */}
-                {arcadeGame === 'racer' && <RacerTab />}
-                {arcadeGame === 'pong' && <CyberPongTab />}
-
-                {/* In-Game AI Companion Floating Widget */}
-                <ArcadeCompanionWidget gameName={arcadeGame === 'racer' ? '3D Cyber Racer' : '3D Neon Cyber Pong'} />
+      <section className="panel p-6 sm:p-10">
+        <div className="eyebrow">Flagship</div>
+        <div className="mt-3 grid md:grid-cols-2 gap-8 md:gap-12 items-end">
+          <div>
+            <h2 className="font-display text-3xl sm:text-4xl tracking-tight">IRAM OS 26.10</h2>
+            <p className="mt-3 text-muted leading-relaxed">
+              An agentic Linux distribution on Ubuntu 26.10, Hyprland 0.56 and PipeWire. It brings a
+              creative suite, a video engine and system tools for agents under a single{" "}
+              <code className="font-mono text-sm text-ink">iram</code> command.
+            </p>
+            <Link href="/iram-os/" className="mt-5 inline-flex items-center gap-1.5 text-sm text-accent hover:underline">
+              See what&apos;s inside <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-6">
+            {STATS.map((s) => (
+              <div key={s.label} className="border-t border-line pt-3">
+                <dd className="font-display text-4xl">{s.value}</dd>
+                <dt className="mt-1 text-sm text-muted">{s.label}</dt>
               </div>
-            )}
+            ))}
+          </dl>
+        </div>
+      </section>
 
-            {activeTab === 'iptv' && <IPTVTab />}
-            {activeTab === 'thirukkural' && <ThirukkuralTab />}
-            {activeTab === 'calendar' && <CalendarTab />}
-            {activeTab === 'kavithai' && <KavithaiTab />}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+      <section className="mt-20">
+        <div className="flex items-baseline justify-between mb-2">
+          <h2 className="font-display text-3xl tracking-tight">Selected work</h2>
+          <Link href="/projects/" className="text-sm text-muted hover:text-ink">View all</Link>
+        </div>
+        <ul>
+          {selected.map((p) => (
+            <li key={p.name} className="border-b border-line">
+              <a
+                href={p.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group grid sm:grid-cols-[1fr_1.4fr_auto] gap-x-8 gap-y-1 py-5"
+              >
+                <span className="font-medium group-hover:text-accent transition-colors">{p.title}</span>
+                <span className="text-sm text-muted leading-relaxed">{p.summary}</span>
+                <ArrowUpRight className="hidden sm:block w-4 h-4 text-muted group-hover:text-accent" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-20">
+        <h2 className="font-display text-3xl tracking-tight mb-6">Also on this site</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-line border border-line rounded-xl overflow-hidden">
+          {SECTIONS.map((s) => (
+            <Link key={s.href} href={s.href} className="bg-surface p-5 hover:bg-surface-2 transition-colors">
+              <div className="font-medium">
+                {s.title}
+                {s.ta && <span className="ml-2 font-tamil text-sm text-muted">{s.ta}</span>}
+              </div>
+              <p className="mt-1 text-sm text-muted">{s.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

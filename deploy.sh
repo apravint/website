@@ -20,6 +20,7 @@ echo "Updating deployment directory (docs/)..."
 rm -rf docs/*
 cp -r out/* docs/
 cp public/CNAME docs/CNAME 2>/dev/null || true
+touch docs/.nojekyll
 
 echo "=========================================================="
 echo "          Build Completed & Copied to docs/               "

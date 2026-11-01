@@ -1,8 +1,8 @@
 {
-  "name": "Tamil Kavithai",
-  "short_name": "TamilKavithai",
-  "theme_color": "#05070f",
-  "background_color": "#05070f",
+  "name": "Pravin Tamilan",
+  "short_name": "Pravin",
+  "theme_color": "#121110",
+  "background_color": "#121110",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
