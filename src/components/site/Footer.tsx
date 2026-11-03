@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   const links = [
     { href: "https://github.com/apravint", label: "GitHub" },
@@ -10,6 +12,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row gap-4 justify-between text-sm text-muted">
         <span>© {new Date().getFullYear()} Pravin Tamilan</span>
         <div className="flex flex-wrap gap-5">
+          <Link href="/legal/" className="hover:text-ink">Privacy &amp; terms</Link>
           {links.map((l) => (
             <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
               {l.label}
