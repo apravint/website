@@ -147,6 +147,8 @@ export default function TvView() {
       <div className="grid lg:grid-cols-[1fr_21rem] gap-4 items-start">
         <div>
           <div className="relative aspect-video rounded-xl overflow-hidden bg-black text-white">
+            {/* Live HLS streams carry no caption files to attach. */}
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
             <video ref={videoRef} className={`w-full h-full ${channel && !streamError ? "" : "invisible"}`} playsInline controls />
             {!channel && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/70 text-sm">

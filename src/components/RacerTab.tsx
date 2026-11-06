@@ -161,7 +161,7 @@ export default function RacerTab() {
   const initAudio = () => {
     if (audioCtxRef.current) return;
     try {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioCtxRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     } catch (e) {}
   };
 
@@ -877,7 +877,7 @@ export default function RacerTab() {
     if (roadLinesMeshRef.current) {
       const dummy = new THREE.Object3D();
       for (let i = 0; i < 40; i++) {
-        let z = (-i * 10) + (scoreRef.current * 0.4) % 10;
+        const z = (-i * 10) + (scoreRef.current * 0.4) % 10;
         dummy.rotation.x = -Math.PI / 2;
         dummy.position.set(0, 0.02, z);
         dummy.updateMatrix();
@@ -1105,7 +1105,7 @@ export default function RacerTab() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
                 <span className="font-extrabold uppercase tracking-widest text-emerald-300">
-                  📡 GOD'S EYE SATELLITE RADAR - LAT 35.67° N / LON 139.65° E
+                  📡 GOD&apos;S EYE SATELLITE RADAR - LAT 35.67° N / LON 139.65° E
                 </span>
               </div>
               <div className="text-right">
