@@ -39,7 +39,7 @@ export default function CyberPongTab() {
     if (!soundEnabledRef.current) return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioCtxRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       }
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
@@ -154,10 +154,10 @@ export default function CyberPongTab() {
     let ballY = height / 2;
     let ballSpeedX = 6 * (Math.random() > 0.5 ? 1 : -1);
     let ballSpeedY = (Math.random() * 4 - 2);
-    let ballRadius = 9;
+    const ballRadius = 9;
 
     // Particle Trail Pool
-    let particles: { x: number; y: number; vx: number; vy: number; color: string; life: number }[] = [];
+    const particles: { x: number; y: number; vx: number; vy: number; color: string; life: number }[] = [];
 
     // PowerUp item
     let powerUp: { x: number; y: number; type: 'speed' | 'shield' | 'bigpaddle'; duration: number } | null = null;
@@ -198,7 +198,7 @@ export default function CyberPongTab() {
       } else {
         // AI Logic based on difficulty
         const p2Center = p2Y + p2Height / 2;
-        let aiSpeed = difficulty === 'rookie' ? 3.5 : difficulty === 'pro' ? 5.5 : 7.2;
+        const aiSpeed = difficulty === 'rookie' ? 3.5 : difficulty === 'pro' ? 5.5 : 7.2;
         const aiMargin = difficulty === 'rookie' ? 25 : difficulty === 'pro' ? 12 : 5;
 
         if (ballSpeedX > 0) { // Only track when ball coming towards AI

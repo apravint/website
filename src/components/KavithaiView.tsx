@@ -116,7 +116,7 @@ export default function KavithaiView() {
         <form onSubmit={compose} className="panel p-5 mb-6 grid sm:grid-cols-[1fr_12rem_auto] gap-3 items-end">
           <label className="text-sm">
             <span className="block mb-1 text-muted">Topic</span>
-            <input className="field font-tamil" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="மழை, அம்மா, வெற்றி..." autoFocus />
+            <input className="field font-tamil" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="மழை, அம்மா, வெற்றி..." />
           </label>
           <label className="text-sm">
             <span className="block mb-1 text-muted">Category</span>
