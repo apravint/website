@@ -1097,7 +1097,7 @@ export default function RacerTab() {
       <div className="relative w-full min-h-[480px] md:min-h-[660px] border-2 border-cyber-cyan/40 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,240,255,0.15)] bg-black font-sans">
         <div ref={containerRef} className="w-full h-full min-h-[480px] md:min-h-[660px] flex items-center justify-center overflow-hidden block" />
 
-        {/* God's Eye View Tactical Satellite Overlay */}
+        {/* Tactical Satellite Overlay */}
         {cameraView === 'topdown' && gameState === 'playing' && (
           <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4 font-mono select-none">
             {/* Top Satellite Telemetry Bar */}
@@ -1105,7 +1105,7 @@ export default function RacerTab() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
                 <span className="font-extrabold uppercase tracking-widest text-emerald-300">
-                  📡 GOD&apos;S EYE SATELLITE RADAR - LAT 35.67° N / LON 139.65° E
+                  📡 SATELLITE RADAR - LAT 35.67° N / LON 139.65° E
                 </span>
               </div>
               <div className="text-right">
@@ -1314,7 +1314,7 @@ export default function RacerTab() {
               ? 'bg-emerald-500/30 border-emerald-400 text-emerald-300 font-black animate-pulse'
               : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
           }`}
-          title="Toggle Camera View (Chase / Hood / Cockpit / God's Eye Topdown)"
+          title="Toggle Camera View (Chase / Hood / Cockpit / Satellite Topdown)"
         >
           {cameraView === 'topdown' ? '📡 RADAR' : '🎥 CAM'}
         </button>
