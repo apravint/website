@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { PROJECTS } from "@/data/projects";
 import { COMMANDS, CRAFT_APPS, SUBSYSTEMS } from "@/data/iram";
 import { NAV } from "@/components/site/Header";
+import { APP_GROUPS, APPS, playUrl } from "@/data/apps";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const CATEGORIES = ["IRAM OS", "AI & agents", "Linux", "Web & apps", "Finance"];
 
@@ -45,5 +48,26 @@ describe("NAV", () => {
     const hrefs = NAV.map((n) => n.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
     for (const h of hrefs) expect(h).toMatch(/^\/[a-z-]+\/$/);
+  });
+});
+
+describe("APPS", () => {
+  it("lists the 13 live Play apps with unique package names", () => {
+    expect(APPS).toHaveLength(13);
+    const ids = APPS.map((a) => a.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it.each(APPS.map((a) => [a.name, a] as const))("%s is complete and has its icon", (_name, a) => {
+    expect(a.id).toMatch(/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$/);
+    expect(APP_GROUPS.map((g) => g.id)).toContain(a.group);
+    expect(a.summary.trim()).not.toBe("");
+    expect(a.summary.length).toBeLessThanOrEqual(90);
+    expect(a.icon).toMatch(/^\/apps\/[a-z-]+\.png$/);
+    expect(existsSync(join(__dirname, "..", "public", a.icon))).toBe(true);
+  });
+
+  it("builds Google Play store links", () => {
+    expect(playUrl("io.tamilkavithai.gita")).toBe("https://play.google.com/store/apps/details?id=io.tamilkavithai.gita");
   });
 });

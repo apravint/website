@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { PROJECTS } from "@/data/projects";
+import { APPS } from "@/data/apps";
 
 const STATS = [
   { value: "11", label: "creative apps" },
@@ -10,6 +11,7 @@ const STATS = [
 ];
 
 const SECTIONS = [
+  { href: "/apps/", title: "Apps", desc: `${APPS.length} Android apps on Google Play.` },
   { href: "/thirukkural/", title: "Thirukkural", ta: "திருக்குறள்", desc: "All 1,330 couplets with four commentaries." },
   { href: "/kavithai/", title: "Kavithai", ta: "கவிதை", desc: "Tamil poems to read and listen to." },
   { href: "/calendar/", title: "Calendar", ta: "நாட்காட்டி", desc: "Tamil dates, holidays and daily timings." },
@@ -38,6 +40,7 @@ export default function Home() {
             Explore IRAM OS <ArrowRight className="w-4 h-4" />
           </Link>
           <Link href="/projects/" className="btn">All projects</Link>
+          <Link href="/apps/" className="btn">Android apps</Link>
         </div>
       </section>
 

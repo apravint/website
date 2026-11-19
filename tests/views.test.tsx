@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import ProjectsView from "@/components/ProjectsView";
 import LegalView from "@/components/LegalView";
+import AppsView from "@/components/AppsView";
+import { APP_GROUPS, APPS } from "@/data/apps";
 import { PROJECTS } from "@/data/projects";
 
 describe("ProjectsView", () => {
@@ -64,10 +66,10 @@ describe("LegalView", () => {
 
   it("shows the privacy policy first and switches to the terms", async () => {
     render(<LegalView />);
-    expect(screen.getByRole("heading", { level: 2, name: "Information Collection and Use" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Ads" })).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Terms & Conditions" }));
-    expect(screen.queryByRole("heading", { name: "Information Collection and Use" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Ads" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "2. How You Can Use the App" })).toBeInTheDocument();
     expect(window.location.search).toBe("?tab=terms");
   });
@@ -82,6 +84,36 @@ describe("LegalView", () => {
 
   it("has no axe violations", async () => {
     const { container } = render(<LegalView />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("AppsView", () => {
+  it("lists every app under its group", () => {
+    render(<AppsView />);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual(APP_GROUPS.map((g) => g.id));
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(APPS.length);
+  });
+
+  it("links each app to its Google Play page in a new tab", () => {
+    render(<AppsView />);
+    for (const app of APPS) {
+      const link = screen.getByRole("link", { name: `Get it on Google Play: ${app.name}` });
+      expect(link).toHaveAttribute("href", `https://play.google.com/store/apps/details?id=${app.id}`);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    }
+  });
+
+  it("links each group to its privacy policy", () => {
+    render(<AppsView />);
+    for (const g of APP_GROUPS) {
+      expect(screen.getByRole("link", { name: `Privacy policy for the ${g.id} apps` })).toHaveAttribute("href", g.privacy.replace(/\/(\?|$)/, "$1"));
+    }
+  });
+
+  it("has no axe violations", async () => {
+    const { container } = render(<AppsView />);
     expect(await axe(container)).toHaveNoViolations();
   });
 });

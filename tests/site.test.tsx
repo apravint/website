@@ -78,7 +78,7 @@ describe("Home page", () => {
   it("has a single h1 and links to each section", async () => {
     const { container } = render(<Home />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    for (const href of ["/thirukkural/", "/kavithai/", "/calendar/", "/markets/", "/arcade/", "/tv/", "/ai/"]) {
+    for (const href of ["/apps/", "/thirukkural/", "/kavithai/", "/calendar/", "/markets/", "/arcade/", "/tv/", "/ai/"]) {
       expect(container.querySelector(`a[href="${href}"], a[href="${href.slice(0, -1)}"]`)).not.toBeNull();
     }
     expect(await axe(container)).toHaveNoViolations();
