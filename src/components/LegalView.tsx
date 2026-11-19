@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Chips, Page } from "@/components/site/ui";
 
 type Tab = "privacy" | "terms";
@@ -13,31 +14,124 @@ const TABS = [
 const EMAIL = "apravint@gmail.com";
 const Mail = () => <a href={`mailto:${EMAIL}`} className="text-accent hover:underline">{EMAIL}</a>;
 
+const A = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <a href={href} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>
+);
+
+/** Linked from the ten Tamil apps' Play listings (built from the tamilkavithai codebase). Static so store reviewers can read it. */
 function Privacy() {
   return (
     <>
-      <p className="eyebrow">Last updated: October 7, 2025</p>
-      <p>Pravin Tamilan built the Pravin Tamilan app as an ad-supported and free service. This SERVICE is provided by Pravin Tamilan at no cost and is intended for use as is.</p>
-      <p>This page describes our policies with respect to the collection, use, and disclosure of Personal Information when you use our Service.</p>
-      <p>If you choose to use our Service, you agree to the collection and use of information as outlined in this Policy. The Personal Information we collect is used to operate and improve the Service; we will not share it except as described below.</p>
-      <h2>Information Collection and Use</h2>
-      <p>For a better experience while using our Service, we may ask you to provide certain personally identifiable information. The information we collect may be retained on your device or stored by us and used as described in this Policy.</p>
-      <h2>Log Data</h2>
-      <p>When you use our Service, in case of an error we may collect data and information (through third-party products) on your device called Log Data. This may include your device&apos;s IP address, device name, operating system version, app configuration at time of use, the time and date of your use, and other diagnostics.</p>
-      <h2>Cookies</h2>
-      <p>Cookies are small files used by websites and services to store a small amount of data on your device. While this Service does not use cookies directly, third-party services we use may use cookies for analytics and performance. You may control or refuse cookies using your browser settings; doing so may affect some features of the Service.</p>
-      <h2>Service Providers</h2>
-      <p>We may employ third-party companies and individuals to facilitate our Service, provide it on our behalf, perform Service-related tasks, or assist in analyzing how the Service is used. These providers may have access to your Personal Information only to perform tasks on our behalf and are obligated not to disclose or use it for other purposes.</p>
+      <p className="eyebrow">Last updated: November 19, 2026</p>
+      <p>
+        This policy covers the free Android apps Pravin Tamilan publishes on Google Play from the Tamil Kavithai
+        codebase: Tamil Kavithai, Thirukkural Daily, Status Maker, Bhakti Daily, Bharathiyar Kavithaigal, Health A–Z,
+        Tamil Panchangam, Bhagavad Gita Tamil, Tamil Bible and Quran in Tamil.
+        The Desk Clock, Desk Focus and Desk Intervals apps have{" "}
+        <Link href="/desk-clock/privacy/" className="text-accent hover:underline">their own privacy policy</Link>.
+        All the apps are listed on the <Link href="/apps/" className="text-accent hover:underline">Apps page</Link>.
+      </p>
+      <p>
+        The apps have no accounts and no sign-in. We do not ask for your name, email, contacts, location or files,
+        and we do not sell your data.
+      </p>
+
+      <h2>What stays on your phone</h2>
+      <p>
+        Your settings, favourites, bookmarks, reading progress, reminder times, chosen city and the cards and videos
+        you make are stored only on your phone. They are not sent to us. Uninstalling the app deletes them.
+      </p>
+
+      <h2>Ads</h2>
+      <p>
+        The apps show ads from Google AdMob. AdMob may collect and use your device&apos;s advertising ID, IP address
+        and information about how ads are shown and tapped, to serve and measure ads. In the European Economic Area,
+        the UK and Switzerland the app asks for your consent first, and you can change your choice later under
+        &quot;Ad privacy choices&quot; in the app&apos;s settings. You can reset or delete your advertising ID in your
+        phone&apos;s settings. See{" "}
+        <A href="https://policies.google.com/technologies/partner-sites">how Google uses information from apps that use its services</A>.
+      </p>
+
+      <h2>Usage statistics and crash reports</h2>
+      <p>
+        The apps use Google Firebase Analytics to count which screens and features are used, Firebase Crashlytics
+        to receive a report when the app crashes, and Firebase Remote Config to switch features on or off without an
+        update. These services receive an app-instance identifier, your device model, Android version, country and
+        language, and for crashes the technical details of the error. They are not linked to your name or email. See{" "}
+        <A href="https://firebase.google.com/support/privacy">Firebase&apos;s privacy information</A>.
+      </p>
+
+      <h2>Features that send text over the internet</h2>
+      <ul>
+        <li>
+          <strong>Translation.</strong> When you ask for a translation, the text you translate is sent to Google
+          Translate.
+        </li>
+        <li>
+          <strong>AI explanations (optional).</strong> If you connect an AI service with your own API key, the key is
+          kept in your phone&apos;s encrypted storage and the poem or verse you ask about is sent to that service
+          (for example OpenAI, Anthropic, Google Gemini, Groq or OpenRouter) under its own privacy policy. Nothing is
+          sent unless you set this up.
+        </li>
+        <li>
+          <strong>Online content.</strong> Some apps download poems, verses or health articles when you open
+          them. These requests carry your IP address, as any download does.
+        </li>
+      </ul>
+
+      <h2>Permissions</h2>
+      <ul>
+        <li>
+          <strong>Microphone</strong>, only if you use voice search. Your phone&apos;s speech recognition turns the
+          words into text; the apps do not record or keep audio.
+        </li>
+        <li>
+          <strong>Photos</strong>, only when you pick a picture for a card. The picture stays on your phone.
+        </li>
+        <li>
+          <strong>Notifications</strong>, for the daily reminder you can turn off at any time, and{" "}
+          <strong>run at start-up</strong> so reminders survive a restart.
+        </li>
+      </ul>
+
+      <h2>Health information</h2>
+      <p>
+        Health A–Z gives general reference information from MedlinePlus. It is not medical advice and does not
+        collect any health information about you.
+      </p>
+
+      <h2>Deleting your data</h2>
+      <p>
+        Uninstalling an app removes everything it stored on your phone. Analytics data is kept by Firebase for a limited time
+        and is not tied to your identity; to ask us to delete the analytics data for your app instance,
+        email us. Ad data is handled by Google under its own policy.
+      </p>
+
+      <h2>Children</h2>
+      <p>
+        The apps are not directed at children under 13, and we do not knowingly collect information from children.
+        If you believe a child has sent us information, contact us and we will delete it.
+      </p>
+
       <h2>Security</h2>
-      <p>We use commercially reasonable measures to protect your Personal Information; however, no method of transmission or storage is 100% secure and we cannot guarantee absolute security.</p>
-      <h2>Links to Other Sites</h2>
-      <p>This Service may contain links to other sites. We are not responsible for the content or privacy practices of those sites; please review their privacy policies separately.</p>
-      <h2>Children&apos;s Privacy</h2>
-      <p>This Service does not address anyone under the age of 13. We do not knowingly collect information from children under 13; if we discover such collection, we will delete it. If you believe we have collected information from a child, please contact us.</p>
-      <h2>Changes to This Privacy Policy</h2>
-      <p>We may update our Privacy Policy from time to time. Changes are effective when posted on this page; please check back periodically.</p>
+      <p>
+        No method of transmission or storage is perfectly secure, so we keep what leaves your phone to the minimum
+        described here.
+      </p>
+
+      <h2>This website</h2>
+      <p>
+        pravintamilan.com sets no cookies and has no ads or tracking. Your colour theme choice is saved in your
+        browser. The AI chat page runs the model in your browser or on a server you choose, so your messages never
+        reach us, and some pages load public data such as GitHub projects or TV channel lists straight from those
+        services.
+      </p>
+
+      <h2>Changes</h2>
+      <p>If this policy changes, the new version will be posted on this page with a new date.</p>
+
       <h2>Contact Us</h2>
-      <p>If you have questions or suggestions about this Privacy Policy, please contact us at <Mail />.</p>
+      <p>Questions about this policy or your data: <Mail />.</p>
     </>
   );
 }
@@ -121,7 +215,7 @@ export default function LegalView({ initialTab = "privacy" }: { initialTab?: Tab
     <Page>
       <div className="mx-auto max-w-2xl">
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight">Legal</h1>
-        <p className="mt-3 text-muted">Privacy policy and terms for the Pravin Tamilan app and website.</p>
+        <p className="mt-3 text-muted">Privacy policy and terms for the Pravin Tamilan Android apps and website.</p>
         <div className="mt-8">
           <Chips label="Choose a document" options={TABS} value={tab} onChange={select} />
         </div>

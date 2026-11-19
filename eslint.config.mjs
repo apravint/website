@@ -28,6 +28,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated or non-web output.
     "docs/**",
+    "dist/**",
     "android/**",
     "public/**",
     "coverage/**",

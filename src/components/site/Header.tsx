@@ -8,6 +8,7 @@ import { Menu, Moon, Sun, X } from "lucide-react";
 export const NAV = [
   { href: "/iram-os/", label: "IRAM OS" },
   { href: "/projects/", label: "Projects" },
+  { href: "/apps/", label: "Apps" },
   { href: "/thirukkural/", label: "Thirukkural" },
   { href: "/kavithai/", label: "Kavithai" },
   { href: "/calendar/", label: "Calendar" },
