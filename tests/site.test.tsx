@@ -10,6 +10,7 @@ import Header, { NAV } from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import NotFound from "@/app/not-found";
 import Home from "@/app/page";
+import LauncherPrivacy from "@/app/launcher/privacy/page";
 
 describe("Header", () => {
   it("links to every section in the main navigation", () => {
@@ -81,6 +82,19 @@ describe("Home page", () => {
     for (const href of ["/apps/", "/thirukkural/", "/kavithai/", "/calendar/", "/markets/", "/arcade/", "/tv/", "/ai/"]) {
       expect(container.querySelector(`a[href="${href}"], a[href="${href.slice(0, -1)}"]`)).not.toBeNull();
     }
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("IRAM Launcher privacy policy", () => {
+  it("names the app, discloses AdMob and Play Billing, and offers a contact", async () => {
+    const { container } = render(<LauncherPrivacy />);
+    expect(screen.getByRole("heading", { level: 1, name: "IRAM Launcher — Privacy Policy" })).toBeInTheDocument();
+    expect(screen.getByText(/com\.apravint\.iramlauncher/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Ads" })).toBeInTheDocument();
+    expect(container).toHaveTextContent(/Google AdMob/);
+    expect(container).toHaveTextContent(/Pro is bought through Google Play/);
+    expect(screen.getByRole("link", { name: "apravint@gmail.com" })).toHaveAttribute("href", "mailto:apravint@gmail.com");
     expect(await axe(container)).toHaveNoViolations();
   });
 });
