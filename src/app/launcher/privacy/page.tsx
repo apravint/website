@@ -17,7 +17,7 @@ export default function LauncherPrivacy() {
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight">IRAM Launcher — Privacy Policy</h1>
         <p className="mt-3 text-muted">For IRAM Launcher (com.apravint.iramlauncher), an Android home screen app by Pravin Tamilan.</p>
         <article className="mt-8 space-y-4 leading-relaxed [&_h2]:mt-8 [&_h2]:font-display [&_h2]:text-2xl [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1">
-          <p className="eyebrow">Last updated: November 20, 2026</p>
+          <p className="eyebrow">Last updated: November 22, 2026</p>
           <p>
             IRAM Launcher is a free home screen app with an optional one-time Pro purchase. It has no accounts and no
             sign-in, and it does not collect your name, email, contacts, location, photos or files.
@@ -32,8 +32,27 @@ export default function LauncherPrivacy() {
 
           <h2>What stays on your phone</h2>
           <p>
-            Your pinned apps, recently opened apps, chosen style and theme, and any theme trial are stored only on
-            your phone. They are never sent to us. Uninstalling the app deletes them.
+            Your pinned apps, recently opened apps, chosen style, theme and icon pack, your home screen widgets, and
+            any theme trial are stored only on your phone. They are never sent to us. Uninstalling the app deletes
+            them.
+          </p>
+
+          <h2>Widgets and icon packs</h2>
+          <p>
+            Home screen widgets you add are shown by the launcher but run by the app that made them, under that
+            app&apos;s own privacy policy. When you add a widget, Android may ask you to allow the launcher to show
+            it. If you choose an icon pack, the launcher reads that pack&apos;s icons on your phone; nothing is sent
+            anywhere.
+          </p>
+
+          <h2>Accessibility service (double-tap to lock)</h2>
+          <p>
+            IRAM Launcher has an optional &quot;Double-tap to lock&quot; setting, off by default. Android only lets a
+            home screen app lock the phone through an accessibility service, so if you turn this on, the app asks
+            you to enable &quot;IRAM Launcher: double-tap to lock&quot; in your phone&apos;s accessibility settings.
+            The service is used only to lock your screen when you double-tap an empty part of the home screen. It
+            does not receive accessibility events, cannot read what is on your screen, and does not collect, store or
+            share any information. You can turn it off at any time in your phone&apos;s accessibility settings.
           </p>
 
           <h2>Ads</h2>
