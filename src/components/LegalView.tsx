@@ -28,7 +28,9 @@ function Privacy() {
         codebase: Tamil Kavithai, Thirukkural Daily, Status Maker, Bhakti Daily, Bharathiyar Kavithaigal, Health A–Z,
         Tamil Panchangam, Bhagavad Gita Tamil, Tamil Bible and Quran in Tamil.
         The Desk Clock, Desk Focus and Desk Intervals apps have{" "}
-        <Link href="/desk-clock/privacy/" className="text-accent hover:underline">their own privacy policy</Link>.
+        <Link href="/desk-clock/privacy/" className="text-accent hover:underline">their own privacy policy</Link>, and so
+        do the{" "}
+        <Link href="/city-guides/privacy/" className="text-accent hover:underline">City Guides travel apps</Link>.
         All the apps are listed on the <Link href="/apps/" className="text-accent hover:underline">Apps page</Link>.
       </p>
       <p>

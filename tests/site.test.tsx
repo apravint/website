@@ -11,6 +11,7 @@ import Footer from "@/components/site/Footer";
 import NotFound from "@/app/not-found";
 import Home from "@/app/page";
 import LauncherPrivacy from "@/app/launcher/privacy/page";
+import CityGuidesPrivacy from "@/app/city-guides/privacy/page";
 
 describe("Header", () => {
   it("links to every section in the main navigation", () => {
@@ -94,6 +95,23 @@ describe("IRAM Launcher privacy policy", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Ads" })).toBeInTheDocument();
     expect(container).toHaveTextContent(/Google AdMob/);
     expect(container).toHaveTextContent(/Pro is bought through Google Play/);
+    expect(screen.getByRole("link", { name: "apravint@gmail.com" })).toHaveAttribute("href", "mailto:apravint@gmail.com");
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("City Guides privacy policy", () => {
+  it("names the Dubai app, discloses location, fetched data, AdMob and a contact", async () => {
+    const { container } = render(<CityGuidesPrivacy />);
+    expect(screen.getByRole("heading", { level: 1, name: "City Guides apps — Privacy Policy" })).toBeInTheDocument();
+    expect(screen.getByText(/com\.apravint\.cityguide\.dubai/)).toBeInTheDocument();
+    expect(container).toHaveTextContent(/only on your phone/);
+    expect(container).toHaveTextContent(/Open-Meteo/);
+    expect(container).toHaveTextContent(/European Central Bank/);
+    expect(container).toHaveTextContent(/Google Translate/);
+    expect(container).toHaveTextContent(/Google ML Kit/);
+    expect(screen.getByRole("heading", { level: 2, name: "Ads" })).toBeInTheDocument();
+    expect(container).toHaveTextContent(/Google AdMob/);
     expect(screen.getByRole("link", { name: "apravint@gmail.com" })).toHaveAttribute("href", "mailto:apravint@gmail.com");
     expect(await axe(container)).toHaveNoViolations();
   });
