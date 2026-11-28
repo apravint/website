@@ -12,6 +12,7 @@ import NotFound from "@/app/not-found";
 import Home from "@/app/page";
 import LauncherPrivacy from "@/app/launcher/privacy/page";
 import CityGuidesPrivacy from "@/app/city-guides/privacy/page";
+import QrPrivacy from "@/app/tools/qr/privacy/page";
 
 describe("Header", () => {
   it("links to every section in the main navigation", () => {
@@ -111,6 +112,21 @@ describe("City Guides privacy policy", () => {
     expect(container).toHaveTextContent(/Google Translate/);
     expect(container).toHaveTextContent(/Google ML Kit/);
     expect(screen.getByRole("heading", { level: 2, name: "Ads" })).toBeInTheDocument();
+    expect(container).toHaveTextContent(/Google AdMob/);
+    expect(screen.getByRole("link", { name: "apravint@gmail.com" })).toHaveAttribute("href", "mailto:apravint@gmail.com");
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("QR Scanner & Maker privacy page", () => {
+  it("states what stays on the phone, the camera use and the ads", async () => {
+    const { container } = render(<QrPrivacy />);
+    expect(screen.getByRole("heading", { level: 1, name: "QR Scanner & Maker — Privacy Policy" })).toBeInTheDocument();
+    expect(screen.getByText(/com\.apravint\.tools\.qr/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "The camera" })).toBeInTheDocument();
+    expect(container).toHaveTextContent(/never sent to us or to anyone else/);
+    expect(container).toHaveTextContent(/not backed up/);
+    expect(container).toHaveTextContent(/Ad privacy choices/);
     expect(container).toHaveTextContent(/Google AdMob/);
     expect(screen.getByRole("link", { name: "apravint@gmail.com" })).toHaveAttribute("href", "mailto:apravint@gmail.com");
     expect(await axe(container)).toHaveNoViolations();
